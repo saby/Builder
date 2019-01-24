@@ -70,8 +70,12 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
              * читать файлы, которых не существует
              */
             if (!taskParameters.config.sources) {
+               const projectName = taskParameters.config.rawConfig.cld_name;
                cdnModulesPaths = cdnModulesPaths.filter(
-                  prettyPath => !helpers.needToRemoveModuleForDesktop(prettyPath)
+                  prettyPath => !helpers.needToRemoveModuleForDesktop(
+                     prettyPath,
+                     projectName === 'retail-offline' || projectName === 'presto-offline'
+                  )
                );
             }
 
