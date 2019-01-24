@@ -71,7 +71,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
              */
             if (!taskParameters.config.sources) {
                const projectName = taskParameters.config.rawConfig.cld_name;
-               versionedModulesPaths = versionedModulesPaths.filter(
+               cdnModulesPaths = cdnModulesPaths.filter(
                   prettyPath => !helpers.needToRemoveModuleForDesktop(
                      prettyPath,
                      projectName === 'retail-offline' || projectName === 'presto-offline'
