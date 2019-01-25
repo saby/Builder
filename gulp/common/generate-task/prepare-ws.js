@@ -22,20 +22,6 @@ const {
    generateTaskForTerminatePool
 } = require('../helpers');
 
-const wsModulesNames = [
-   'ws',
-   'WS.Core',
-   'View',
-   'Vdom',
-   'Controls',
-   'Router',
-   'Inferno',
-   'WS.Data',
-   'Types',
-   'Env',
-   'Browser'
-];
-
 /**
  * Генерация задачи инкрементальной сборки модулей.
  * @param {TaskParameters} taskParameters параметры задачи
@@ -55,7 +41,6 @@ function generateTaskForPrepareWS(taskParameters) {
          done();
       };
    }
-   const modulesFromWS = taskParameters.config.modules.filter(moduleInfo => wsModulesNames.includes(moduleInfo.name));
 
    const pool = workerPool.pool(path.join(__dirname, '../worker-compile-es-and-ts.js'), {
 
@@ -71,10 +56,12 @@ function generateTaskForPrepareWS(taskParameters) {
 
    const localTaskParameters = new TaskParameters(taskParameters.config, taskParameters.cache, false, pool);
    const seriesTask = [generateTaskForRemoveOldFiles(taskParameters)];
-   if (modulesFromWS.length) {
+   const requiredModules = taskParameters.config.modules.filter(moduleInfo => moduleInfo.required);
+   if (requiredModules.length) {
       seriesTask.push(
          gulp.parallel(
-            modulesFromWS.map(moduleInfo => generateTaskForPrepareWSModule(localTaskParameters, moduleInfo))
+            requiredModules
+               .map(moduleInfo => generateTaskForPrepareWSModule(localTaskParameters, moduleInfo))
          )
       );
    }

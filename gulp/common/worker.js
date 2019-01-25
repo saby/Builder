@@ -50,9 +50,11 @@ try {
    });
 
    if (needInitWs) {
+      const requiredModules = JSON.parse(process.env['required-modules']);
+
       // ws должен быть вызван раньше чем первый global.requirejs
       const nodeWS = require('./node-ws');
-      nodeWS.init();
+      nodeWS.init(requiredModules);
    }
 
    /**
