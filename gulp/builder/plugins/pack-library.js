@@ -41,12 +41,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
       /* @this Stream */
       function onTransform(file, encoding, callback) {
-         const prettyPath = helpers.unixifyPath(file.path);
          if (
             file.extname === '.js' &&
             esExt.test(file.history[0]) &&
-            !libPackHelpers.isPrivate(path.relative(moduleInfo.output, file.path)) &&
-            !prettyPath.endsWith('Socnet/Group/settings.js')
+            !libPackHelpers.isPrivate(path.relative(moduleInfo.output, file.path))
          ) {
             libraries.push(file);
             callback();
