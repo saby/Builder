@@ -58,10 +58,7 @@ module.exports = function declarePlugin(taskParameters) {
          const modules = taskParameters.config.modules.map(moduleInfo => moduleInfo.name);
          const projectName = taskParameters.config.rawConfig.cld_name;
          if (!modules.includes('Genie') &&
-            helpers.needToRemoveModuleForDesktop(
-               prettyPath,
-               projectName === 'retail-offline' || projectName === 'presto-offline'
-            )
+            helpers.needToRemoveModuleForDesktop(prettyPath, projectName)
          ) {
             callback(null);
             return;
