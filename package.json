@@ -1,6 +1,6 @@
 {
    "name": "sbis3-builder",
-   "version": "19.100.0-BUILD",
+   "version": "19.110.0-BUILD",
    "private": true,
    "description": "Gulp-based builder for SBIS3 web projects",
    "files": [
@@ -48,7 +48,7 @@
       "tensor-xmldom": "0.2.0-b9",
       "through2": "2.0.3",
       "typescript": "^3.0.3",
-      "saby-typescript": "git+https://github.com/saby/TypeScript.git#rc-19.100",
+      "saby-typescript": "git+https://github.com/saby/TypeScript.git#rc-19.110",
       "uglify-js": "3.3.23",
       "vinyl": "2.2.0",
       "workerpool": "2.3.0"
@@ -64,12 +64,12 @@
       "eslint-plugin-promise": "3.8.0",
       "mocha": "5.2.0",
       "nyc": "12.0.2",
-      "sbis3-controls": "git+ssh://git@git.sbis.ru:sbis/controls.git#rc-19.100",
-      "sbis3-json-generator": "git+ssh://git@git.sbis.ru:root/sbis3-json-generator.git#rc-19.100",
-      "sbis3-ws": "git+ssh://git@git.sbis.ru:sbis/ws.git#rc-19.100",
-      "Router": "git+ssh://git@platform-git.sbis.ru:saby/router.git#rc-19.100",
-      "saby-types": "git+https://github.com/saby/Types.git#rc-19.100",
-      "ws-data": "git+ssh://git@git.sbis.ru:ws/data.git#rc-19.100"
+      "sbis3-controls": "git+ssh://git@git.sbis.ru:sbis/controls.git#rc-19.110",
+      "sbis3-json-generator": "git+ssh://git@git.sbis.ru:root/sbis3-json-generator.git#rc-19.110",
+      "sbis3-ws": "git+ssh://git@git.sbis.ru:sbis/ws.git#rc-19.110",
+      "Router": "git+ssh://git@platform-git.sbis.ru:saby/router.git#rc-19.110",
+      "saby-types": "git+https://github.com/saby/Types.git#rc-19.110",
+      "ws-data": "git+ssh://git@git.sbis.ru:ws/data.git#rc-19.110"
    },
    "engines": {
       "node": ">=8.9.3"
