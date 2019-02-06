@@ -42,7 +42,7 @@ const wsLogger = {
    }
 };
 
-function initWs() {
+function initWs(requiredModules) {
    // Используем платформу из кода проекта.
    // Это нужно для беспроблемного прохождения тестов WS и Controls, а также сборки онлайна.
    // Часто код WS должен быть одинаковым на стенде и в билдере, иначе стенд разваливается.
@@ -89,36 +89,14 @@ function initWs() {
    });
    global.requirejs = requireJS.config(config);
    const loadContents = global.requirejs('Core/load-contents');
+   const modulesForAppContents = {};
+   requiredModules.forEach((currentModule) => {
+      modulesForAppContents[currentModule] = {
+         path: path.join(appRoot, currentModule)
+      };
+   });
    const appContents = {
-      modules: {
-         View: {
-            path: path.join(appRoot, 'View')
-         },
-         Vdom: {
-            path: path.join(appRoot, 'Vdom')
-         },
-         Router: {
-            path: path.join(appRoot, 'Router')
-         },
-         Controls: {
-            path: path.join(appRoot, 'Controls')
-         },
-         'WS.Data': {
-            path: path.join(appRoot, 'WS.Data')
-         },
-         Inferno: {
-            path: path.join(appRoot, 'Inferno')
-         },
-         Types: {
-            path: path.join(appRoot, 'Types')
-         },
-         Env: {
-            path: path.join(appRoot, 'Env')
-         },
-         Browser: {
-            path: path.join(appRoot, 'Browser')
-         }
-      }
+      modules: modulesForAppContents
    };
    loadContents(appContents, true, { resources: '/' });
    global.requirejs('Core/core');
@@ -131,10 +109,10 @@ module.exports = {
    /**
     * Инициализация ядра платформы WS.
     */
-   init() {
+   init(requiredModules) {
       try {
          if (!initialized) {
-            initWs();
+            initWs(requiredModules);
             initialized = true;
          }
       } catch (e) {

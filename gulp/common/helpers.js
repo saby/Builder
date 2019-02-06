@@ -120,6 +120,9 @@ function generateTaskForInitWorkerPool(taskParameters) {
       } else {
          maxWorkers = os.cpus().length - 1;
       }
+      const requiredModules = taskParameters.config.modules
+         .filter(currentModule => currentModule.required)
+         .map(currentModule => currentModule.name);
 
       // Нельзя занимать больше ядер чем есть. Основной процесс тоже потребляет ресурсы
       taskParameters.setWorkerPool(
@@ -129,7 +132,8 @@ function generateTaskForInitWorkerPool(taskParameters) {
                env: {
                   'ws-core-path': wsCorePath,
                   'main-process-cwd': process.cwd(),
-                  'init-ws': taskParameters.config.needTemplates || taskParameters.config.builderTests
+                  'init-ws': taskParameters.config.needTemplates || taskParameters.config.builderTests,
+                  'required-modules': JSON.stringify(requiredModules)
                },
                execArgv: ['--max-old-space-size=1024']
             }

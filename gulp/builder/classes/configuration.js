@@ -296,7 +296,13 @@ class BuildConfiguration {
       }
 
       for (const module of this.rawConfig.modules) {
-         const moduleInfo = new ModuleInfo(module.name, module.responsible, module.path, this.outputPath);
+         const moduleInfo = new ModuleInfo(
+            module.name,
+            module.responsible,
+            module.path,
+            this.outputPath,
+            module.required
+         );
          moduleInfo.symlinkInputPathToAvoidProblems(this.cachePath);
 
          moduleInfo.contents.buildMode = this.getBuildMode();
