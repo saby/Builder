@@ -68,6 +68,7 @@
       "sbis3-controls": "git+ssh://git@git.sbis.ru:sbis/controls.git#rc-19.200",
       "sbis3-json-generator": "git+ssh://git@git.sbis.ru:root/sbis3-json-generator.git#rc-19.200",
       "sbis3-ws": "git+ssh://git@git.sbis.ru:sbis/ws.git#rc-19.200",
+      "rmi": "git+ssh://git@git.sbis.ru:sbis/rmi.git#rc-19.200",
       "Router": "git+ssh://git@platform-git.sbis.ru:saby/router.git#rc-19.200",
       "saby-types": "git+https://github.com/saby/Types.git#rc-19.200",
       "ws-data": "git+ssh://git@git.sbis.ru:ws/data.git#rc-19.200"
