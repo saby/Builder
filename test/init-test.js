@@ -55,7 +55,9 @@ function getPlatformModules() {
       new ModuleInfo('Router', '', path.join(nodeModulesPath, 'Router/Router'), true),
       new ModuleInfo('Inferno', '', path.join(nodeModulesPath, 'sbis3-ws/Inferno'), true),
       new ModuleInfo('Controls', '', path.join(nodeModulesPath, 'sbis3-controls/Controls'), true),
-      new ModuleInfo('Types', '', path.join(nodeModulesPath, 'saby-types/Types'), true)
+      new ModuleInfo('Types', '', path.join(nodeModulesPath, 'saby-types/Types'), true),
+      new ModuleInfo('Env', '', path.join(nodeModulesPath, 'rmi/src/client/Env'), true),
+      new ModuleInfo('Browser', '', path.join(nodeModulesPath, 'rmi/src/client/Browser'), true)
    ];
 }
 
