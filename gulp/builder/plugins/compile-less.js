@@ -131,8 +131,17 @@ module.exports = function declarePlugin(taskParameters, moduleInfo, gulpModulesI
          const
             moduleName = path.basename(moduleInfo.output),
             prettyModuleOutput = helpers.prettifyPath(moduleInfo.output),
-            needSaveImportLogs = taskParameters.config.logFolder && moduleLessConfig.importsLogger,
-            compiledLess = [];
+            needSaveImportLogs = taskParameters.config.logFolder && moduleLessConfig.importsLogger;
+
+         let compiledLess = [];
+
+         /**
+          * если уже существует мета-файл по результатам предыдущей сборки, необходимо
+          * прочитать его и дополнить новыми скомпилированными стилями.
+          */
+         if (await fs.pathExists(path.join(moduleInfo.output, '.builder/compiled-less.min.json'))) {
+            compiledLess = await fs.readJson(path.join(moduleInfo.output, '.builder/compiled-less.min.json'));
+         }
 
          /**
           * Если разработчиком в конфигурации less задан параметр для логгирования импортов для
