@@ -34,15 +34,18 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             return;
          }
 
-         let newText;
+         let result;
 
          if (file.extname === '.css') {
-            newText = versionizeStyles(file, moduleInfo);
+            result = versionizeStyles(file, moduleInfo);
          } else if (['.html', '.tmpl', '.xhtml', '.wml'].includes(file.extname)) {
-            newText = versionizeTemplates(file, moduleInfo);
+            result = versionizeTemplates(file, moduleInfo);
          }
 
-         file.contents = Buffer.from(newText);
+         file.contents = Buffer.from(result.newText);
+         if (result.errors) {
+            taskParameters.cache.markFileAsFailed(file.history[0]);
+         }
       } catch (error) {
          taskParameters.cache.markFileAsFailed(file.history[0]);
          logger.error({
