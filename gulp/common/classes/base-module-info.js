@@ -54,11 +54,7 @@ class ModuleInfo {
          try {
             fs.unlinkSync(newPath);
          } catch (e) {
-            logger.debug({
-               message: 'Не смогли удалить старый симлинк или его не было',
-               filePath: newPath,
-               error: e
-            });
+            // it's not an error. Symlink doesn't exists in first build without builder cache
          }
          fs.ensureSymlinkSync(this.path, newPath, 'dir');
          this.path = newPath;
