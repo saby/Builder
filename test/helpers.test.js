@@ -108,9 +108,13 @@ describe('library pack helpers', () => {
       let result = libPackHelpers.isPrivate(dependency);
       result.should.be.equal(true);
 
-      dependency = 'Test/private/_module';
+      dependency = 'Test/public/_module';
       result = libPackHelpers.isPrivate(dependency);
-      result.should.be.equal(true);
+      result.should.be.equal(false);
+
+      dependency = 'Controls/_module';
+      result = libPackHelpers.isPrivate(dependency);
+      result.should.be.equal(false);
 
       dependency = 'Test/public/module';
       result = libPackHelpers.isPrivate(dependency);
@@ -126,9 +130,13 @@ describe('library pack helpers', () => {
       let result = libPackHelpers.isPrivate(dependency);
       result.should.be.equal(true);
 
-      dependency = 'Test\\private\\_module';
+      dependency = 'Test\\public\\_module';
       result = libPackHelpers.isPrivate(dependency);
-      result.should.be.equal(true);
+      result.should.be.equal(false);
+
+      dependency = 'Controls\\_module';
+      result = libPackHelpers.isPrivate(dependency);
+      result.should.be.equal(false);
 
       dependency = 'Test\\public\\module';
       result = libPackHelpers.isPrivate(dependency);
