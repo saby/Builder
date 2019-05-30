@@ -14,7 +14,7 @@ const through = require('through2'),
    esExt = /\.(es|ts)$/,
    jsExt = /\.js$/;
 
-const typescriptPlatform = new Set(['WS.Core', 'Transport', 'Lib', 'ServiceUpdateNotifier']);
+const typescriptPlatform = new Set(['Transport', 'Lib', 'ServiceUpdateNotifier']);
 
 /**
  * Объявление плагина
