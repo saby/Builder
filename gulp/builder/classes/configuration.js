@@ -11,7 +11,8 @@ const ConfigurationReader = require('../../common/configuration-reader'),
    ModuleInfo = require('./module-info'),
    getLanguageByLocale = require('../../../lib/get-language-by-locale'),
    { checkForSourcesOutput } = require('../../../lib/helpers'),
-   availableLanguage = require('../../../resources/availableLanguage.json');
+   availableLanguage = require('../../../resources/availableLanguage.json'),
+   fs = require('fs-extra');
 
 /**
  * Класс с данными о конфигурации сборки
@@ -299,6 +300,11 @@ class BuildConfiguration {
 
       this.needTemplates = this.rawConfig.wml || this.rawConfig.htmlWml || this.rawConfig.deprecatedXhtml;
 
+      /**
+       * remove all previous symlinks to avoid problems with crashed symlinks(symlinks to removed directories, f.e.
+       * renamed directory to sources)
+       */
+      fs.emptyDirSync(this.cachePath);
       for (const module of this.rawConfig.modules) {
          const moduleInfo = new ModuleInfo(
             module.name,
