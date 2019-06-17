@@ -15,7 +15,8 @@ const builderMeta = new Set([
    'routes-info.json',
    'static_templates.json'
 ]);
-
+const helpers = require('../../../lib/helpers');
+const path = require('path');
 const extensions = new Set([
    '.js',
    '.tmpl',
@@ -36,6 +37,9 @@ const extensions = new Set([
  */
 module.exports = function declarePlugin(taskParameters) {
    const buildConfig = taskParameters.config;
+   const moduleDependencies = taskParameters.cache.getModuleDependencies();
+   const jsModules = [];
+
    return through.obj(
       function onTransform(file, encoding, callback) {
          /**
@@ -76,6 +80,7 @@ module.exports = function declarePlugin(taskParameters) {
                 * пакет шаблон компонента 2 раза
                 */
                if (debugMode || isMinified || file.basename.endsWith('.min.original.js')) {
+                  jsModules.push(file);
                   callback(null, file);
                   return;
                }
@@ -105,6 +110,30 @@ module.exports = function declarePlugin(taskParameters) {
                }
                callback(null);
          }
+      },
+
+      /* @this Stream */
+      function onFlush(callback) {
+         const moduleDeps = taskParameters.cache.getModuleDependencies();
+         const currentModulePrivateLibraries = new Set();
+         Object.keys(moduleDeps.packedLibraries).forEach((currentLibrary) => {
+            moduleDeps.packedLibraries[currentLibrary].forEach(
+               currentModule => currentModulePrivateLibraries.add(currentModule)
+            );
+         });
+         jsModules.forEach((currentModule) => {
+            const prettyFilePath = helpers.unixifyPath(currentModule.path);
+            const prettyRoot = helpers.unixifyPath(path.dirname(currentModule.base));
+            const currentModuleName = helpers.removeLeadingSlash(prettyFilePath
+               .replace(prettyRoot, '')
+               .replace('.min.js', ''));
+
+            if (currentModulePrivateLibraries.has(currentModuleName)) {
+               return;
+            }
+            this.push(currentModule);
+         });
+         callback();
       }
    );
 };
