@@ -50,9 +50,6 @@ class ModuleInfo {
          if (isShareOnWindows(cachePath)) {
             throw new Error('На windows путь до кеша не может быть сетевым .');
          }
-         if (fs.pathExistsSync(newPath)) {
-            fs.unlinkSync(newPath);
-         }
          fs.ensureSymlinkSync(this.path, newPath, 'dir');
          this.path = newPath;
       }
