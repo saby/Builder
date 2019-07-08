@@ -68,7 +68,7 @@ function generateWorkflow(processArgv) {
       generateTaskForBuildModules(taskParameters, modulesForPatch),
 
       generateTaskForRemoveFiles(taskParameters),
-      generateTaskForSaveCache(taskParameters),
+      generateTaskForSaveCache(taskParameters, modulesForPatch),
       generateTaskForTerminatePool(taskParameters),
       generateTaskForFinalizeDistrib(taskParameters, modulesForPatch),
       generateTaskForCheckModuleDeps(taskParameters),
@@ -96,9 +96,9 @@ function generateTaskForTypescriptCompile(taskParameters) {
    };
 }
 
-function generateTaskForSaveCache(taskParameters) {
+function generateTaskForSaveCache(taskParameters, modulesForPatch) {
    return function saveCache() {
-      return taskParameters.cache.save();
+      return taskParameters.cache.save(modulesForPatch);
    };
 }
 

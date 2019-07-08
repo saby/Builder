@@ -111,7 +111,7 @@ class StoreInfo {
       }
    }
 
-   async save(cacheDirectory) {
+   async save(cacheDirectory, modulesForPatch) {
       await fs.outputJson(
          path.join(cacheDirectory, 'builder-info.json'),
          {
@@ -171,6 +171,14 @@ class StoreInfo {
          {
             lastCacheDirectory: cacheDirectory
          },
+         {
+            spaces: 1
+         }
+      );
+
+      await fs.outputJson(
+         path.join(cacheDirectory, 'modules-for-patch.json'),
+         modulesForPatch,
          {
             spaces: 1
          }

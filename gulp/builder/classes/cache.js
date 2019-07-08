@@ -71,8 +71,8 @@ class Cache {
       }
    }
 
-   save() {
-      return this.currentStore.save(this.config.cachePath);
+   save(modulesForPatch) {
+      return this.currentStore.save(this.config.cachePath, modulesForPatch);
    }
 
    /**
@@ -167,9 +167,13 @@ class Cache {
             removePromises.push(fs.remove(this.config.rawConfig.output));
          }
       }
-      logger.info('Запускается очистка кэша');
+      if (removePromises.length > 0) {
+         logger.info('Запускается очистка кэша');
+      }
       await Promise.all(removePromises);
-      logger.info('Очистка кэша завершена');
+      if (removePromises.length > 0) {
+         logger.info('Очистка кэша завершена');
+      }
    }
 
    /**
