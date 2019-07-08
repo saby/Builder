@@ -266,6 +266,18 @@ describe('versionize-content', () => {
       currentFile.versioned.should.equal(true);
 
       currentFile = {
+         contents: '{{? it.is.hasModule(\'Application\') }}src="/previewer/resources/Application/App.js" {{?}}',
+         base,
+         path: filePath.replace('.tmpl', '.xhtml')
+
+      };
+      currentFile.history = [currentFile.path];
+      result = versionizeContent.versionizeTemplates(currentFile, currentModuleInfo);
+      result.newText.should.equal('{{? it.is.hasModule(\'Application\') }}src="/previewer/resources/Application/App.min.js?x_module=%{MODULE_VERSION_STUB=Application}" {{?}}');
+      result.errors.should.equal(false);
+      currentFile.versioned.should.equal(true);
+
+      currentFile = {
          contents: 'src="../build/pdf.min.js"',
          base,
          path: filePath
