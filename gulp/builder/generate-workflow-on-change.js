@@ -13,7 +13,8 @@ const path = require('path'),
    fs = require('fs-extra'),
    gulpRename = require('gulp-rename'),
    gulpChmod = require('gulp-chmod'),
-   plumber = require('gulp-plumber');
+   plumber = require('gulp-plumber'),
+   helpers = require('../../lib/helpers');
 
 const Cache = require('./classes/cache'),
    Configuration = require('./classes/configuration.js'),
@@ -73,15 +74,25 @@ function generateTaskForBuildFile(taskParameters, filePath) {
    for (const moduleInfo of taskParameters.config.modules) {
       gulpModulesPaths[moduleInfo.name] = moduleInfo.path;
       if (!currentModuleInfo) {
-         let relativePath = path.relative(moduleInfo.path, filePath);
+         let relativePath = path.relative(
+            helpers.unixifyPath(moduleInfo.path),
+            helpers.unixifyPath(filePath)
+         );
 
          // на windows если два файла на разных дисках, то path.relative даёт путь от диска, без ..
          if (!relativePath.includes('..') && !path.isAbsolute(relativePath)) {
             currentModuleInfo = moduleInfo;
          } else {
-            // если модуль задан через симлинк, попробуем сопоставить файл и модуль
+            /**
+             * если модуль задан через симлинк, попробуем сопоставить файл и модуль
+             * Также резолвим
+             */
             const realModulePath = fs.realpathSync(moduleInfo.path);
-            relativePath = path.relative(realModulePath, filePath);
+            const realFilePath = fs.realpathSync(filePath);
+            relativePath = path.relative(
+               helpers.unixifyPath(realModulePath),
+               helpers.unixifyPath(realFilePath)
+            );
             if (!relativePath.includes('..') && !path.isAbsolute(relativePath)) {
                currentModuleInfo = moduleInfo;
                filePathInProject = path.join(moduleInfo.path, relativePath);
