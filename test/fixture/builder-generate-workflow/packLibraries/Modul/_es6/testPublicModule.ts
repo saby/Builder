@@ -1,5 +1,5 @@
 'use strict';
 // @ts-ignore
-import * as removeArrayDuplicates from '../public/publicFunction2';
+import * as removeArrayDuplicates from '../public/publicInterface';
 
 export = removeArrayDuplicates;

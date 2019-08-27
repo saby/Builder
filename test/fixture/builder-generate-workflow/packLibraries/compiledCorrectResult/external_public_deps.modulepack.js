@@ -1,5 +1,5 @@
 define('Modul/external_public_deps', [
-    'Modul/public/publicFunction2',
+    'Modul/public/publicInterface',
     'require',
     'exports',
     'Modul/Modul',
