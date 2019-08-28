@@ -1,0 +1,15 @@
+{
+  "includeCore": true,
+  "modules": [
+    "InterfaceModule3/amdModule",
+    "InterfaceModule3/*"
+  ],
+  "include": [
+    "InterfaceModule3/amdModule",
+    "InterfaceModule3/*"
+  ],
+  "exclude": [
+    "InterfaceModule3/amdModule"
+  ],
+  "output": "exclude-module.package.js"
+}

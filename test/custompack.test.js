@@ -80,6 +80,30 @@ describe('custompack', () => {
       );
    });
 
+   it('should build properly for private package', async() => {
+      let result;
+      try {
+         const config = await fs.readJson(path.join(applicationRoot, 'configs/private-package.package.json'));
+         const configsArray = packHelpers.getConfigsFromPackageJson(
+            path.normalize('configs/private-package.package.json'),
+            config
+         );
+         const currentResult = await customPacker.generateCustomPackage(
+            depsTree,
+            root,
+            application,
+            configsArray[0],
+            customPackParameters
+         );
+         result = currentResult;
+      } catch (err) {
+         result = err;
+      }
+
+      (result instanceof Error).should.equal(false);
+      debugger;
+   });
+
    it('versioned meta: should return correct css package path without theme', () => {
       const packagePath = '/test/Controls/controls-application.package.min';
       const themeName = '';
