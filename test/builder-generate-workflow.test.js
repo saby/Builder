@@ -7,7 +7,7 @@ const path = require('path'),
    pMap = require('p-map'),
    helpers = require('../lib/helpers'),
    { decompress } = require('iltorb'),
-   { brotliCompatible } = require('../lib/builder-constants');
+   { isWindows } = require('../lib/builder-constants');
 
 const generateWorkflow = require('../gulp/builder/generate-workflow.js');
 
@@ -1142,7 +1142,7 @@ describe('gulp/builder/generate-workflow.js', () => {
             'themes.config.min.json.gz'
          ];
 
-         if (brotliCompatible) {
+         if (!isWindows) {
             correctMembers = correctMembers.concat([
                'Page.min.wml.br',
                'Stable.min.css.br',
@@ -1156,7 +1156,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          // output directory must have brotli(except windows os) and gzip files, only for minified files and packages.
          resultFiles.should.have.members(correctMembers);
 
-         if (brotliCompatible) {
+         if (!isWindows) {
             const cssContent = await fs.readFile(path.join(moduleOutputFolder, 'test-brotli.package.min.css'));
             const cssBrotliContent = await fs.readFile(path.join(moduleOutputFolder, 'test-brotli.package.min.css.br'));
             const cssDecompressed = await brotliDecompress(cssBrotliContent);

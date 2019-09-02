@@ -9,7 +9,7 @@
 const through = require('through2'),
    logger = require('../../../lib/logger').logger(),
    execInPool = require('../../common/exec-in-pool'),
-   { brotliCompatible } = require('../../../lib/builder-constants');
+   { isWindows } = require('../../../lib/builder-constants');
 
 const includeExts = ['.js', '.json', '.css', '.tmpl', '.wml', '.woff', '.ttf'];
 
@@ -64,7 +64,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
              * of Node.js 12 will be released https://nodejs.org/en/about/releases/
              * Build brotli only with compatible version of Node.Js 10.14.2+.
              */
-            const buildBrotli = brotliCompatible;
+            const buildBrotli = !isWindows;
             const [error, result] = await execInPool(
                taskParameters.pool,
                'compress',
