@@ -120,10 +120,19 @@ function generateTaskForRemoveFiles(taskParameters, modulesForPatch) {
 }
 
 function generateTaskForCheckModuleDeps(taskParameters) {
-   const isOnlineInside = taskParameters.config.modules.find(
+   const { config } = taskParameters;
+
+   /**
+    * enable module dependencies checker for plugin and oonline projects.
+    * Plugin project installation strictly depends on s3mod-dependencies.
+    * Online project also needs dependency check to avoid Server-side errors on web-pages.
+    * @type {string|boolean}
+    */
+   const isPluginBuild = config.rawConfig.cld_name && config.rawConfig.cld_name.startsWith('SbisPlugin');
+   const isOnlineInside = config.modules.find(
       moduleInfo => moduleInfo.name === 'OnlineSbisRu'
    );
-   if (!isOnlineInside) {
+   if (!(isOnlineInside || isPluginBuild)) {
       return function skipCheckModuleDepsExisting(done) {
          done();
       };
