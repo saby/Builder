@@ -72,7 +72,7 @@ try {
       processingRoutes = require('../../lib/processing-routes'),
       runMinifyCss = require('../../lib/run-minify-css'),
       runMinifyXhtmlAndHtml = require('../../lib/run-minify-xhtml-and-html'),
-      uglifyJs = require('../../lib/run-uglify-js'),
+      minifyJs = require('../../lib/run-minify-js'),
       { wrapWorkerFunction } = require('./helpers'),
       { packLibrary } = require('../../lib/pack/library-packer'),
       { brotli, gzip } = require('../../lib/helpers');
@@ -224,7 +224,7 @@ try {
       buildXhtml: wrapWorkerFunction(buildXhtml),
       minifyCss: wrapWorkerFunction(runMinifyCss),
       minifyXhtmlAndHtml: wrapWorkerFunction(runMinifyXhtmlAndHtml),
-      uglifyJs: wrapWorkerFunction(uglifyJs),
+      minifyJs: wrapWorkerFunction(minifyJs),
       compress: wrapWorkerFunction(compress),
       collectWords: wrapWorkerFunction(collectWords),
       packLibrary: wrapWorkerFunction(packLibrary)

@@ -84,7 +84,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
                // если xhtml не возможно минифицировать, то запишем оригинал
 
-               const [error, obj] = await execInPool(taskParameters.pool, 'uglifyJs', [file.path, newText, true]);
+               const [error, obj] = await execInPool(taskParameters.pool, 'minifyJs', [file.path, newText, true]);
                newText = obj.code;
                if (error) {
                   taskParameters.cache.markFileAsFailed(file.history[0]);

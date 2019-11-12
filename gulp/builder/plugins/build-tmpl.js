@@ -138,7 +138,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
                const [errorUglify, obj] = await execInPool(
                   taskParameters.pool,
-                  'uglifyJs',
+                  'minifyJs',
                   [file.path, newText, true],
                   relativeFilePath.replace(templateExtReg, '.min$1'),
                   moduleInfo

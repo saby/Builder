@@ -2,32 +2,31 @@
 
 const initTest = require('./init-test');
 
-const runUglifyJs = require('../lib/run-uglify-js');
+const runMinifyJs = require('../lib/run-minify-js');
 
-describe('run uglify-js', () => {
+describe('run minify-js', () => {
    before(async() => {
       await initTest();
    });
    it('empty', () => {
       const text = '';
-      const result = runUglifyJs('virtual.js', text);
+      const result = runMinifyJs('virtual.js', text);
       result.code.should.equal('');
    });
-   it('uglifyjs-test-eval-minify', () => {
+   it('minifyjs-test-eval-minify', () => {
       /**
-       * uglifyJS может сломать конструкцию с определением глобального
-       * объекта.
-       * Если такое произошло, значит надо откатить версию uglify-js
-       * и добиться работы данного теста.( и пожаловаться авторам сия чуда:))
+       * uglifyJS had a bug that breaks down determining of
+       * global object. Check this case also for new compressor
+       * "terser"
        */
 
       const text = "(function(){ return this || (0,eval)('this'); }())";
-      const result = runUglifyJs('virtual.js', text);
+      const result = runMinifyJs('virtual.js', text);
       result.code.should.equal('(function(){this||(0,eval)("this")})();');
    });
    it('simple', () => {
       const text = 'var r = 0;';
-      const result = runUglifyJs('virtual.js', text);
+      const result = runMinifyJs('virtual.js', text);
       result.code.should.equal('var r=0;');
    });
    it('simple test for typeof undefined', () => {
@@ -35,10 +34,10 @@ describe('run uglify-js', () => {
       // это не равнозначные действия
       const text = 'if("undefined" === typeof test1){test2 = 0;}';
 
-      const result = runUglifyJs('virtual.js', text, false);
+      const result = runMinifyJs('virtual.js', text, false);
       result.code.should.equal('if("undefined"===typeof test1)test2=0;');
 
-      const resultForMarkup = runUglifyJs('virtual.js', text, true);
+      const resultForMarkup = runMinifyJs('virtual.js', text, true);
       resultForMarkup.code.should.equal('if("undefined"===typeof test1)test2=0;');
    });
 
@@ -54,14 +53,21 @@ describe('run uglify-js', () => {
          '   }\n' +
          '})();';
 
-      const result = runUglifyJs('virtual.js', text, false);
+      const result = runMinifyJs('virtual.js', text, false);
+      const text1 =
+         '(function() {\n' +
+         "   const test = () => { return '123'; }; test();" +
+         '})();';
+
+      const result1 = runMinifyJs('virtual.js', text1, false);
+      console.log(result1);
       result.code.should.equal(
-         '(function(){var e;if("undefined"===typeof("undefined"===typeof tclosure||!tclosure?arguments[arguments.length-1]:tclosure))console.log(1)})();'
+         '(function(){var e="undefined"===typeof tclosure||!tclosure?arguments[arguments.length-1]:tclosure;if("undefined"===typeof e)console.log(1)})();'
       );
 
-      const resultForMarkup = runUglifyJs('virtual.js', text, true);
+      const resultForMarkup = runMinifyJs('virtual.js', text, true);
       resultForMarkup.code.should.equal(
-         '(function(){var e;if("undefined"===typeof("undefined"===typeof tclosure||!tclosure?arguments[arguments.length-1]:tclosure))console.log(1)})();'
+         '(function(){var e="undefined"===typeof tclosure||!tclosure?arguments[arguments.length-1]:tclosure;if("undefined"===typeof e)console.log(1)})();'
       );
    });
 });

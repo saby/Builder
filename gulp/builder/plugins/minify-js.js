@@ -103,7 +103,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             if (!file.modulepack) {
                // если файл не возможно минифицировать, то запишем оригинал
                let minText = file.contents.toString();
-               const [error, minified] = await execInPool(taskParameters.pool, 'uglifyJs', [
+               const [error, minified] = await execInPool(taskParameters.pool, 'minifyJs', [
                   file.path,
                   minText,
                   false
@@ -129,10 +129,9 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                // минимизируем оригинальный JS
                // если файл не возможно минифицировать, то запишем оригинал
                let minOriginalText = file.contents.toString();
-               const [errorOriginal, minifiedOriginal] = await execInPool(taskParameters.pool, 'uglifyJs', [
+               const [errorOriginal, minifiedOriginal] = await execInPool(taskParameters.pool, 'minifyJs', [
                   file.path,
-                  minOriginalText,
-                  false
+                  minOriginalText
                ]);
                if (errorOriginal) {
                   taskParameters.cache.markFileAsFailed(file.history[0]);
@@ -162,7 +161,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                // если файл не возможно минифицировать, то запишем оригинал
                let minText = file.modulepack;
 
-               const [error, minified] = await execInPool(taskParameters.pool, 'uglifyJs', [
+               const [error, minified] = await execInPool(taskParameters.pool, 'minifyJs', [
                   file.path,
                   minText,
                   file.library

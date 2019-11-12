@@ -2020,7 +2020,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          const packedHtml = await fs.readFile(path.join(outputFolder, 'TestModule/testPage.html'), 'utf8');
          let containsNeededPackage = packedHtml.includes('href="/testService/resources/TestModule/static_packages/7497a16791b95bc13816581289af74d8.css"');
          containsNeededPackage.should.equal(true);
-         containsNeededPackage = packedHtml.includes('src="/testService/resources/TestModule/static_packages/30ac01cebb99671a6238487f140a1e92.js"');
+         containsNeededPackage = packedHtml.includes('src="/testService/resources/TestModule/static_packages/f13f86fd32b36a2d087f8f8257d040b5.js"');
          containsNeededPackage.should.equal(true);
       };
 

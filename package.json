@@ -58,7 +58,7 @@
       "typescript": "3.7.2",
       "saby-typescript": "git+https://github.com/saby/TypeScript.git#rc-20.1000",
       "saby-units": "git+https://github.com/saby/Units.git#rc-20.1000",
-      "uglify-js": "3.3.23",
+      "terser": "4.3.9",
       "vinyl": "2.2.0",
       "workerpool": "2.3.0",
       "iltorb": "2.4.3",
