@@ -4,8 +4,32 @@
 const fs = require('fs-extra'),
    path = require('path');
 
-const dest = path.join(__dirname, 'dest');
-const destNodeModules = path.join(dest, 'node_modules');
+/**
+ * Parse all parameters of current node command
+ * @param{Array} argv - arguments from cli for current command
+ * @returns Array
+ */
+function getProcessParameters(argv) {
+   const result = {};
+   for (const argument of argv) {
+      const match = argument.match(/^--([^-=]+)=['"]?([^'"]*)['"]?$/i);
+      if (match) {
+         // eslint-disable-next-line prefer-destructuring
+         result[match[1]] = match[2];
+      }
+   }
+   return result;
+}
+
+const processParams = getProcessParameters(process.argv);
+let projectDirectory;
+if (processParams.directory) {
+   projectDirectory = path.join(__dirname, processParams.directory);
+} else {
+   // eslint-disable-next-line id-match
+   projectDirectory = __dirname;
+}
+const nodeModulesDir = path.join(projectDirectory, 'node_modules');
 
 // все строки в lower case
 const filesForRemove = [
@@ -76,14 +100,27 @@ const exclusions = [
    'workerpool.min.js'
 ];
 
+function readDevDependencies() {
+   const packageJson = JSON.parse(
+      fs.readFileSync(path.join(projectDirectory, 'package.json'), 'utf8')
+   );
+   return Object.keys(packageJson.devDependencies);
+}
+
+// exclude devDependencies from minifier to avoid problems with it in builder unit tests
+const librariesToExclude = readDevDependencies();
+
 function recursiveReadDir(folder, results) {
    const files = fs.readdirSync(folder);
    for (const file of files) {
       const filePath = path.join(folder, file);
       const isDir = fs.statSync(filePath).isDirectory();
-      results.push({ path: filePath, isDir });
-      if (isDir) {
-         recursiveReadDir(filePath, results);
+      const isExcludedLibrary = isDir && librariesToExclude.includes(path.basename(filePath));
+      if (!isExcludedLibrary) {
+         results.push({ path: filePath, isDir });
+         if (isDir) {
+            recursiveReadDir(filePath, results);
+         }
       }
    }
 }
@@ -111,7 +148,7 @@ function needRemove(filePath, isDir) {
 }
 
 const files = [];
-recursiveReadDir(destNodeModules, files);
+recursiveReadDir(nodeModulesDir, files);
 for (const file of files) {
    if (needRemove(file.path, file.isDir)) {
       console.log(`remove ${file.path}`);
@@ -119,5 +156,8 @@ for (const file of files) {
    }
 }
 
-// package-lock.json уже не нужен после npm ci
-fs.removeSync(path.join(dest, 'package-lock.json'));
+if (processParams.directory) {
+
+   // package-lock.json уже не нужен после npm ci
+   fs.removeSync(path.join(__dirname, processParams.directory, 'package-lock.json'));
+}

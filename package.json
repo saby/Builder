@@ -20,8 +20,8 @@
    },
    "scripts": {
       "build": "npm run build:verify && npm run build:only",
-      "build:verify": "npm run build:lint && npm run build:test",
-      "build:only": "node copy-to-dest.js && cd dest && npm i --production && cd ../ && node minify-dest.js",
+      "build:verify": "node minify-builder.js && npm run build:lint && npm run build:test",
+      "build:only": "node copy-to-dest.js && cd dest && npm i --production && cd ../ && node minify-dest.js --directory=dest",
       "build:test": "node ./node_modules/mocha/bin/mocha --exit --timeout 600000 -R xunit --reporter-options output=xunit-result.xml > xunit.log",
       "build:lint": "node ./node_modules/eslint/bin/eslint --no-color --no-eslintrc -c=.eslintrc -f=stylish --quiet . > eslint-report.log",
       "test": "node ./node_modules/mocha/bin/mocha --timeout 600000",
