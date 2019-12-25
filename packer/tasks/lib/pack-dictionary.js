@@ -27,11 +27,9 @@ function getNameModule(pathModule, applicationRoot) {
  */
 function getAmdDictionaryPath(applicationRoot, moduleName, locale, region) {
    const localePath = path.join(applicationRoot, moduleName, 'lang', locale);
-
    if (fs.existsSync(path.join(localePath, `${locale}-${region}.json.js`))) {
       return path.normalize(path.join(localePath, `${locale}-${region}.json.js`));
    }
-
    return path.normalize(path.join(localePath, `${locale}.json.js`));
 }
 
@@ -63,7 +61,7 @@ function getNameDict(name, lang) {
  *          - мета данные json модуля.
  */
 function createJsonJsModule(moduleName, fullPath, lang) {
-   const moduleFullPath = helpers.unixifyPath(fullPath);
+   const moduleFullPath = helpers.unixifyPath(fullPath.replace(/\.js$/, '.json.js'));
    const jsonModuleName = `${getNameDict(moduleName, lang)}.json`;
    return {
       amd: true,
@@ -96,7 +94,6 @@ function packDictClassic(modules, applicationRoot, availableLanguage) {
          Object.keys(dictPack).forEach((lang) => {
             const [currentLocale, currentRegion] = lang.split('-');
             const fullPath = getAmdDictionaryPath(applicationRoot, moduleName, currentLocale, currentRegion);
-
             if (needPushDict(moduleName, lang, isPackedDict)) {
                const dictTextModule = createJsonJsModule(moduleName, fullPath, lang);
                dictPack[lang].push(dictTextModule);
