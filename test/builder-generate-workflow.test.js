@@ -1659,10 +1659,6 @@ describe('gulp/builder/generate-workflow.js', () => {
                path: path.join(sourceFolder, 'Inferno')
             },
             {
-               name: 'Controls',
-               path: path.join(sourceFolder, 'Controls')
-            },
-            {
                name: 'Types',
                path: path.join(sourceFolder, 'Types')
             }
@@ -1689,14 +1685,6 @@ describe('gulp/builder/generate-workflow.js', () => {
          (await isRegularFile(outputFolder, 'contents.min.js')).should.equal(true);
       });
       it('exclude new unknown for builder packages', async() => {
-         const controlsOutputFolder = path.join(outputFolder, 'Controls');
-
-         /**
-          * Controls module should have his custom packages because of bundles list in builder contains them.
-          * Custom packages from "Modul" should be ignored from custom packer
-          */
-         (await isRegularFile(controlsOutputFolder, 'controls-application.package.min.js')).should.equal(true);
-         (await isRegularFile(controlsOutputFolder, 'controls-application.package.min.css')).should.equal(true);
          (await isRegularFile(moduleOutputFolder, 'test.package.min.js')).should.equal(false);
          (await isRegularFile(moduleOutputFolder, 'test.package.min.css')).should.equal(false);
       });
@@ -2174,10 +2162,6 @@ describe('gulp/builder/generate-workflow.js', () => {
             {
                name: 'Inferno',
                path: path.join(sourceFolder, 'Inferno')
-            },
-            {
-               name: 'Controls',
-               path: path.join(sourceFolder, 'Controls')
             },
             {
                name: 'Types',

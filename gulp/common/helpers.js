@@ -135,7 +135,7 @@ function generateTaskForInitWorkerPool(taskParameters) {
       // save worker's config in cache to use it as debug info
       await fs.outputJson(
          path.join(taskParameters.config.cachePath, 'workerpool-config.json'),
-         Object.assign({ systemMaxWorkers: os.cpus().length }, workerPoolConfig)
+         { systemMaxWorkers: os.cpus().length, ...workerPoolConfig }
       );
 
       // Нельзя занимать больше ядер чем есть. Основной процесс тоже потребляет ресурсы

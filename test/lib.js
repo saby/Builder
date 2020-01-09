@@ -60,7 +60,6 @@ function linkPlatform(sourceFolder) {
       fs.symlink(path.join(nodeModulesPath, 'sbis3-ws/Inferno'), path.join(sourceFolder, 'Inferno'), 'dir'),
       fs.symlink(path.join(nodeModulesPath, 'saby-types/Types'), path.join(sourceFolder, 'Types'), 'dir'),
       fs.symlink(path.join(nodeModulesPath, 'saby-i18n/I18n'), path.join(sourceFolder, 'I18n'), 'dir'),
-      fs.symlink(path.join(nodeModulesPath, 'wasaby-controls/Controls'), path.join(sourceFolder, 'Controls'), 'dir'),
       fs.symlink(path.join(nodeModulesPath, 'wasaby-app/src/Application'), path.join(sourceFolder, 'Application'), 'dir'),
       fs.symlink(path.join(nodeModulesPath, 'rmi/src/client/Env'), path.join(sourceFolder, 'Env'), 'dir'),
       fs.symlink(path.join(nodeModulesPath, 'rmi/src/client/SbisEnv'), path.join(sourceFolder, 'SbisEnv'), 'dir'),

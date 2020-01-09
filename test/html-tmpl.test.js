@@ -22,7 +22,7 @@ describe('convert html.tmpl', () => {
             multiService: false
          }
       );
-      result.includes('<html application="Controls/Application"').should.equal(true);
+      result.includes('<html application="UI/_base/HTML"').should.equal(true);
    });
 
    describe('templates config - check wsconfig setup', () => {
