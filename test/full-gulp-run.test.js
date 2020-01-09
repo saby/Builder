@@ -74,10 +74,6 @@ describe('builder', () => {
                required: true
             },
             {
-               name: 'Controls',
-               path: path.join(sourceFolder, 'Controls')
-            },
-            {
                name: 'Types',
                path: path.join(sourceFolder, 'Types'),
                required: true
