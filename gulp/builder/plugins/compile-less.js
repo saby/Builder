@@ -11,7 +11,6 @@ const through = require('through2'),
    transliterate = require('../../../lib/transliterate'),
    execInPool = require('../../common/exec-in-pool'),
    helpers = require('../../../lib/helpers'),
-   Vinyl = require('vinyl'),
    fs = require('fs-extra'),
    { defaultAutoprefixerOptions } = require('../../../lib/builder-constants'),
    cssExt = /\.css$/;
@@ -413,7 +412,7 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                } catch (error) {
                   taskParameters.cache.markFileAsFailed(currentLessFile.history[0]);
                   logger.error({
-                     message: 'Ошибка builder\'а при компиляции less',
+                     message: 'Builder error occurred in less compiler',
                      error,
                      filePath: currentLessFile.history[0]
                   });
@@ -424,21 +423,25 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
          await Promise.all(promises);
 
          /**
-          * log error for current fallen less only once to avoid logs hell if error will be in one on theme's sources.
+          * do logging errors of current errored less for once to avoid hell of logs
+          * in case of error had been occured by sort of theme's source.
           */
          if (errors) {
             Object.keys(errorsList).forEach(
                failedLessFile => logger.error({ filePath: failedLessFile, ...errorsList[failedLessFile] })
             );
-            logger.info(`Информация об Интерфейсных модулей для компилятора less: ${JSON.stringify(gulpModulesInfo)}`);
+            logger.info(`Information about interface modules used by less compiler during the build: ${JSON.stringify(gulpModulesInfo)}`);
          }
          if (taskParameters.config.customPack) {
-            const jsonFile = new Vinyl({
-               path: '.builder/compiled-less.min.json',
-               contents: Buffer.from(JSON.stringify([...compiledLess].sort(), null, 2)),
-               moduleInfo
-            });
-            this.push(jsonFile);
+            /**
+             * Because there is a possibility of writing compiled-less meta in SDK(this one is strictly
+             * forbidden on UNIX-based OS without a special permission - sudo),
+             * we'll write it in output folder directly and immediately by using "fs" library instead of "Vinyl"
+             */
+            await fs.outputJson(
+               path.join(moduleInfo.output, '.builder/compiled-less.min.json'),
+               [...compiledLess].sort()
+            );
          }
 
          if (needSaveImportLogs) {
