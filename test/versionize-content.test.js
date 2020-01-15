@@ -99,7 +99,7 @@ describe('versionize-content', () => {
          path: filePath
       };
       result = versionizeContent.versionizeStyles(currentFile, currentModuleInfo, versionParams);
-      result.newText.should.equal('background-image:url(/resources/SBIS3.CONTROLS/default-theme/img/ajax-loader-16x16-wheel.gif?x_module=%{MODULE_VERSION_STUB=MyModule}&x_version=builder-test-1)');
+      result.newText.should.equal('background-image:url(/resources/SBIS3.CONTROLS/default-theme/img/ajax-loader-16x16-wheel.gif?x_module=%{MODULE_VERSION_STUB=MyModule})');
       result.errors.should.equal(false);
 
       // проверим, что информация о версионировании прокидывается в файл
@@ -112,7 +112,7 @@ describe('versionize-content', () => {
          base
       };
       result = versionizeContent.versionizeStyles(currentFile, currentModuleInfo, versionParams);
-      result.newText.should.equal('url(\'../default-theme/fonts/cbuc-icons/cbuc-icons.woff?x_module=%{MODULE_VERSION_STUB=MyModule}&x_version=builder-test-1\')');
+      result.newText.should.equal('url(\'../default-theme/fonts/cbuc-icons/cbuc-icons.woff?x_module=%{MODULE_VERSION_STUB=MyModule}\')');
       result.errors.should.equal(false);
       currentFile.versioned.should.equal(true);
 
@@ -132,7 +132,7 @@ describe('versionize-content', () => {
          base
       };
       result = versionizeContent.versionizeStyles(currentFile, currentModuleInfo, versionParams);
-      result.newText.should.equal('url(\'../../MyModule2/default-theme/fonts/cbuc-icons/cbuc-icons.woff?x_module=%{MODULE_VERSION_STUB=MyModule2}&x_version=builder-test-1\')');
+      result.newText.should.equal('url(\'../../MyModule2/default-theme/fonts/cbuc-icons/cbuc-icons.woff?x_module=%{MODULE_VERSION_STUB=MyModule2}\')');
       result.errors.should.equal(true);
       currentFile.versioned.should.equal(true);
 
@@ -143,7 +143,7 @@ describe('versionize-content', () => {
          base
       };
       result = versionizeContent.versionizeStyles(currentFile, wscoreModuleInfo, versionParams);
-      result.newText.should.equal('url(\'../../MyModule2/default-theme/fonts/cbuc-icons/cbuc-icons.woff?x_module=%{MODULE_VERSION_STUB=MyModule2}&x_version=builder-test-1\')');
+      result.newText.should.equal('url(\'../../MyModule2/default-theme/fonts/cbuc-icons/cbuc-icons.woff?x_module=%{MODULE_VERSION_STUB=MyModule2}\')');
       result.errors.should.equal(false);
       currentFile.versioned.should.equal(true);
 
@@ -153,7 +153,7 @@ describe('versionize-content', () => {
          base
       };
       result = versionizeContent.versionizeStyles(currentFile, currentModuleInfo, versionParams);
-      result.newText.should.equal('url(\'fonts/TensorFont/1.0.3/TensorFont/TensorFont.eot?x_module=%{MODULE_VERSION_STUB=MyModule}&x_version=builder-test-1#iefix\')');
+      result.newText.should.equal('url(\'fonts/TensorFont/1.0.3/TensorFont/TensorFont.eot?x_module=%{MODULE_VERSION_STUB=MyModule}#iefix\')');
       result.errors.should.equal(false);
       currentFile.versioned.should.equal(true);
 
@@ -163,7 +163,7 @@ describe('versionize-content', () => {
          base
       };
       result = versionizeContent.versionizeStyles(currentFile, currentModuleInfo, versionParams);
-      result.newText.should.equal('url(\'fonts/TensorFont/1.0.3/TensorFont/TensorFont.eot?x_module=%{MODULE_VERSION_STUB=MyModule}&x_version=builder-test-1#test123\')');
+      result.newText.should.equal('url(\'fonts/TensorFont/1.0.3/TensorFont/TensorFont.eot?x_module=%{MODULE_VERSION_STUB=MyModule}#test123\')');
       result.errors.should.equal(false);
       currentFile.versioned.should.equal(true);
 
@@ -189,7 +189,7 @@ describe('versionize-content', () => {
          path: filePath
       };
       result = versionizeContent.versionizeStyles(currentFile, moduleInfoWithSpace, versionParams);
-      result.newText.should.equal('background: url(img/Point.png?x_module=%{MODULE_VERSION_STUB=MyModule_with_space}&x_version=builder-test-1)');
+      result.newText.should.equal('background: url(img/Point.png?x_module=%{MODULE_VERSION_STUB=MyModule_with_space})');
       result.errors.should.equal(false);
    });
 
@@ -463,8 +463,8 @@ describe('versionize-content', () => {
       const styleSourceNotChanged = styleSourceContent.includes("url('cbuc-icons/cbuc-icons.eot#iefix')") &&
          styleSourceContent.includes("url('cbuc-icons/cbuc-icons.woff2')");
       styleSourceNotChanged.should.equal(true);
-      const styleCompiledChanged = styleCompiledContent.includes('url(cbuc-icons/cbuc-icons.eot?x_module=%{MODULE_VERSION_STUB=Modul}&x_version=test#iefix)') &&
-         styleCompiledContent.includes('url(cbuc-icons/cbuc-icons.woff2?x_module=%{MODULE_VERSION_STUB=Modul}&x_version=test)');
+      const styleCompiledChanged = styleCompiledContent.includes('url(cbuc-icons/cbuc-icons.eot?x_module=%{MODULE_VERSION_STUB=Modul}#iefix)') &&
+         styleCompiledContent.includes('url(cbuc-icons/cbuc-icons.woff2?x_module=%{MODULE_VERSION_STUB=Modul})');
       styleCompiledChanged.should.equal(true);
       await clearWorkspace();
    });
