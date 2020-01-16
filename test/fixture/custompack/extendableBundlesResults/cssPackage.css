@@ -1,4 +1,4 @@
 /* /InterfaceModule1/extend.package.json:superbundle-for-builder-tests.package.js */
-.interfaceModule1_logoDefault{background-image:url(/resources/InterfaceModule1/images/logo-en.svg?x_module=%{MODULE_VERSION_STUB=InterfaceModule1})}
+.interfaceModule1_logoDefault{background-image:url(/resources/InterfaceModule1/images/logo-en.svg?x_module=%{MODULE_VERSION_STUB=InterfaceModule1}&x_version=builder.unit.tests)}
 /* /InterfaceModule2/extend.package.json:superbundle-for-builder-tests.package.js */
-.interfaceModule2_logoDefault{background-image:url(/resources/InterfaceModule2/images/logo-en.svg?x_module=%{MODULE_VERSION_STUB=InterfaceModule2})}
+.interfaceModule2_logoDefault{background-image:url(/resources/InterfaceModule2/images/logo-en.svg?x_module=%{MODULE_VERSION_STUB=InterfaceModule2}&x_version=builder.unit.tests)}
