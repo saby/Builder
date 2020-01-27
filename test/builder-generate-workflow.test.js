@@ -515,7 +515,7 @@ describe('gulp/builder/generate-workflow.js', () => {
       const testResults = async() => {
          const module1Meta = await fs.readFile(path.join(outputFolder, 'Module1/.builder/module.js'), 'utf8');
          module1Meta.should.equal('define(\'Module1/.builder/module\',[],function(){return {"dict":["en","en-GB","en-US","en.css","ru-RU"]};});');
-         (await isRegularFile(path.join(outputFolder, 'Module2/.builder'), 'module.js')).should.equal(false);
+         (await isRegularFile(path.join(outputFolder, 'Module2/.builder'), 'module.js')).should.equal(true);
          const { messages } = await fs.readJson(path.join(workspaceFolder, 'logs/builder_report.json'));
          const errorMessage = 'Attempt to use css from root lang directory, use less instead!';
          let cssLangErrorExists = false;
@@ -591,7 +591,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          testModuleThemes(testModuleContents);
 
          // new themes meta must not be stored into ".builder/module.js" meta for localization module.
-         (await isRegularFile(path.join(outputFolder, 'TestModule/.builder'), 'module.js')).should.equal(false);
+         (await isRegularFile(path.join(outputFolder, 'TestModule/.builder'), 'module.js')).should.equal(true);
 
          /**
           * In case of using new themes algorythm for less compiling we must not compile less also for
@@ -1009,6 +1009,7 @@ describe('gulp/builder/generate-workflow.js', () => {
       // проверим, что все нужные файлы появились в "стенде"
       let resultsFiles = await fs.readdir(moduleOutputFolder);
       resultsFiles.should.have.members([
+         '.builder',
          'ForChange.js',
          'ForChange_old.html',
          'ForRename_old.js',
@@ -2024,7 +2025,9 @@ describe('gulp/builder/generate-workflow.js', () => {
             'cdn_modules.json',
             'compiled-less.min.json',
             'libraries.json',
-            'versioned_modules.json'
+            'versioned_modules.json',
+            'module.js',
+            'module.min.js'
          ]);
 
          // check subdirectory of module

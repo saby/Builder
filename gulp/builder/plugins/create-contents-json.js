@@ -1,5 +1,6 @@
 /**
- * Плагин для создания contents.json и contents.js (информация для require, описание локализации и т.д.)
+ * Gulp plugin for creating of contents.json and contents.js meta files
+ * (information for require.js, localization description, etc.)
  * @author Kolbeshin F.A.
  */
 
@@ -9,13 +10,12 @@ const through = require('through2'),
    Vinyl = require('vinyl'),
    logger = require('../../../lib/logger').logger(),
    path = require('path'),
-   helpers = require('../../../lib/helpers'),
-   assert = require('assert');
+   helpers = require('../../../lib/helpers');
 
 /**
- * Объявление плагина
- * @param {BuildConfiguration} config конфигурация сборки
- * @param {ModuleInfo} moduleInfo информация о модуле
+ * Plugin declaration
+ * @param {BuildConfiguration} taskParameters - whole parameters list(gulp configuration, all builder cache, etc. )
+ * @param {ModuleInfo} moduleInfo - interface module info for current file in the flow
  * @returns {stream}
  */
 module.exports = function declarePlugin(taskParameters, moduleInfo) {
@@ -41,7 +41,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                moduleInfo.contents.buildnumber = `%{MODULE_VERSION_STUB=${path.basename(moduleInfo.output)}}`;
             }
 
-            // сохраняем модульный contents в общий, если необходимо
+            // save modular contents.js into joined if needed.
             if (taskParameters.config.joinedMeta) {
                helpers.joinContents(taskParameters.config.commonContents, moduleInfo.contents);
             }
@@ -65,37 +65,31 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                moduleMeta = moduleInfo.contents.modules[currentModuleName],
                moduleMetaResult = {};
 
-            /**
-             * in module.js meta i18n needs only "dict" property to use, store it if
-             */
+            // in module.js meta i18n needs only "dict" property to use, store it if exists.
             if (moduleMeta.hasOwnProperty('dict')) {
                moduleMetaResult.dict = moduleMeta.dict;
             }
 
             /**
-             * meta for module must contain dictionary list for current Interface module. Otherwise there
-             * is no reason to save AMD-formatted meta for this interface module. I18n module must return
-             * default meta in this case
+             * generate AMD-formatted meta for current module localization despite the fact of its content value.
+             * Will be completely remove in 20.2100 after completion of the task
+             * https://online.sbis.ru/opendoc.html?guid=0f5682ba-f95d-4bf9-a4b7-54a539e54c9d
              */
-            try {
-               assert.deepStrictEqual({}, moduleMetaResult);
-            } catch (err) {
-               const moduleMetaContent = `define('${currentModuleName}/.builder/module',[],function(){return ${JSON.stringify(moduleMetaResult)};});`;
-               const moduleMetaFile = new Vinyl({
-                  path: '.builder/module.js',
-                  contents: Buffer.from(moduleMetaContent),
-                  moduleInfo,
-                  compiled: true
-               });
-               const moduleMetaMinFile = new Vinyl({
-                  path: '.builder/module.min.js',
-                  contents: Buffer.from(moduleMetaContent),
-                  moduleInfo,
-                  compiled: true
-               });
-               this.push(moduleMetaFile);
-               this.push(moduleMetaMinFile);
-            }
+            const moduleMetaContent = `define('${currentModuleName}/.builder/module',[],function(){return ${JSON.stringify(moduleMetaResult)};});`;
+            const moduleMetaFile = new Vinyl({
+               path: '.builder/module.js',
+               contents: Buffer.from(moduleMetaContent),
+               moduleInfo,
+               compiled: true
+            });
+            const moduleMetaMinFile = new Vinyl({
+               path: '.builder/module.min.js',
+               contents: Buffer.from(moduleMetaContent),
+               moduleInfo,
+               compiled: true
+            });
+            this.push(moduleMetaFile);
+            this.push(moduleMetaMinFile);
          } catch (error) {
             logger.error({
                message: "Ошибка Builder'а",

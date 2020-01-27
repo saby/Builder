@@ -37,6 +37,8 @@ function getPrivatePartsCache(taskParameters, moduleInfo) {
  */
 module.exports = function declarePlugin(taskParameters, moduleInfo) {
    const libraries = [];
+
+   // sourceRoot variable is already have unixified module path.
    const sourceRoot = path.dirname(moduleInfo.path);
    return through.obj(
 
