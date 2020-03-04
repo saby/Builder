@@ -140,19 +140,6 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
 
    // check for offline plugin application
    const multiThemes = getMultiThemesList(allThemes, taskParameters.config.themes);
-
-   /**
-    * temporary decision in 2100 to provide backward compatibility between new
-    * and multi scheme for default theme. For 2100 only.
-    * https://online.sbis.ru/doc/e88ff761-5db0-4fe0-bd23-021cb4c1b6f2
-     */
-   multiThemes.default = {
-      path: `${gulpModulesInfo.gulpModulesPaths['Controls-default-theme']}/_theme`,
-      config: {
-         tags: ['ws4-default']
-      },
-      customPath: true
-   };
    const newThemes = getNewThemesList(allThemes);
    let autoprefixerOptions = false;
    switch (typeof taskParameters.config.autoprefixer) {
