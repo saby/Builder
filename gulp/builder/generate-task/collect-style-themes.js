@@ -106,6 +106,15 @@ function generateTaskForCollectThemes(taskParameters) {
             .pipe(mapStream(async(file, done) => {
                const currentFileName = path.basename(file.path);
                if (currentFileName === 'themes.config.json') {
+                  /**
+                   * if "themes.config.json" config file was found, log it as warning
+                   * so folks responsible for project building can write errors
+                   * for this to fix it and dont miss any of the config file.
+                   */
+                  logger.warning({
+                     message: '"themes.config.json" is deprecated. You have to get rid of it.',
+                     filePath: file.path
+                  });
                   try {
                      const parsedLessConfig = JSON.parse(file.contents);
                      configLessChecker.checkOptions(parsedLessConfig);
@@ -158,6 +167,15 @@ function generateTaskForCollectThemes(taskParameters) {
                            logger.warning(`There is no configuration file ${themeConfigPath} with set of compatibility tags ` +
                               `for theme ${file.path}. This theme won't be participating in less build.`);
                         } else {
+                           /**
+                            * if "theme.config.json" config file was found, log it as warning
+                            * so folks responsible for project building can write errors
+                            * for this to fix it and dont miss any of the config file.
+                            */
+                           logger.warning({
+                              message: '"theme.config.json" is deprecated. You have to get rid of it.',
+                              filePath: file.path
+                           });
                            try {
                               themeConfig = await fs.readJson(themeConfigPath);
                            } catch (error) {
