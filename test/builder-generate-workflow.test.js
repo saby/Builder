@@ -572,11 +572,18 @@ describe('gulp/builder/generate-workflow.js', () => {
          testModuleThemes(testModuleContents);
 
          /**
-          * In case of using new themes algorythm for less compiling we must not compile less also for
+          * We need to import SBIS3.CONTROLS variables into new theme less files to get an ability to move
+          * old variables from Controls-default-theme into SBIS3.CONTROLS without errors.
+          *
+          * TODO return behaviour below after all of less files will be tested for old SBIS3.CONTROLS variables
+          * TODO and gotten corresponding old variables import for that.
+          *
+          * In case of using new themes algorythm for less compiling we must not compile less for
           * old themes. Result will be the same, but for the same time it will downgrade the speed
           * because of compiling 2 styles for one less with the same result's content.
           */
          (await isRegularFile(path.join(outputFolder, 'TestModule-anotherTheme-theme'), 'badVariable.css')).should.equal(false);
+         (await isRegularFile(path.join(outputFolder, 'TestModule-anotherTheme-theme'), 'onlineVariable.css')).should.equal(true);
       };
       const config = {
          cache: cacheFolder,
@@ -620,7 +627,7 @@ describe('gulp/builder/generate-workflow.js', () => {
       await runWorkflowWithTimeout(30000);
       await testResults();
 
-      // css files don't be processing in new less compiler, so these should be ignored
+      // css files doesn't processing in new less compiler, so these should be ignored
       await testEmptyLessLog(['emptyLessNewTheme.less'], ['less', 'css']);
       await runWorkflowWithTimeout(30000);
       await testResults();
