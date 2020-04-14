@@ -306,7 +306,8 @@ describe('build less', () => {
       });
       it('new theme - should return empty array', () => {
          const result = getCurrentImports('path/to/some/less.less', newTheme, gulpModulesInfo.gulpModulesPaths);
-         result.length.should.equal(0);
+         result.length.should.equal(1);
+         result.should.have.members(['@import \'SBIS3.Controls/themes/online/_variables\';']);
       });
    });
 });
