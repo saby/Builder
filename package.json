@@ -61,7 +61,6 @@
       "uglify-js": "3.3.23",
       "vinyl": "2.2.0",
       "workerpool": "2.3.0",
-      "iltorb": "2.4.3",
       "semver": "6.3.0"
    },
    "devDependencies": {
