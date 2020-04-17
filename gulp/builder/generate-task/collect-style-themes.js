@@ -8,14 +8,11 @@
 
 'use strict';
 
-const gulp = require('gulp'),
-   path = require('path'),
-   plumber = require('gulp-plumber'),
-   mapStream = require('map-stream'),
-   fs = require('fs-extra'),
-   helpers = require('../../../lib/helpers'),
-   configLessChecker = require('../../../lib/config-less-checker');
-
+const gulp = require('gulp');
+const path = require('path');
+const plumber = require('gulp-plumber');
+const mapStream = require('map-stream');
+const helpers = require('../../../lib/helpers');
 const logger = require('../../../lib/logger').logger();
 const startTask = require('../../common/start-task-with-timer');
 
@@ -83,7 +80,7 @@ function generateTaskForCollectThemes(taskParameters) {
    );
    const tasks = taskParameters.config.modules.map((moduleInfo) => {
       const input = [
-         path.join(moduleInfo.path, '/themes/*/*.less'),
+         path.join(moduleInfo.path, '/themes/*/theme.config.json'),
          path.join(moduleInfo.path, '/themes.config.json'),
          path.join(moduleInfo.path, '/**/_theme.less')
       ];
@@ -102,40 +99,19 @@ function generateTaskForCollectThemes(taskParameters) {
                   }
                })
             )
-            .pipe(mapStream(async(file, done) => {
+            .pipe(mapStream((file, done) => {
                const currentFileName = path.basename(file.path);
-               if (currentFileName === 'themes.config.json') {
+               if (currentFileName === 'themes.config.json' || currentFileName === 'theme.config.json') {
                   /**
-                   * if "themes.config.json" config file was found, log it as warning
+                   * if "(themes/theme).config.json" config file was found, log it as warning
                    * so folks responsible for project building can write errors
                    * for this to fix it and dont miss any of the config file.
                    */
                   logger.warning({
-                     message: '"themes.config.json" is deprecated. You have to get rid of it.',
+                     message: `"${currentFileName}" is deprecated. You have to get rid of it.`,
                      filePath: file.path
                   });
-                  try {
-                     const parsedLessConfig = JSON.parse(file.contents);
-                     configLessChecker.checkOptions(parsedLessConfig);
-
-                     // disable old less in less config if disabled for all project
-                     if (!taskParameters.config.oldThemes) {
-                        parsedLessConfig.old = false;
-                     }
-                     await taskParameters.cache.addModuleLessConfiguration(
-                        moduleInfo.name,
-                        parsedLessConfig,
-                        taskParameters.config.rawConfig.cache
-                     );
-                  } catch (error) {
-                     logger.error({
-                        message: 'Ошибка обработки файла конфигурации less для Интерфейсного модуля',
-                        error,
-                        filePath: file.path,
-                        moduleInfo
-                     });
-                  }
-               } else if (currentFileName === '_theme.less') {
+               } else {
                   const currentModuleName = path.basename(moduleInfo.output);
                   const currentModuleNameParts = currentModuleName.split('-');
 
@@ -155,50 +131,13 @@ function generateTaskForCollectThemes(taskParameters) {
                      );
                      taskParameters.cache.addNewStyleTheme(themeModule, modifier, result);
                   }
-               } else {
-                  const fileName = path.basename(file.path, '.less');
-                  const folderName = path.basename(path.dirname(file.path));
-                  if (fileName === folderName) {
-                     const themeConfigPath = `${path.dirname(file.path)}/theme.config.json`;
-                     let themeConfig;
-                     if (!(await fs.pathExists(themeConfigPath))) {
-                        logger.warning(`There is no configuration file ${themeConfigPath} with set of compatibility tags ` +
-                           `for theme ${file.path}. This theme won't be participating in less build.`);
-                     } else {
-                        /**
-                         * if "theme.config.json" config file was found, log it as warning
-                         * so folks responsible for project building can write errors
-                         * for this to fix it and dont miss any of the config file.
-                         */
-                        logger.warning({
-                           message: '"theme.config.json" is deprecated. You have to get rid of it.',
-                           filePath: file.path
-                        });
-                        try {
-                           themeConfig = await fs.readJson(themeConfigPath);
-                        } catch (error) {
-                           logger.error({
-                              message: 'Theme configuration file error occurred. Check validity of the configuration file',
-                              error,
-                              filePath: themeConfigPath,
-                              moduleInfo
-                           });
-                        }
-                     }
-                     taskParameters.cache.addStyleTheme(folderName, path.dirname(file.path), themeConfig);
-                  }
                }
                done();
             }));
       };
    });
 
-   const collectStyleThemes = startTask(
-      'collectStyleThemes',
-      taskParameters,
-      null,
-      () => taskParameters.cache.checkThemesForUpdate
-   );
+   const collectStyleThemes = startTask('collectStyleThemes', taskParameters);
    return gulp.series(
       collectStyleThemes.start,
       gulp.parallel(tasks),

@@ -2,7 +2,6 @@
 
 const initTest = require('./init-test');
 const { parseCurrentModuleName, getThemeModifier } = require('../gulp/builder/generate-task/collect-style-themes');
-const { checkForNewThemeType } = require('../gulp/builder/plugins/compile-less');
 const { defaultAutoprefixerOptions } = require('../lib/builder-constants');
 const
    path = require('path'),
@@ -10,7 +9,6 @@ const
    helpers = require('../lib/helpers'),
    { resolveThemeName } = require('../lib/less/build-less'),
    {
-      getThemeImport,
       getCurrentImports,
       processLessFile
    } = require('../lib/less/helpers');
@@ -18,15 +16,27 @@ const
 const workspaceFolder = helpers.prettifyPath(path.join(__dirname, 'fixture/build-less')),
    pathsForImport = [workspaceFolder],
    themes = {
-      'online': path.join(workspaceFolder, 'SBIS3.CONTROLS/themes/online'),
-      'presto': path.join(workspaceFolder, 'SBIS3.CONTROLS/themes/presto'),
-      'carry': path.join(workspaceFolder, 'SBIS3.CONTROLS/themes/carry')
+      'online': {
+         path: path.join(workspaceFolder, 'SBIS3.CONTROLS/themes/online'),
+         moduleName: 'SBIS3.CONTROLS'
+      },
+      'presto': {
+         path: path.join(workspaceFolder, 'SBIS3.CONTROLS/themes/presto'),
+         name: 'presto',
+         moduleName: 'SBIS3.CONTROLS'
+
+      },
+      'carry': {
+         path: path.join(workspaceFolder, 'SBIS3.CONTROLS/themes/carry'),
+         name: 'carry',
+         moduleName: 'SBIS3.CONTROLS'
+      }
    };
 
 const defaultModuleThemeObject = {
    name: 'online',
-   path: themes.online,
-   isDefault: true
+   path: themes.online.path,
+   moduleName: themes.online.moduleName
 };
 
 describe('build less', () => {
@@ -45,7 +55,7 @@ describe('build less', () => {
       const filePath = helpers.prettifyPath(path.join(workspaceFolder, 'AnyModule/bla/bla/long/path/test.less'));
       const text = '';
       const result = await processLessFile(text, filePath, defaultModuleThemeObject, gulpModulesInfo);
-      result.imports.length.should.equal(2);
+      result.imports.length.should.equal(3);
       result.text.should.equal('');
    });
    it('theme less', async() => {
@@ -61,7 +71,7 @@ describe('build less', () => {
       const filePath = helpers.prettifyPath(path.join(workspaceFolder, 'AnyModule/bla/bla/long/path/test.less'));
       const text = '.test { box-shadow: 0 4px 24px #d2e2f3e0; }';
       const result = await processLessFile(text, filePath, defaultModuleThemeObject, gulpModulesInfo);
-      result.imports.length.should.equal(2);
+      result.imports.length.should.equal(3);
       result.text.should.equal('.test {\n' +
          '  box-shadow: 0 4px 24px #d2e2f3e0;\n' +
          '}\n');
@@ -70,7 +80,7 @@ describe('build less', () => {
       const filePath = path.join(workspaceFolder, 'AnyModule/bla/bla/long/path/test.less');
       const text = '.test-selector {\ntest-mixin: @test-mixin;test-var: @test-var;}';
       const result = await processLessFile(text, filePath, defaultModuleThemeObject, gulpModulesInfo);
-      result.imports.length.should.equal(2);
+      result.imports.length.should.equal(3);
       result.text.should.equal(".test-selector {\n  test-mixin: 'mixin there';\n  test-var: 'it is online';\n}\n");
    });
    it('less with grids: correctly added prefixes', async() => {
@@ -87,7 +97,7 @@ describe('build less', () => {
          gulpModulesInfo,
          defaultAutoprefixerOptions
       );
-      result.imports.length.should.equal(2);
+      result.imports.length.should.equal(3);
       result.text.should.equal(
          '.test-prefixes {\n' +
          '  display: -ms-grid;\n' +
@@ -107,7 +117,7 @@ describe('build less', () => {
          '      grid-template-rows: auto;\n' +
          '}';
       const result = await processLessFile(text, filePath, defaultModuleThemeObject, gulpModulesInfo);
-      result.imports.length.should.equal(2);
+      result.imports.length.should.equal(3);
       result.text.should.equal(
          '.test-prefixes {\n' +
          '  display: grid;\n' +
@@ -123,9 +133,10 @@ describe('build less', () => {
       const themeName = resolveThemeName(filePath, retailModulePath);
       const result = await processLessFile(text, filePath, {
          name: themeName,
-         path: themes[themeName]
+         path: themes[themeName].path,
+         moduleName: themes[themeName].moduleName
       }, gulpModulesInfo);
-      result.imports.length.should.equal(2);
+      result.imports.length.should.equal(3);
       result.text.should.equal(".test-selector {\n  test-mixin: 'mixin there';\n  test-var: 'it is carry';\n}\n");
    });
    it('less from retail with presto theme', async() => {
@@ -134,10 +145,11 @@ describe('build less', () => {
       const text = '.test-selector {\ntest-mixin: @test-mixin;test-var: @test-var;}';
       const themeName = resolveThemeName(filePath, retailModulePath);
       const result = await processLessFile(text, filePath, {
-         name: 'presto',
-         path: themes[themeName]
+         name: themeName,
+         path: themes[themeName].path,
+         moduleName: themes[themeName].moduleName
       }, gulpModulesInfo);
-      result.imports.length.should.equal(2);
+      result.imports.length.should.equal(3);
       result.text.should.equal(".test-selector {\n  test-mixin: 'mixin there';\n  test-var: 'it is presto';\n}\n");
    });
    it('Button less from SBIS3.CONTROLS', async() => {
@@ -146,9 +158,10 @@ describe('build less', () => {
       const themeName = resolveThemeName(filePath, filePath);
       const result = await processLessFile(text, filePath, {
          name: themeName,
-         path: themes[themeName]
+         path: themes[themeName].path,
+         moduleName: themes[themeName].moduleName
       }, gulpModulesInfo);
-      result.imports.length.should.equal(2);
+      result.imports.length.should.equal(3);
       result.text.should.equal(".test-selector {\n  test-mixin: 'mixin there';\n  test-var: 'it is online';\n}\n");
    });
 
@@ -159,7 +172,8 @@ describe('build less', () => {
       const themeName = resolveThemeName(filePath, filePath);
       const result = await processLessFile(text, filePath, {
          name: themeName,
-         path: themes[themeName]
+         path: themes[themeName].path,
+         moduleName: themes[themeName].moduleName
       }, gulpModulesInfo);
       const errorMessage = result.error.replace(/\\/g, '/');
       return lib
@@ -173,44 +187,13 @@ describe('build less', () => {
       const themeName = resolveThemeName(filePath, filePath);
       const result = await processLessFile(text, filePath, {
          name: themeName,
-         path: themes[themeName]
+         path: themes[themeName].path,
+         moduleName: themes[themeName].moduleName
       }, gulpModulesInfo);
-      result.imports.length.should.equal(2);
+      result.imports.length.should.equal(3);
       result.text.should.equal(
          ".test-selector {\n  test-mixin: 'mixin there';\n  test-var: 'it is online';\n}\n"
       );
-   });
-
-   it('get correct variables import', () => {
-      let result = getThemeImport(gulpModulesInfo.gulpModulesPaths, {
-         isDefault: true,
-         name: 'online',
-         path: 'SBIS3.CONTROLS/themes/online/_variables'
-      });
-      result.should.equal('@import \'SBIS3.CONTROLS/themes/online/_variables/_variables\';');
-      result = getThemeImport(gulpModulesInfo.gulpModulesPaths, {
-         isDefault: true,
-         name: 'online',
-         path: 'SBIS3.CONTROLS/themes/online/_variables',
-         variablesFromLessConfig: 'Controls-default-theme'
-      });
-      result.should.equal('@import \'Controls-default-theme/_theme\';');
-      result = getThemeImport(gulpModulesInfo.gulpModulesPaths, {
-         isDefault: true,
-         name: 'theme',
-         path: 'path/to/some/multi'
-      });
-      result.should.equal('@import \'path/to/some/multi/theme\';');
-      result = getThemeImport(gulpModulesInfo.gulpModulesPaths, {
-         isDefault: true,
-         name: 'carry'
-      });
-      result.should.equal('@import \'Controls-default-theme/_theme\';');
-      result = getThemeImport({}, {
-         isDefault: true,
-         name: 'default'
-      });
-      result.should.equal('');
    });
 
    it("get correct base info for new theme's interface module", () => {
@@ -233,18 +216,6 @@ describe('build less', () => {
       result.should.equal('dark/medium');
       result = getThemeModifier(root, darkLThemePath);
       result.should.equal('dark-large');
-   });
-   it('check theme for new type', () => {
-      const multiTheme = {
-         path: 'path/to/myTheme'
-      };
-      const newTheme = {
-         type: 'new',
-         moduleName: 'TestModule',
-         themeName: 'online'
-      };
-      checkForNewThemeType(multiTheme).should.equal(false);
-      checkForNewThemeType(newTheme).should.equal(true);
    });
    describe('get correct imports for current less', () => {
       const oldTheme = {
@@ -275,7 +246,7 @@ describe('build less', () => {
          const result = getCurrentImports('path/to/some/less.less', oldTheme, gulpModulesInfo.gulpModulesPaths);
          result.length.should.equal(3);
          result.should.have.members([
-            '@import \'path/to/default/default\';',
+            '@import \'Controls-default-theme/_theme\';',
             '@import "SBIS3.CONTROLS/themes/_mixins";',
             '@themeName: default;'
          ]);

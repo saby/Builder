@@ -1,5 +1,5 @@
 /**
- * Плагин для компиляции less.
+ * Plugin for compiling of less files
  * @author Kolbeshin F.A.
  */
 
@@ -14,19 +14,6 @@ const through = require('through2'),
    fs = require('fs-extra'),
    { defaultAutoprefixerOptions } = require('../../../lib/builder-constants'),
    cssExt = /\.css$/;
-
-/**
- * Получаем путь до скомпиленного css в конечной директории относительно
- * корня приложения.
- * @param {Object} moduleInfo - базовая информация об Интерфейсном модуле
- * @param {String} prettyFilePath - отформатированный путь до css-файла.
- * @returns {*}
- */
-function getRelativeOutput(moduleInfo, prettyFilePath) {
-   const { moduleName, prettyModuleOutput } = moduleInfo;
-   const relativePath = path.relative(prettyModuleOutput, prettyFilePath);
-   return path.join(moduleName, relativePath).replace(/\.css$/, '.min.css');
-}
 
 /**
  * Get interface module name from failed less path
@@ -44,46 +31,6 @@ function getModuleNameForFailedImportLess(currentLessBase, failedLessPath) {
 }
 
 /**
- * В случае отсутствия в Интерфейсном модуле конфигурации темизации less
- * файлов, генерируем базовую конфигурацию:
- * 1) Генерируем все less-ки Интерфейсного модуля по старой схеме темизации
- * 2) Не билдим все less-ки Интерфейсного модуля по новой схеме темизации
- */
-function setDefaultLessConfiguration() {
-   return {
-      old: true,
-      multi: false
-   };
-}
-
-/**
- * Check current theme for new theme type
- * @param{Object} currentTheme - current theme info
- * @returns {boolean}
- */
-function checkForNewThemeType(currentTheme) {
-   /**
-    * new themes can't be imported into any less by builder,
-    * only physically import is allowed for it.
-    */
-   return currentTheme.type === 'new';
-}
-
-/**
- * gets new themes list
- * @param allThemes
- */
-function getNewThemesList(allThemes) {
-   const newThemes = {};
-   Object.keys(allThemes).forEach((currentTheme) => {
-      if (allThemes[currentTheme].type === 'new') {
-         newThemes[currentTheme] = allThemes[currentTheme];
-      }
-   });
-   return newThemes;
-}
-
-/**
  * Объявление плагина
  * @param {TaskParameters} taskParameters параметры для задач
  * @param {ModuleInfo} moduleInfo информация о модуле
@@ -96,9 +43,8 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
       return path.join(moduleInfo.output, transliterate(relativePath));
    };
    const moduleLess = [];
-   const allThemes = taskParameters.cache.currentStore.styleThemes;
    const moduleName = path.basename(moduleInfo.output);
-   const newThemes = getNewThemesList(allThemes);
+   const newThemes = taskParameters.cache.currentStore.themeModules;
    let autoprefixerOptions = false;
    switch (typeof taskParameters.config.autoprefixer) {
       case 'boolean':
@@ -206,15 +152,6 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
 
             if (file.cached) {
                taskParameters.cache.addOutputFile(file.history[0], getOutput(file, '.css'), moduleInfo);
-
-               if (!isLangCss) {
-                  Object.keys(allThemes).forEach((key) => {
-                     if (allThemes[key].type !== 'new') {
-                        taskParameters.cache.addOutputFile(file.history[0], getOutput(file, `_${key}.css`), moduleInfo);
-                     }
-                  });
-               }
-
                callback(null, file);
                return;
             }
@@ -235,58 +172,21 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
 
       /* @this Stream */
       async function onFlush(callback) {
-         let moduleLessConfig = taskParameters.cache.getModuleLessConfiguration(moduleInfo.name);
-         if (!moduleLessConfig) {
-            moduleLessConfig = setDefaultLessConfiguration();
-         }
-         const
-            prettyModuleOutput = helpers.prettifyPath(moduleInfo.output),
-            needSaveImportLogs = taskParameters.config.logFolder && moduleLessConfig.importsLogger;
-
-         let compiledLess = new Set();
-
-         /**
-          * если уже существует мета-файл по результатам предыдущей сборки, необходимо
-          * прочитать его и дополнить новыми скомпилированными стилями.
-          */
-         if (await fs.pathExists(path.join(moduleInfo.output, '.builder/compiled-less.min.json'))) {
-            compiledLess = new Set(await fs.readJson(path.join(moduleInfo.output, '.builder/compiled-less.min.json')));
-         }
-
-         /**
-          * Если разработчиком в конфигурации less задан параметр для логгирования импортов для
-          * компилируемого less, создаём json-лог и пишем его в директорию логов с названием соответствующего
-          * Интерфейсного модуля. Если такой лог уже существует, предварительно вычитываем его и меняем набор
-          * импортов изменённых less(для инкрементальной сборки).
-          */
-         let lessImportsLogs = {}, lessImportsLogsPath;
-         if (needSaveImportLogs) {
-            lessImportsLogsPath = path.join(taskParameters.config.logFolder, `less-imports-for-${moduleName}.json`);
-            if (await fs.pathExists(lessImportsLogsPath)) {
-               lessImportsLogs = await fs.readJson(lessImportsLogsPath);
-            }
-         }
-         let errors = false;
          const promises = [];
          const errorsList = {};
+         let errors = false;
          Object.keys(moduleLess).forEach((lessFile) => {
             promises.push((async(currentLessFile) => {
                try {
-                  const lessInfo = {
-                     filePath: currentLessFile.history[0],
-                     modulePath: moduleInfo.path,
-                     text: currentLessFile.contents.toString(),
-                     moduleLessConfig,
-                     autoprefixerOptions
-                  };
-                  const [error, results] = await execInPool(
+                  const [error, result] = await execInPool(
                      taskParameters.pool,
                      'buildLess',
                      [
-                        lessInfo,
-                        gulpModulesInfo,
-                        currentLessFile.isLangCss,
-                        allThemes
+                        currentLessFile.history[0],
+                        currentLessFile.contents.toString(),
+                        moduleInfo.path,
+                        autoprefixerOptions,
+                        gulpModulesInfo
                      ],
                      currentLessFile.history[0],
                      moduleInfo,
@@ -311,78 +211,50 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                      return;
                   }
 
-                  for (const result of results) {
-                     taskParameters.storePluginTime('less compiler', result.passedTime, true);
-                     if (result.error) {
-                        if (result.type) {
-                           const moduleNameForFail = getModuleNameForFailedImportLess(
-                              currentLessFile.base,
-                              result.failedLess
-                           );
-                           const moduleInfoForFail = taskParameters.config.modules.find(
-                              currentModuleInfo => currentModuleInfo.name === moduleNameForFail
-                           );
-                           let message = result.error;
+                  taskParameters.storePluginTime('less compiler', result.passedTime, true);
+                  if (result.error) {
+                     if (result.type) {
+                        const moduleNameForFail = getModuleNameForFailedImportLess(
+                           currentLessFile.base,
+                           result.failedLess
+                        );
+                        const moduleInfoForFail = taskParameters.config.modules.find(
+                           currentModuleInfo => currentModuleInfo.name === moduleNameForFail
+                        );
+                        let message = result.error;
 
-                           // add more additional logs information for bad import in less
-                           if (result.type === 'import') {
-                              const errorLoadAttempts = result.error.slice(result.error.indexOf('Tried -'), result.error.length);
-                              result.error = result.error.replace(errorLoadAttempts, '');
+                        // add more additional logs information for bad import in less
+                        if (result.type === 'import') {
+                           const errorLoadAttempts = result.error.slice(result.error.indexOf('Tried -'), result.error.length);
+                           result.error = result.error.replace(errorLoadAttempts, '');
 
-                              message = `Bad import detected ${result.error}. Check interface module of current import ` +
-                                 `for existing in current project. Needed by: ${currentLessFile.history[0]}. ` +
-                                 `For theme: ${result.theme.name}. Theme type: ${result.theme.isDefault ? 'old' : 'new'}\n${errorLoadAttempts}`;
-                           }
-                           errorsList[result.failedLess] = {
-                              message,
-                              moduleInfo: moduleInfoForFail
-                           };
-                        } else {
-                           const messageParts = [];
-                           messageParts.push(`Less compiler error: ${result.error}. Source file: ${currentLessFile.history[0]}. `);
-                           if (result.theme) {
-                              messageParts.push(`Theme: ${result.theme.name}. `);
-                              messageParts.push(`Theme type: ${result.theme.isDefault ? 'old' : 'new'}`);
-                           }
-                           messageParts.push('\n');
-                           logger.error({ message: messageParts.join('') });
+                           message = `Bad import detected ${result.error}. Check interface module of current import ` +
+                              `for existing in current project. Needed by: ${currentLessFile.history[0]}.\n${errorLoadAttempts}`;
                         }
-                        errors = true;
-                        taskParameters.cache.markFileAsFailed(currentLessFile.history[0]);
+                        errorsList[result.failedLess] = {
+                           message,
+                           moduleInfo: moduleInfoForFail
+                        };
                      } else {
-                        const { compiled } = result;
-                        const outputPath = getOutput(currentLessFile, compiled.defaultTheme ? '.css' : `_${compiled.nameTheme}.css`);
-
-                        /**
-                         * Мета-данные о скомпилированных less нужны только во время
-                         * выполнения кастомной паковки
-                         */
-                        if (taskParameters.config.customPack) {
-                           const relativeOutput = helpers.unixifyPath(
-                              getRelativeOutput(
-                                 { moduleName, prettyModuleOutput },
-                                 helpers.unixifyPath(outputPath)
-                              )
-                           );
-                           compiledLess.add(relativeOutput);
-                        }
-                        taskParameters.cache.addOutputFile(currentLessFile.history[0], outputPath, moduleInfo);
-                        taskParameters.cache.addDependencies(currentLessFile.history[0], compiled.imports);
-
-                        const newFile = currentLessFile.clone();
-                        newFile.contents = Buffer.from(compiled.text);
-                        newFile.path = outputPath;
-                        newFile.base = moduleInfo.output;
-                        newFile.lessSource = currentLessFile.contents;
-                        this.push(newFile);
-
-                        if (needSaveImportLogs) {
-                           lessImportsLogs[outputPath] = {
-                              importedByBuilder: compiled.importedByBuilder,
-                              allImports: compiled.imports
-                           };
-                        }
+                        const messageParts = [];
+                        messageParts.push(`Less compiler error: ${result.error}. Source file: ${currentLessFile.history[0]}. `);
+                        messageParts.push('\n');
+                        logger.error({ message: messageParts.join('') });
                      }
+                     errors = true;
+                     taskParameters.cache.markFileAsFailed(currentLessFile.history[0]);
+                  } else {
+                     const { compiled } = result;
+                     const outputPath = getOutput(currentLessFile, '.css');
+                     taskParameters.cache.addOutputFile(currentLessFile.history[0], outputPath, moduleInfo);
+                     taskParameters.cache.addDependencies(currentLessFile.history[0], compiled.imports);
+
+                     const newFile = currentLessFile.clone();
+                     newFile.contents = Buffer.from(compiled.text);
+                     newFile.path = outputPath;
+                     newFile.base = moduleInfo.output;
+                     newFile.lessSource = currentLessFile.contents;
+                     this.push(newFile);
                   }
                } catch (error) {
                   taskParameters.cache.markFileAsFailed(currentLessFile.history[0]);
@@ -407,27 +279,11 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
             );
             logger.info(`Information about interface modules used by less compiler during the build: ${JSON.stringify(gulpModulesInfo)}`);
          }
-         if (taskParameters.config.customPack) {
-            /**
-             * Because there is a possibility of writing compiled-less meta in SDK(this one is strictly
-             * forbidden on UNIX-based OS without a special permission - sudo),
-             * we'll write it in output folder directly and immediately by using "fs" library instead of "Vinyl"
-             */
-            await fs.outputJson(
-               path.join(moduleInfo.output, '.builder/compiled-less.min.json'),
-               [...compiledLess].sort()
-            );
-         }
-
-         if (needSaveImportLogs) {
-            await fs.outputJson(lessImportsLogsPath, lessImportsLogs);
-         }
          callback();
       }
    );
 }
 
 module.exports = {
-   compileLess,
-   checkForNewThemeType
+   compileLess
 };

@@ -248,7 +248,7 @@ function generateDownloadModuleCache(taskParameters, moduleInfo) {
          if (moduleInfo.rebuild) {
             const currentStoreModulesCache = taskParameters.cache.currentStore;
             const lastStoreModulesCache = taskParameters.cache.lastStore;
-            currentStoreModulesCache.newThemesModules = lastStoreModulesCache.newThemesModules;
+            currentStoreModulesCache.themeModules = lastStoreModulesCache.themeModules;
          } else {
             // in patch for modules without rebuild configuration store cache "as is"
             moduleInfo.cache.currentStore = moduleInfo.cache.lastStore;
