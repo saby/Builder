@@ -91,13 +91,6 @@ function generateTaskForRemoveFiles(taskParameters) {
                      relativePath.replace(/\.ts$/, '')
                   );
                }
-               if (relativePath.endsWith('.less') || relativePath.endsWith('.css')) {
-                  metaToUpdate.add(
-                     'compiled-less.min.json',
-                     moduleName,
-                     relativePath.replace(/\.(less|css)$/, '.min.css')
-                  );
-               }
             })()
          )
       );

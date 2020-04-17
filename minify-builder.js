@@ -108,7 +108,13 @@ function readDevDependencies() {
 }
 
 // exclude devDependencies from minifier to avoid problems with it in builder unit tests
-const librariesToExclude = readDevDependencies();
+const librariesToExclude =
+   [
+      ...readDevDependencies(),
+
+      // needed by eslint with all of it's executable files
+      'esquery'
+   ];
 
 function recursiveReadDir(folder, results) {
    const files = fs.readdirSync(folder);

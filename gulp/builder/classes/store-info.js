@@ -38,12 +38,9 @@ class StoreInfo {
       // и подавать их при повторном запуске как изменённые
       this.filesWithErrors = new Set();
 
-      // Темы для компиляции less. <Имя темы>: <путь до файла <Имя темы>.less>
-      this.styleThemes = {};
-
-      this.lessConfig = {};
-
-      this.newThemesModules = {};
+      // List of all interface modules with theme. Template <interface module>-<theme name>-theme
+      // F.e. Controls-default-theme
+      this.themeModules = {};
    }
 
    static getLastRunningParametersPath(cacheDirectory) {
@@ -93,28 +90,10 @@ class StoreInfo {
             });
          }
          try {
-            this.styleThemes = await fs.readJson(path.join(cacheDirectory, 'style-themes.json'));
-         } catch (error) {
-            logger.info({
-               message: `Cache file "${path.join(cacheDirectory, 'style-themes.json')}" failed to be read`,
-               error
-            });
-         }
-
-         try {
-            this.newThemesModules = await fs.readJson(path.join(cacheDirectory, 'new-themes.json'));
+            this.themeModules = await fs.readJson(path.join(cacheDirectory, 'new-themes.json'));
          } catch (error) {
             logger.info({
                message: `Cache file "${path.join(cacheDirectory, 'new-themes.json')}" failed to be read`,
-               error
-            });
-         }
-
-         try {
-            this.lessConfig = await fs.readJson(path.join(cacheDirectory, 'less-configs.json'));
-         } catch (error) {
-            logger.info({
-               message: `Cache file "${path.join(cacheDirectory, 'less-configs.json')}" failed to be read`,
                error
             });
          }
@@ -155,23 +134,8 @@ class StoreInfo {
          }
       );
       await fs.outputJson(
-         path.join(cacheDirectory, 'style-themes.json'),
-         this.styleThemes,
-         {
-            spaces: 1
-         }
-      );
-      await fs.outputJson(
          path.join(cacheDirectory, 'new-themes.json'),
-         this.newThemesModules,
-         {
-            spaces: 1
-         }
-      );
-
-      await fs.outputJson(
-         path.join(cacheDirectory, 'less-configs.json'),
-         this.lessConfig,
+         this.themeModules,
          {
             spaces: 1
          }

@@ -243,9 +243,7 @@ class Cache {
          if (lastModuleCache.versionedModules.hasOwnProperty(prettyPath)) {
             currentModuleCache.versionedModules[prettyPath] = lastModuleCache.versionedModules[prettyPath];
          }
-         if (path.basename(prettyPath) === 'themes.config.json' && !currentModuleCache.lessConfig) {
-            currentModuleCache.lessConfig = lastModuleCache.lessConfig;
-         }
+
          if (lastModuleCache.cdnModules.hasOwnProperty(prettyPath)) {
             currentModuleCache.cdnModules[prettyPath] = lastModuleCache.cdnModules[prettyPath];
          }
@@ -470,76 +468,28 @@ class Cache {
    }
 
    /**
-    * Сохранить в кэше конфигурацию сборки less для данного Интерфейсного
-    * модуля
-    * @param{String} moduleName - название Интерфейсного модуля
-    * @param config
-    */
-   async addModuleLessConfiguration(moduleName, config, cacheDirectory) {
-      const lastModuleLessConfig = this.lastStore.lessConfig[moduleName];
-
-      /**
-       * if themes config was changed since the last build,
-       * rebuild all less in current project to get actual themed css content
-       */
-      try {
-         assert.deepStrictEqual(config, lastModuleLessConfig);
-      } catch (error) {
-         this.dropCacheForLess = true;
-      }
-      this.currentStore.lessConfig[moduleName] = config;
-      if (!await fs.pathExists(path.join(cacheDirectory, 'save-cache-for-less.json')) && !this.dropCacheForLess) {
-         this.dropCacheForLess = true;
-      }
-   }
-
-   /**
-    * Получить из кэша конфигурацию сборки less для данного Интерфейсного
-    * модуля
-    * @returns {*}
-    */
-   getModuleLessConfiguration(moduleName) {
-      return this.currentStore.lessConfig[moduleName];
-   }
-
-   /**
     * adds new theme into style themes cache
     * @param{String} folderName - Interface module name
     * @param{Object} config - base info about current theme
     */
    addNewStyleTheme(themeModule, modifier, config) {
       const { moduleName, themeName } = config;
-      const { styleThemes } = this.currentStore;
-      if (!styleThemes.hasOwnProperty(themeModule)) {
-         styleThemes[themeModule] = {
+      const { themeModules } = this.currentStore;
+      if (!themeModules.hasOwnProperty(themeModule)) {
+         themeModules[themeModule] = {
             type: 'new',
             moduleName,
             themeName,
             modifiers: [modifier]
          };
       } else {
-         styleThemes[themeModule].modifiers.push(modifier);
+         themeModules[themeModule].modifiers.push(modifier);
       }
    }
 
    getNewStyleTheme(themeModule) {
-      const { styleThemes } = this.currentStore;
-      return styleThemes[themeModule];
-   }
-
-   addStyleTheme(themeName, filePath, themeConfig) {
-      this.currentStore.styleThemes[themeName] = {
-         path: filePath,
-         config: themeConfig
-      };
-   }
-
-   checkThemesForUpdate() {
-      try {
-         assert.deepStrictEqual(this.currentStore.styleThemes, this.lastStore.styleThemes);
-      } catch (error) {
-         this.dropCacheForLess = true;
-      }
+      const { themeModules } = this.currentStore;
+      return themeModules[themeModule];
    }
 
    /**
@@ -562,10 +512,10 @@ class Cache {
     */
    storeNewThemesModules(moduleName, lessName, themeModifier, themeName) {
       const currentLessControl = helpers.unixifyPath(`${moduleName}/${lessName}`);
-      if (!this.currentStore.newThemesModules.hasOwnProperty(moduleName)) {
-         this.currentStore.newThemesModules[moduleName] = {};
+      if (!this.currentStore.themeModules.hasOwnProperty(moduleName)) {
+         this.currentStore.themeModules[moduleName] = {};
       }
-      const currentNewThemesMeta = this.currentStore.newThemesModules[moduleName];
+      const currentNewThemesMeta = this.currentStore.themeModules[moduleName];
       if (!currentNewThemesMeta.hasOwnProperty(currentLessControl)) {
          currentNewThemesMeta[currentLessControl] = [];
       }
@@ -577,10 +527,10 @@ class Cache {
 
    /**
     * Gets new themes meta info for current Interface module
-    * @returns {newThemesModules|{}}
+    * @returns {themeModules|{}}
     */
    getNewThemesModulesCache(moduleName) {
-      return this.currentStore.newThemesModules[moduleName] || {};
+      return this.currentStore.themeModules[moduleName] || {};
    }
 
 

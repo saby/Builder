@@ -103,39 +103,6 @@ describe('custompack', () => {
 
       (result instanceof Error).should.equal(false);
    });
-
-   it('versioned meta: should return correct css package path without theme', () => {
-      const packagePath = '/test/Controls/controls-application.package.min';
-      const themeName = '';
-
-      const result = packHelpers.getCssPackagePathForMeta(themeName, packagePath);
-
-      result.should.equal('/test/Controls/controls-application.package.min.css');
-   });
-   it('versioned meta: should return correct css package path with theme', () => {
-      const packagePath = '/test/Controls/controls-application.package.min';
-      const themeName = 'myTheme';
-
-      const result = packHelpers.getCssPackagePathForMeta(themeName, packagePath);
-
-      result.should.equal('/test/Controls/controls-application_myTheme.package.min.css');
-   });
-   it('versioned meta: should return correct css moduled-package path without theme', () => {
-      const packagePath = '/test/Employee/Card/EmployeeCard.min';
-      const themeName = '';
-
-      const result = packHelpers.getCssPackagePathForMeta(themeName, packagePath);
-
-      result.should.equal('/test/Employee/Card/EmployeeCard.min.css');
-   });
-   it('versioned meta: should return correct css moduled-package path with theme', () => {
-      const packagePath = '/test/Employee/Card/EmployeeCard.min';
-      const themeName = 'myTheme';
-
-      const result = packHelpers.getCssPackagePathForMeta(themeName, packagePath);
-
-      result.should.equal('/test/Employee/Card/EmployeeCard_myTheme.min.css');
-   });
    it('should reject error when no data to pack', async() => {
       let result;
       try {
