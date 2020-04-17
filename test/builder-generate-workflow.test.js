@@ -29,8 +29,6 @@ const workspaceFolder = path.join(__dirname, 'workspace'),
    moduleOutputFolder = path.join(outputFolder, 'Modul'),
    module2OutputFolder = path.join(outputFolder, 'Modul2'),
    moduleSourceFolder = path.join(sourceFolder, 'Модуль'),
-   noThemesModuleOutputFolder = path.join(outputFolder, 'Modul_bez_tem'),
-   noThemesModuleSourceFolder = path.join(sourceFolder, 'Модуль без тем'),
    themesSourceFolder = path.join(sourceFolder, 'Тема Скрепка');
 
 const clearWorkspace = function() {
@@ -144,10 +142,6 @@ describe('gulp/builder/generate-workflow.js', () => {
                path: path.join(sourceFolder, 'Модуль')
             },
             {
-               name: 'Модуль без тем',
-               path: path.join(sourceFolder, 'Модуль без тем')
-            },
-            {
                name: 'TestModule',
                path: path.join(sourceFolder, 'TestModule')
             }
@@ -163,6 +157,7 @@ describe('gulp/builder/generate-workflow.js', () => {
 
       lessDependenciesForTest['TestModule/stable'].should.have.members([
          'css!Controls-default-theme/_old-mixins',
+         'css!Controls-default-theme/_theme',
          'css!SBIS3.CONTROLS/themes/_mixins',
          'css!SBIS3.CONTROLS/themes/online/_variables',
          'css!TestModule/Stable-for-import',
@@ -180,6 +175,7 @@ describe('gulp/builder/generate-workflow.js', () => {
       lessDependenciesForTest = (await fs.readJson(testModuleDepsPath)).lessDependencies;
       lessDependenciesForTest['TestModule/stable'].should.have.members([
          'css!Controls-default-theme/_old-mixins',
+         'css!Controls-default-theme/_theme',
          'css!SBIS3.CONTROLS/themes/_mixins',
          'css!SBIS3.CONTROLS/themes/online/_variables',
          'css!TestModule/Stable-for-import',
@@ -309,10 +305,6 @@ describe('gulp/builder/generate-workflow.js', () => {
                path: path.join(sourceFolder, 'Модуль')
             },
             {
-               name: 'Модуль без тем',
-               path: path.join(sourceFolder, 'Модуль без тем')
-            },
-            {
                name: 'TestModule',
                path: path.join(sourceFolder, 'TestModule')
             }
@@ -366,10 +358,6 @@ describe('gulp/builder/generate-workflow.js', () => {
                path: path.join(sourceFolder, 'Модуль')
             },
             {
-               name: 'Модуль без тем',
-               path: path.join(sourceFolder, 'Модуль без тем')
-            },
-            {
                name: 'TestModule',
                path: path.join(sourceFolder, 'TestModule')
             }
@@ -382,7 +370,6 @@ describe('gulp/builder/generate-workflow.js', () => {
       await testEmptyLessLog(['emptyLess.less', 'emptyCss.css'], ['less', 'css']);
 
       let resultsFiles;
-      let noThemesResultsFiles;
 
       // проверим, что все нужные файлы появились в "стенде"
       resultsFiles = await fs.readdir(moduleOutputFolder);
@@ -394,20 +381,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          'ForRename_old.less',
          'Stable.css',
          'Stable.less',
-         'module-dependencies.json',
-         'themes.config.json'
-      ]);
-      noThemesResultsFiles = await fs.readdir(noThemesModuleOutputFolder);
-      noThemesResultsFiles.should.have.members([
-         'Error.less',
-         'ForChange.css',
-         'ForChange.less',
-         'ForRename_old.css',
-         'ForRename_old.less',
-         'Stable.css',
-         'Stable.less',
-         'module-dependencies.json',
-         'themes.config.json'
+         'module-dependencies.json'
       ]);
 
       const stableCss = await fs.readFile(path.join(moduleOutputFolder, 'Stable.css'), 'utf8');
@@ -430,10 +404,6 @@ describe('gulp/builder/generate-workflow.js', () => {
          path.join(moduleSourceFolder, 'ForRename_old.less'),
          path.join(moduleSourceFolder, 'ForRename_new.less')
       );
-      await fs.rename(
-         path.join(noThemesModuleSourceFolder, 'ForRename_old.less'),
-         path.join(noThemesModuleSourceFolder, 'ForRename_new.less')
-      );
       const filePathForChange = path.join(moduleSourceFolder, 'ForChange.less');
       const data = await fs.readFile(filePathForChange);
       await fs.writeFile(filePathForChange, `${data.toString()}\n.test-selector2 {}`);
@@ -452,41 +422,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          'ForRename_new.less',
          'Stable.css',
          'module-dependencies.json',
-         'Stable.less',
-         'themes.config.json'
-      ]);
-      noThemesResultsFiles = await fs.readdir(noThemesModuleOutputFolder);
-      noThemesResultsFiles.should.have.members([
-         'Error.less',
-         'ForChange.css',
-         'ForChange.less',
-         'ForRename_new.css',
-         'ForRename_new.less',
-         'module-dependencies.json',
-         'Stable.css',
-         'Stable.less',
-         'themes.config.json'
-      ]);
-
-      // disable old themes for current project.
-      config.oldThemes = false;
-      await fs.writeJSON(configPath, config);
-
-      await runWorkflowWithTimeout();
-      await testEmptyLessLog(['emptyLess.less', 'emptyCss.css'], ['less', 'css']);
-
-      // in results of module TestModule must not exists styles for old themes
-      resultsFiles = await fs.readdir(path.join(outputFolder, 'TestModule'));
-      resultsFiles.should.have.members([
-         'Stable-for-import.less',
-         'Stable-for-theme-import.less',
-         'Stable-with-import.less',
-         'emptyLess.less',
-         'emptyCss.css',
-         'module-dependencies.json',
-         'stable.js',
-         'stable.ts',
-         'themes.config.json'
+         'Stable.less'
       ]);
 
       await clearWorkspace();
@@ -728,10 +664,6 @@ describe('gulp/builder/generate-workflow.js', () => {
                name: 'Модуль',
                path: path.join(sourceFolder, 'Модуль'),
                rebuild: true
-            },
-            {
-               name: 'Модуль без тем',
-               path: path.join(sourceFolder, 'Модуль без тем')
             }
          ]
       };
@@ -750,14 +682,10 @@ describe('gulp/builder/generate-workflow.js', () => {
          'ForRename_old.less',
          'Stable.css',
          'Stable.less',
-         'themes.config.json',
-         'themes.config.min.json',
          'ForChange.min.css',
          'ForRename_old.min.css',
          'Stable.min.css'
       ]);
-      const noThemesDirectoryExists = await fs.pathExists(path.join(patchOutputFolder, 'Modul_bez_tem'));
-      noThemesDirectoryExists.should.equal(false);
       const sbis3controlsDirectoryExists = await fs.pathExists(path.join(patchOutputFolder, 'SBIS3.CONTROLS'));
       sbis3controlsDirectoryExists.should.equal(false);
       const controlsThemeDirectoryExists = await fs.pathExists(path.join(patchOutputFolder, 'Controls-default-theme'));
@@ -1883,10 +1811,6 @@ describe('gulp/builder/generate-workflow.js', () => {
             'test-brotli.package.min.js',
             'test-brotli.package.min.js.gz',
             'test-brotli.package.min.js.br',
-            'themes.config.json',
-            'themes.config.min.json',
-            'themes.config.min.json.gz',
-            'themes.config.min.json.br',
             'private.js',
             'private.min.css',
             'private.min.css.gz',
@@ -2027,7 +1951,6 @@ describe('gulp/builder/generate-workflow.js', () => {
          testDirectory = await fs.readdir(path.join(modulesCacheFolder, 'InterfaceModule1/.builder'));
          testDirectory.should.have.members([
             'cdn_modules.json',
-            'compiled-less.min.json',
             'libraries.json',
             'versioned_modules.json'
          ]);
@@ -2078,23 +2001,16 @@ describe('gulp/builder/generate-workflow.js', () => {
       it('patch - meta should be updated after sources removal', async() => {
          const currentMetaOutput = path.join(outputFolder, 'ExternalInterfaceModule', '.builder');
          let librariesMeta = await fs.readJson(path.join(currentMetaOutput, 'libraries.json'));
-         let compiledLessMeta = await fs.readJson(path.join(currentMetaOutput, 'compiled-less.min.json'));
          librariesMeta.should.have.members([
             'ExternalInterfaceModule/library'
          ]);
-         compiledLessMeta.should.have.members([]);
 
          /**
           * rename ts-file(to check libraries.json for an update)
-          * create less file(to check compiled-less.min.json for an update)
           */
          await fs.rename(
             path.join(sourceFolder, 'ExternalInterfaceModule', 'library.ts'),
             path.join(sourceFolder, 'ExternalInterfaceModule', 'library_new.ts')
-         );
-         await fs.outputFile(
-            path.join(sourceFolder, 'ExternalInterfaceModule', 'test.less'),
-            '.interfaceModule1_logoDefault{background-image:url(images/logo-en.svg)}'
          );
 
          // run build
@@ -2102,12 +2018,8 @@ describe('gulp/builder/generate-workflow.js', () => {
 
          // read meta and check it for updated data
          librariesMeta = await fs.readJson(path.join(currentMetaOutput, 'libraries.json'));
-         compiledLessMeta = await fs.readJson(path.join(currentMetaOutput, 'compiled-less.min.json'));
          librariesMeta.should.have.members([
             'ExternalInterfaceModule/library_new'
-         ]);
-         compiledLessMeta.should.have.members([
-            'ExternalInterfaceModule/test.min.css'
          ]);
 
          // rollback for further unit tests
@@ -2115,7 +2027,6 @@ describe('gulp/builder/generate-workflow.js', () => {
             path.join(sourceFolder, 'ExternalInterfaceModule', 'library_new.ts'),
             path.join(sourceFolder, 'ExternalInterfaceModule', 'library.ts')
          );
-         await fs.remove(path.join(sourceFolder, 'ExternalInterfaceModule', 'test.less'));
          await clearWorkspace();
       });
       it('patch module with cleared cache', async() => {

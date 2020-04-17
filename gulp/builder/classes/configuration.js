@@ -102,12 +102,6 @@ class BuildConfiguration {
       // compress sources to gzip and brotli formats
       this.compress = false;
 
-      // compile themed styles
-      this.themes = false;
-
-      // enable old themes in less compile
-      this.oldThemes = true;
-
       // join module's meta files into common root meta file
       this.joinedMeta = false;
 
@@ -150,14 +144,6 @@ class BuildConfiguration {
             this[currentOption] = this.rawConfig[currentOption];
          }
       });
-
-      // themes flag - input value can be boolean or array
-      if (this.rawConfig.hasOwnProperty('themes')) {
-         const { themes } = this.rawConfig;
-         if (typeof themes === 'boolean' || themes instanceof Array === true) {
-            this.themes = themes;
-         }
-      }
 
       // autoprefixer option - input value can be bollean or object
       if (this.rawConfig.hasOwnProperty('autoprefixer')) {
