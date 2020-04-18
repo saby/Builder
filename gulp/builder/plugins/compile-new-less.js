@@ -30,33 +30,6 @@ function getModuleNameForFailedImportLess(currentLessBase, failedLessPath) {
 }
 
 /**
- * Check current theme for new theme type
- * @param{Object} currentTheme - current theme info
- * @returns {boolean}
- */
-function checkForNewThemeType(currentTheme) {
-   /**
-    * new themes can't be imported into any less by builder,
-    * only physically import is allowed for it.
-    */
-   return currentTheme.type === 'new';
-}
-
-/**
- * gets new themes list
- * @param allThemes
- */
-function getNewThemesList(allThemes) {
-   const newThemes = {};
-   Object.keys(allThemes).forEach((currentTheme) => {
-      if (allThemes[currentTheme].type === 'new') {
-         newThemes[currentTheme] = allThemes[currentTheme];
-      }
-   });
-   return newThemes;
-}
-
-/**
  * Gets proper theme modificator for current building less. If modifier doesnt exists in theme
  * modifiers list, empty string will be returned.
  * Example:
@@ -99,10 +72,9 @@ function compileNewLess(taskParameters, moduleInfo, gulpModulesInfo) {
       const relativePath = path.relative(moduleInfo.path, file.history[0]).replace(/\.less$/, replacingExt);
       return path.join(moduleInfo.output, transliterate(relativePath));
    };
-   const allThemes = taskParameters.cache.currentStore.styleThemes;
    const moduleName = path.basename(moduleInfo.output);
 
-   const newThemes = getNewThemesList(allThemes);
+   const newThemes = taskParameters.cache.currentStore.themeModules;
    const currentModuleNewTheme = taskParameters.cache.getNewStyleTheme(moduleInfo.name);
    let autoprefixerOptions = false;
    switch (typeof taskParameters.config.autoprefixer) {
@@ -306,6 +278,5 @@ function compileNewLess(taskParameters, moduleInfo, gulpModulesInfo) {
 }
 
 module.exports = {
-   compileNewLess,
-   checkForNewThemeType
+   compileNewLess
 };

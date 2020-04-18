@@ -18,9 +18,9 @@ function saveNewThemesToContents(taskParameters, moduleInfo) {
       /* @this Stream */
       function onTransform(file, encode, callback) {
          const currentContents = JSON.parse(file.contents);
-         const newThemesModules = taskParameters.cache.getNewThemesModulesCache(moduleInfo.name);
-         if (Object.keys(newThemesModules).length > 0) {
-            currentContents.modules[moduleInfo.runtimeModuleName].newThemes = newThemesModules;
+         const themeModules = taskParameters.cache.getNewThemesModulesCache(moduleInfo.name);
+         if (Object.keys(themeModules).length > 0) {
+            currentContents.modules[moduleInfo.runtimeModuleName].newThemes = themeModules;
          }
 
          // save current module contents into root common contents if needed

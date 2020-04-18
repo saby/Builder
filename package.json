@@ -47,8 +47,6 @@
       "humanize": "0.0.9",
       "less": "3.10.3",
       "map-stream": "0.0.7",
-      "minimatch": "3.0.4",
-      "is-glob": "4.0.0",
       "p-map": "1.2.0",
       "postcss": "7.0.1",
       "postcss-safe-parser": "4.0.1",
