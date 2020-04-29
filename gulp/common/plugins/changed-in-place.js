@@ -19,7 +19,12 @@ module.exports = function declarePlugin(taskParameters, moduleInfo = null) {
    return through.obj(async function onTransform(file, encoding, callback) {
       const startTime = Date.now();
       try {
-         const isChanged = taskParameters.cache.isFileChanged(file.path, file.contents, moduleInfo);
+         const isChanged = taskParameters.cache.isFileChanged(
+            file.path,
+            file.contents,
+            file.stat.mtime.toString(),
+            moduleInfo
+         );
          if (isChanged instanceof Promise) {
             file.cached = !(await isChanged);
          } else {

@@ -7,8 +7,7 @@
 const path = require('path'),
    fs = require('fs-extra'),
    assert = require('assert'),
-   pMap = require('p-map'),
-   crypto = require('crypto');
+   pMap = require('p-map');
 
 const helpers = require('../../../lib/helpers'),
    transliterate = require('../../../lib/transliterate'),
@@ -206,14 +205,11 @@ class Cache {
     * @param {ModuleInfo} moduleInfo информация о модуле.
     * @returns {Promise<boolean>}
     */
-   async isFileChanged(filePath, fileContents, moduleInfo) {
+   async isFileChanged(filePath, fileContents, fileTimeStamp, moduleInfo) {
       const prettyPath = helpers.prettifyPath(filePath);
       let hash = '';
       if (fileContents) {
-         hash = crypto
-            .createHash('sha1')
-            .update(fileContents)
-            .digest('base64');
+         hash = fileTimeStamp;
       }
       const isChanged = await this._isFileChanged(prettyPath, hash, moduleInfo);
 
@@ -417,12 +413,8 @@ class Cache {
             }
             let isChanged = false;
             if (await fs.pathExists(currentPath)) {
-               const fileContents = await fs.readFile(currentPath);
-               const hash = crypto
-                  .createHash('sha1')
-                  .update(fileContents)
-                  .digest('base64');
-               isChanged = this.lastStore.inputPaths[currentPath].hash !== hash;
+               const fileStats = await fs.stat(currentPath);
+               isChanged = this.lastStore.inputPaths[currentPath].hash !== fileStats.mtime.toString();
             } else {
                isChanged = true;
             }
