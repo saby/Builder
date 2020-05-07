@@ -132,6 +132,9 @@ class BuildConfiguration {
        * Otherwise return html page content as is.
        */
       this.inlineScripts = true;
+
+      // use hash by content instead of file timestamp.
+      this.hashByContent = true;
    }
 
    /**

@@ -16,6 +16,26 @@ const helpers = require('../../../lib/helpers'),
    logger = require('../../../lib/logger').logger();
 
 /**
+ * Gets file hash
+ * @param fileContent
+ * @param hashByContent
+ * @param fileStamp
+ */
+function getFileHash(fileContents, hashByContent, fileStamp) {
+   if (!hashByContent) {
+      return fileStamp;
+   }
+   let hash = '';
+   if (fileContents) {
+      hash = crypto
+         .createHash('sha1')
+         .update(fileContents)
+         .digest('base64');
+   }
+   return hash;
+}
+
+/**
  * Класс кеша для реализации инкрементальной сборки.
  * Использует результаты работы предыдущей сборки, чтобы не делать повторную работу.
  */
@@ -206,16 +226,11 @@ class Cache {
     * @param {ModuleInfo} moduleInfo информация о модуле.
     * @returns {Promise<boolean>}
     */
-   async isFileChanged(filePath, fileContents, moduleInfo) {
+   async isFileChanged(filePath, fileContents, hashByContent, fileTimeStamp, moduleInfo) {
       const prettyPath = helpers.prettifyPath(filePath);
-      let hash = '';
-      if (fileContents) {
-         hash = crypto
-            .createHash('sha1')
-            .update(fileContents)
-            .digest('base64');
-      }
-      const isChanged = await this._isFileChanged(prettyPath, hash, moduleInfo);
+
+      const hash = getFileHash(fileContents, hashByContent, fileTimeStamp);
+      const isChanged = await this._isFileChanged(hashByContent, prettyPath, hash);
 
       const relativePath = path.relative(moduleInfo.path, filePath);
       const outputFullPath = path.join(moduleInfo.output, transliterate(relativePath));
@@ -255,7 +270,7 @@ class Cache {
       return isChanged;
    }
 
-   async _isFileChanged(prettyPath, hash) {
+   async _isFileChanged(hashByContent, prettyPath, hash) {
       // кеша не было, значит все файлы новые
       if (!this.lastStore.startBuildTime) {
          return true;
@@ -305,7 +320,7 @@ class Cache {
       }
 
       if (prettyPath.endsWith('.less') || prettyPath.endsWith('.js') || prettyPath.endsWith('.es') || prettyPath.endsWith('.ts')) {
-         const isChanged = await this._isDependenciesChanged(prettyPath);
+         const isChanged = await this._isDependenciesChanged(hashByContent, prettyPath);
          this.cacheChanges[prettyPath] = isChanged;
          return isChanged;
       }
@@ -398,7 +413,7 @@ class Cache {
     * @param {string} filePath путь до файла
     * @returns {Promise<boolean>}
     */
-   async _isDependenciesChanged(filePath) {
+   async _isDependenciesChanged(hashByContent, filePath) {
       const dependencies = this.getAllDependencies(filePath);
       if (dependencies.length === 0) {
          return false;
@@ -417,12 +432,17 @@ class Cache {
             }
             let isChanged = false;
             if (await fs.pathExists(currentPath)) {
-               const fileContents = await fs.readFile(currentPath);
-               const hash = crypto
-                  .createHash('sha1')
-                  .update(fileContents)
-                  .digest('base64');
-               isChanged = this.lastStore.inputPaths[currentPath].hash !== hash;
+               if (hashByContent) {
+                  const fileContents = await fs.readFile(currentPath);
+                  const hash = crypto
+                     .createHash('sha1')
+                     .update(fileContents)
+                     .digest('base64');
+                  isChanged = this.lastStore.inputPaths[currentPath].hash !== hash;
+               } else {
+                  const fileStats = await fs.stat(currentPath);
+                  isChanged = this.lastStore.inputPaths[currentPath].hash !== fileStats.mtime.toString();
+               }
             } else {
                isChanged = true;
             }
