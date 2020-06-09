@@ -1753,6 +1753,9 @@ describe('gulp/builder/generate-workflow.js', () => {
             'Page.xhtml',
             'contents.js',
             'contents.json',
+            'contents.min.json',
+            'contents.min.json.br',
+            'contents.min.json.gz',
             'Stable.css',
             'Stable.less',
             'Stable.min.css',
@@ -1957,7 +1960,8 @@ describe('gulp/builder/generate-workflow.js', () => {
             'moduleStyle.css',
             'moduleStyle.min.css',
             'contents.js',
-            'contents.json'
+            'contents.json',
+            'contents.min.json'
          ]);
 
          // check builder meta
