@@ -181,8 +181,9 @@ class WatcherTask {
       this.filePath = filePath;
       this.reset();
       logger.info(`watcher: start file ${filePath} build!`);
+      const gulpBinPath = require.resolve('gulp/bin/gulp');
       this.childProcess = exec(
-         `node node_modules/gulp/bin/gulp buildOnChange --config="${processParameters.config}" --nativeWatcher=true --filePath="${this.filePath}"`,
+         `node ${gulpBinPath} buildOnChange --config="${processParameters.config}" --nativeWatcher=true --filePath="${this.filePath}"`,
          processOptions
       );
       this.processOutputEmit();
