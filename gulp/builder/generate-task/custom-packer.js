@@ -114,8 +114,7 @@ function generateTaskForCustomPack(taskParameters) {
       depsTree = new DependencyGraph(),
       configs = {
          commonBundles: {},
-         superBundles: [],
-         extendBundles: taskParameters.config.extendBundles
+         superBundles: []
       },
       results = {
          bundles: {},

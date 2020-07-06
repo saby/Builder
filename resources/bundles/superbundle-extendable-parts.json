@@ -1,0 +1,22 @@
+[
+  "resources/OnlineSbisRu/online-superbundle.package.min",
+  "resources/online-superbundle.package.min",
+  "resources/page-template-superbundle.package.min",
+  "resources/Application/online-superbundle.package.min",
+  "resources/Env/online-superbundle.package.min",
+  "resources/SbisEnv/online-superbundle.package.min",
+  "resources/I18n/online-superbundle.package.min",
+  "resources/View/online-superbundle.package.min",
+  "resources/Browser/online-superbundle.package.min",
+  "resources/Types/online-superbundle.package.min",
+  "resources/ParametersWebAPI/online-superbundle.package.min",
+  "resources/Vdom/online-superbundle.package.min",
+  "resources/UI/online-superbundle.package.min",
+  "resources/Controls/online-superbundle.package.min",
+  "resources/Router/online-superbundle.package.min",
+  "resources/Permission/online-superbundle.package.min",
+  "resources/OnlinePage/online-superbundle.package.min",
+  "resources/Page/online-superbundle.package.min",
+  "resources/EngineUser/online-superbundle.package.min",
+  "resources/LongOperations/online-superbundle.package.min"
+]
