@@ -27,7 +27,7 @@ function generateBuildWorkflowTypescript(processArgv) {
    const { output } = ConfigurationReader.getProcessParameters(processArgv);
    if (!output) {
       // eslint-disable-next-line no-console
-      console.log('output directory wasn\'t added. All ts errors will be caught by using stdout of "exec" command');
+      console.log('output directory wasn\'t added. Using default directory instead');
    }
 
    const tscFlags = '--incremental --tsBuildInfoFile "../front-end"';
