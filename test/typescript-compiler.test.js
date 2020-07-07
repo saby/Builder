@@ -12,7 +12,8 @@ describe('typescript compiler', () => {
       await initTest();
    });
    it('should return errors list', async() => {
-      const result = await runCompilerAndCheckForErrors(workspaceFolder);
+      const outputPath = `${workspaceFolder}/result.txt`;
+      const result = await runCompilerAndCheckForErrors(workspaceFolder, outputPath);
       result.should.have.members([
          'public/publicInterface.ts(15,30): error TS1005: \'{\' expected.',
          'public/publicInterface.ts(8,33): error TS1005: \')\' expected.'
@@ -20,7 +21,7 @@ describe('typescript compiler', () => {
    });
    it('should save tsc output into selected file', async() => {
       const outputPath = `${workspaceFolder}/result.txt`;
-      await runCompilerAndCheckForErrors(workspaceFolder, ` >> ${outputPath}`);
+      await runCompilerAndCheckForErrors(workspaceFolder, outputPath);
       const result = await fs.readFile(outputPath, 'utf8');
       result.includes('public/publicInterface.ts(15,30): error TS1005: \'{\' expected.').should.equal(true);
       result.includes('public/publicInterface.ts(8,33): error TS1005: \')\' expected.').should.equal(true);
