@@ -45,21 +45,32 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             if (taskParameters.config.joinedMeta) {
                helpers.joinContents(taskParameters.config.commonContents, moduleInfo.contents);
             }
+            const sortedContents = JSON.stringify(helpers.sortObject(moduleInfo.contents));
+            const contentsBuffer = Buffer.from(sortedContents);
 
             const contentsJsFile = new Vinyl({
                path: 'contents.js',
-               contents: Buffer.from(`contents=${JSON.stringify(helpers.sortObject(moduleInfo.contents))}`),
+               contents: Buffer.from(`contents=${sortedContents}`),
                moduleInfo,
                compiled: true
             });
             const contentsJsonFile = new Vinyl({
                path: 'contents.json',
-               contents: Buffer.from(JSON.stringify(helpers.sortObject(moduleInfo.contents), null, 2)),
+               contents: contentsBuffer,
                moduleInfo,
                compiled: true
             });
             this.push(contentsJsFile);
             this.push(contentsJsonFile);
+            if (taskParameters.config.isReleaseMode) {
+               const contentsMinJsonFile = new Vinyl({
+                  path: 'contents.min.json',
+                  contents: contentsBuffer,
+                  moduleInfo,
+                  compiled: true
+               });
+               this.push(contentsMinJsonFile);
+            }
          } catch (error) {
             logger.error({
                message: 'Builder error',
