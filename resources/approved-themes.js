@@ -11,5 +11,6 @@ module.exports = new Set([
    'onlinenavigation',
    'sbis',
    'tensorru',
-   'fed2'
+   'fed2',
+   'devtools'
 ]);
