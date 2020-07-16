@@ -207,23 +207,14 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   moduleInfo.cache.storeVersionedModule(file.history[0], outputMinJsFile);
                }
                taskParameters.cache.addOutputFile(file.history[0], outputMinJsFile, moduleInfo);
-
-               /**
-                * В случае работы тестов нам нужно сохранить неминифицированный запакованный модуль,
-                * поскольку это может быть библиотека, а для запакованной библиотеки важно проверить
-                * запакованный контент. В минифицированном варианте могут поменяться имена переменнных и
-                * тест проходить не будет.
-                */
-               if (taskParameters.config.rawConfig.builderTests) {
-                  this.push(
-                     new Vinyl({
-                        base: moduleInfo.output,
-                        path: outputModulepackJsFile,
-                        contents: Buffer.from(file.modulepack)
-                     })
-                  );
-                  taskParameters.cache.addOutputFile(file.history[0], outputModulepackJsFile, moduleInfo);
-               }
+               this.push(
+                  new Vinyl({
+                     base: moduleInfo.output,
+                     path: outputModulepackJsFile,
+                     contents: Buffer.from(file.modulepack)
+                  })
+               );
+               taskParameters.cache.addOutputFile(file.history[0], outputModulepackJsFile, moduleInfo);
             }
          } catch (error) {
             taskParameters.cache.markFileAsFailed(file.history[0]);
