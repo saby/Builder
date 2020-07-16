@@ -45,7 +45,7 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 function getPlatformModules() {
-   const nodeModulesPath = path.normalize(path.join(__dirname, '../node_modules'));
+   const nodeModulesPath = 'C:\\work\\wasaby-controls\\node_modules\\wasaby-cli\\store\\_repos';
    const ModuleInfo = require('../gulp/common/classes/base-module-info');
    return [
       new ModuleInfo('WS.Core', '', path.join(nodeModulesPath, 'sbis3-ws/WS.Core'), true),
