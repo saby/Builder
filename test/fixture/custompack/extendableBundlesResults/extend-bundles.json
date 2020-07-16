@@ -1,0 +1,16 @@
+{
+  "InterfaceModule1/superbundle-for-builder-tests.package.min.css": {
+    "extendsTo": "superbundle-for-builder-tests.package.min.css",
+    "config": "/InterfaceModule1/extend.package.json:superbundle-for-builder-tests.package.js"
+  },
+  "InterfaceModule1/superbundle-for-builder-tests.package.min.js": {
+    "extendsTo": "superbundle-for-builder-tests.package.min.js",
+    "modules": [
+      "InterfaceModule1/amdModule",
+      "InterfaceModule1/library",
+      "css!InterfaceModule1/amdModule",
+      "css!InterfaceModule1/moduleStyle"
+    ],
+    "config": "/InterfaceModule1/extend.package.json:superbundle-for-builder-tests.package.js"
+  }
+}
