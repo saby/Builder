@@ -9,7 +9,7 @@ module.exports = new Set([
    'retail',
    'eventCard',
    'onlinenavigation',
-   'sbis',
+   'helpsbis',
    'tensorru',
    'fed2',
    'devtools'
