@@ -1620,13 +1620,6 @@ describe('gulp/builder/generate-workflow.js', () => {
          (await isRegularFile(moduleOutputFolder, 'test.package.min.css')).should.equal(false);
       });
       it('generate extendable bundles', async() => {
-         const correctExtendableBundles = await fs.readJson(
-            path.join(
-               sourceFolder,
-               'extendableBundlesResults',
-               'extendableBundles.json'
-            )
-         );
          const correctSuperbundleConfig = await fs.readJson(
             path.join(
                sourceFolder,
@@ -1634,16 +1627,21 @@ describe('gulp/builder/generate-workflow.js', () => {
                'superbundle-result-config.json'
             )
          );
-         const wsCoreBundles = await fs.readJson(path.join(outputFolder, 'WS.Core', 'bundles.json'));
+         const correctExtendBundlesConfig = await fs.readJson(
+            path.join(
+               sourceFolder,
+               'extendableBundlesResults',
+               'extend-bundles.json'
+            )
+         );
+         const extendBundlesConfig = await fs.readJson(
+            path.join(outputFolder, 'InterfaceModule1', 'extend-bundles.json')
+         );
 
-         // WS.Core bundles meta must containing joined superbundle from extendable parts
-         Object.keys(correctExtendableBundles).forEach((currentKey) => {
-            wsCoreBundles.hasOwnProperty(currentKey).should.equal(true);
-            wsCoreBundles[currentKey].should.have.members(correctExtendableBundles[currentKey]);
-         });
+         extendBundlesConfig.should.deep.equal(correctExtendBundlesConfig);
          const currentCssPackage = await fs.readFile(path.join(
             outputFolder,
-            'WS.Core',
+            'InterfaceModule1',
             'superbundle-for-builder-tests.package.min.css'
          ));
          const sourceCssPackage = await fs.readFile(path.join(
@@ -1653,7 +1651,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          ));
          const currentJsPackage = await fs.readFile(path.join(
             outputFolder,
-            'WS.Core',
+            'InterfaceModule1',
             'superbundle-for-builder-tests.package.min.js'
          ));
          const sourceJsPackage = await fs.readFile(path.join(
@@ -1664,30 +1662,6 @@ describe('gulp/builder/generate-workflow.js', () => {
 
          currentJsPackage.toString().should.equal(sourceJsPackage.toString());
          currentCssPackage.toString().should.equal(sourceCssPackage.toString());
-
-         const testSuperBundleModules = [
-            'InterfaceModule3/amdAnotherModule',
-            'InterfaceModule3/amdModule',
-            'css!InterfaceModule3/amdModule',
-            'InterfaceModule2/amdModule',
-            'css!InterfaceModule2/moduleStyle',
-            'InterfaceModule1/amdModule',
-            'css!InterfaceModule1/moduleStyle'
-         ];
-
-         const resultWSCoreBundles = await fs.readJson(path.join(outputFolder, 'WS.Core/bundles.json'));
-         const currentBundle = 'resources/WS.Core/superbundle-for-builder-tests.package.min';
-         const resultSuperBundleMeta = resultWSCoreBundles[currentBundle];
-         const resultWSCoreBundlesRoute = await fs.readJson(path.join(outputFolder, 'WS.Core/bundlesRoute.json'));
-         testSuperBundleModules.forEach((currentModule) => {
-            resultSuperBundleMeta.includes(currentModule).should.equal(true);
-            resultWSCoreBundlesRoute.hasOwnProperty(currentModule).should.equal(true);
-            if (currentModule.startsWith('css!')) {
-               resultWSCoreBundlesRoute[currentModule].should.equal(`${currentBundle}.css`);
-            } else {
-               resultWSCoreBundlesRoute[currentModule].should.equal(`${currentBundle}.js`);
-            }
-         });
 
          /**
           * In ExternalInterfaceModule we have packed into moduled superbundle library "library". bundlesRoute meta must
