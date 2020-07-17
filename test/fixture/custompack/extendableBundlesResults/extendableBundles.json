@@ -1,0 +1,13 @@
+{
+  "resources/WS.Core/superbundle-for-builder-tests.package.min": [
+    "InterfaceModule3/amdAnotherModule",
+    "InterfaceModule2/amdModule",
+    "css!InterfaceModule2/moduleStyle",
+    "InterfaceModule3/amdModule",
+    "css!InterfaceModule3/amdModule",
+    "InterfaceModule1/amdModule",
+    "InterfaceModule1/library",
+    "css!InterfaceModule1/moduleStyle",
+    "css!InterfaceModule1/amdModule"
+  ]
+}
