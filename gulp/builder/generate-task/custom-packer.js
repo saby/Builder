@@ -33,7 +33,7 @@ function generateSetSuperBundles(configs, root, modulesForPatch) {
 /**
  * Генерация задачи сбора кастомных пакетов
  * @param {TaskParameters} taskParameters набор параметров Gulp - конфигурация, кэш
- * @param {Object} configs набор кастомных пакетов проекта.
+ * @param {BuildConfiguration} configs набор кастомных пакетов проекта.
  * @param {String} root корень приложения
  * @returns {Undertaker.TaskFunction}
  */
@@ -114,7 +114,8 @@ function generateTaskForCustomPack(taskParameters) {
       depsTree = new DependencyGraph(),
       configs = {
          commonBundles: {},
-         superBundles: []
+         superBundles: [],
+         extendBundles: taskParameters.config.extendBundles
       },
       results = {
          bundles: {},
