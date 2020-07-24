@@ -1,2 +1,5 @@
+/* /InterfaceModule1/extend.package.json:superbundle-for-builder-tests.package.js */
 .interfaceModule1_amdModule{background-image:url(InterfaceModule1/images/logo-en.svg?x_module=%{MODULE_VERSION_STUB=InterfaceModule1})}
 .interfaceModule1_moduleStyle{background-image:url(InterfaceModule1/images/logo-en.svg?x_module=%{MODULE_VERSION_STUB=InterfaceModule1})}
+/* /InterfaceModule2/extend.package.json:superbundle-for-builder-tests.package.js */
+.interfaceModule2_logoDefault{background-image:url(InterfaceModule2/images/logo-en.svg?x_module=%{MODULE_VERSION_STUB=InterfaceModule2})}
