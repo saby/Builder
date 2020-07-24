@@ -33,7 +33,7 @@ module.exports = {
                   computed: false,
                   object: {
                      type: 'Identifier',
-                     name: 'require'
+                     name: 'requirejs'
                   },
                   property: {
                      type: 'Identifier',
