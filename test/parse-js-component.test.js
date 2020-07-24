@@ -190,11 +190,11 @@ describe('parse js component', () => {
                '    }).then(function () {\n' +
                "        return 'another one';\n" +
                '    }).catch(function (err) {\n' +
-               '        require.onError(err);\n' +
+               '        requirejs.onError(err);\n' +
                '    }))\n' +
                '});');
             const minifiedResult = runUglifyJs('virtual.js', result.patchedText);
-            minifiedResult.code.should.equal('define("TestModule/myModule",["require","exports"],function(t,n){"use strict";new Promise(function(n,e){t(["module"],n,e)}).then(function(){return"first one"}).then(function(){return"another one"}).catch(function(n){t.onError(n)})});');
+            minifiedResult.code.should.equal('define("TestModule/myModule",["require","exports"],function(r,e){"use strict";new Promise(function(e,n){r(["module"],e,n)}).then(function(){return"first one"}).then(function(){return"another one"}).catch(function(e){requirejs.onError(e)})});');
          });
 
          it('nested promises as new expession', async() => {
@@ -216,18 +216,18 @@ describe('parse js component', () => {
                '            }).then(function (someAnotherNestedModuleName) {\n' +
                '                console.log(\'someAnotherNestedModuleName: \' + someAnotherNestedModuleName);\n' +
                '            }).catch(function (err) {\n' +
-               '                require.onError(err);\n' +
+               '                requirejs.onError(err);\n' +
                '            }))\n' +
                '            IoC.resolve(\'ILogger\').error(\'EngineUser/Panel\', \'someError\');\n' +
                '        }).catch(function (err) {\n' +
-               '            require.onError(err);\n' +
+               '            requirejs.onError(err);\n' +
                '        }))\n' +
                '    }).catch(function (err) {\n' +
-               '        require.onError(err);\n' +
+               '        requirejs.onError(err);\n' +
                '    }))\n' +
                '});');
             const minifiedResult = runUglifyJs('virtual.js', result.patchedText);
-            minifiedResult.code.should.equal('define("TestModule/test",["require","exports"],function(n,e){"use strict";new Promise(function(e,o){n(["someModuleName"],e,o)}).then(function(e){new Promise(function(e,o){n(["Core/IoC"],e,o)}).then(function(e){new Promise(function(e,o){n(["someAnotherNestedModuleName"],e,o)}).then(function(e){console.log("someAnotherNestedModuleName: "+e)}).catch(function(e){n.onError(e)}),e.resolve("ILogger").error("EngineUser/Panel","someError")}).catch(function(e){n.onError(e)})}).catch(function(e){n.onError(e)})});');
+            minifiedResult.code.should.equal('define("TestModule/test",["require","exports"],function(n,e){"use strict";new Promise(function(e,o){n(["someModuleName"],e,o)}).then(function(e){new Promise(function(e,o){n(["Core/IoC"],e,o)}).then(function(e){new Promise(function(e,o){n(["someAnotherNestedModuleName"],e,o)}).then(function(e){console.log("someAnotherNestedModuleName: "+e)}).catch(function(e){requirejs.onError(e)}),e.resolve("ILogger").error("EngineUser/Panel","someError")}).catch(function(e){requirejs.onError(e)})}).catch(function(e){requirejs.onError(e)})});');
          });
       });
       it('declared promise in variable should be ignored', async() => {
