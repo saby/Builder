@@ -28,6 +28,7 @@
   "resources/Addressee/addressee-suggest.package.min",
   "resources/AddresseeChoice/Packages/AddresseeChoice.package.min",
   "resources/AddresseeChoice/Packages/AddresseeChoiceFilterCompany.package.min",
+  "resources/Analytics/finanalysis.package.min",
   "resources/AreaOfResponsibility/packages/AreaOfResponsibility/List/Main.package.min",
   "resources/AuthFramework/auth-cardProvider.package.min",
   "resources/AuthFramework/auth-demo.package.min",
