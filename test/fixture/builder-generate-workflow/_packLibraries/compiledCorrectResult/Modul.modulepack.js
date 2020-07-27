@@ -171,7 +171,11 @@ define('Modul/Modul', [
     };
     Object.defineProperty(exports, 'default', {
         get: function () {
-            return Modul__es6_Modul_func().default;
+            var result = Modul__es6_Modul_func().default;
+            if (typeof result === 'function' && !result.prototype.hasOwnProperty('_moduleName')) {
+                result.prototype._moduleName = 'Modul/Modul:default';
+            }
+            return result;
         },
         enumerable: true
     });
