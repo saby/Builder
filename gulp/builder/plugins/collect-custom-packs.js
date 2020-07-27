@@ -37,7 +37,7 @@ module.exports = function collectPackageJson(moduleInfo, applicationRoot, config
                configPath,
                currentPackageJson,
                moduleInfo
-            );
+            ).filter(currentConfig => configs.extendBundles || !currentConfig.extendsTo);
 
             configsArray.forEach((currentConfig) => {
                const isPrivatePackage = currentConfig.includeCore && !currentConfig.platformPackage;
