@@ -162,7 +162,7 @@ module.exports = {
                               type: 'ReturnStatement',
                               argument: {
                                  type: 'Identifier',
-                                 name: 'variable'
+                                 name: 'result'
                               }
                            }
                         ]
