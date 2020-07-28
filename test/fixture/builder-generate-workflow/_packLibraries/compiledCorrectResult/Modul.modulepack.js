@@ -179,5 +179,6 @@ define('Modul/Modul', [
         },
         enumerable: true
     });
+    exports._packedLibrary = true;
     return exports;
 });

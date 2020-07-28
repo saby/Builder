@@ -87,5 +87,6 @@ define('Modul2/Module2', [
         },
         enumerable: true
     });
+    exports._packedLibrary = true;
     return exports;
 });
