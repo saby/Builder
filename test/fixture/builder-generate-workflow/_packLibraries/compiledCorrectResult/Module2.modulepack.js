@@ -80,7 +80,7 @@ define('Modul2/Module2', [
     Object.defineProperty(exports, 'default', {
         get: function () {
             var result = Modul2__private_withNotAmdImport_func();
-            if (typeof result === 'function' && !result.prototype.hasOwnProperty('_moduleName')) {
+            if (typeof result === 'function' && result.prototype && !result.prototype.hasOwnProperty('_moduleName')) {
                 result.prototype._moduleName = 'Modul2/Module2:default';
             }
             return result;
