@@ -12,5 +12,6 @@ module.exports = new Set([
    'helpsbis',
    'tensorru',
    'fed2',
-   'devtools'
+   'devtools',
+   'booking-widget'
 ]);
