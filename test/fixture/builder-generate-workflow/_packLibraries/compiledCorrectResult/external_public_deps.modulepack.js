@@ -37,5 +37,6 @@ define('Modul/external_public_deps', [
         simpleArrayFunction: testFunction_1,
         removeArrayDuplicates: Modul__es6_testPublicModule_func()
     };
+    exports._packedLibrary = true;
     return exports;
 });

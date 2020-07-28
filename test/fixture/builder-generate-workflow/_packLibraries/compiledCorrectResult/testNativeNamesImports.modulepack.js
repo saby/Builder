@@ -45,5 +45,6 @@ define('Modul/testNativeNamesImports', [
         },
         enumerable: true
     });
+    exports._packedLibrary = true;
     return exports;
 });
