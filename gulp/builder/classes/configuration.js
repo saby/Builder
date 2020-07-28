@@ -325,15 +325,6 @@ class BuildConfiguration {
          this.urlDefaultServicePath = this.urlServicePath;
       }
 
-      // set tsconfig name from saby-typescript/configs to use while do tsc compilation
-      if (this.rawConfig.hasOwnProperty('tsconfig')) {
-         this.tsconfig = this.rawConfig.tsconfig;
-      } else if (this.branchTests) {
-         this.tsconfig = 'es5.test.json';
-      } else {
-         this.tsconfig = 'es5.json';
-      }
-
       /**
        * Temporarily enable extendable bundles only for sbis plugin to avoid
        * patches building in online project.
