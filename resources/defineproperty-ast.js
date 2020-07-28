@@ -44,10 +44,141 @@ module.exports = {
                         type: 'BlockStatement',
                         body: [
                            {
+                              type: 'VariableDeclaration',
+                              declarations: [
+                                 {
+                                    type: 'VariableDeclarator',
+                                    id: {
+                                       type: 'Identifier',
+                                       name: 'result'
+                                    },
+                                    init: {
+                                       type: 'Identifier',
+                                       name: '<name of private packed module>'
+                                    }
+                                 }
+                              ],
+                              kind: 'var'
+                           },
+                           {
+                              type: 'IfStatement',
+                              test: {
+                                 type: 'LogicalExpression',
+                                 operator: '&&',
+                                 left: {
+                                    type: 'LogicalExpression',
+                                    operator: '&&',
+                                    left: {
+                                       type: 'BinaryExpression',
+                                       operator: '===',
+                                       left: {
+                                          type: 'UnaryExpression',
+                                          operator: 'typeof',
+                                          argument: {
+                                             type: 'Identifier',
+                                             name: 'result'
+                                          },
+                                          prefix: true
+                                       },
+                                       right: {
+                                          type: 'Literal',
+                                          value: 'function',
+                                          raw: "'function'"
+                                       }
+                                    },
+                                    right: {
+                                       type: 'MemberExpression',
+                                       computed: false,
+                                       object: {
+                                          type: 'Identifier',
+                                          name: 'result'
+                                       },
+                                       property: {
+                                          type: 'Identifier',
+                                          name: 'prototype'
+                                       }
+                                    }
+                                 },
+                                 right: {
+                                    type: 'UnaryExpression',
+                                    operator: '!',
+                                    argument: {
+                                       type: 'CallExpression',
+                                       callee: {
+                                          type: 'MemberExpression',
+                                          computed: false,
+                                          object: {
+                                             type: 'MemberExpression',
+                                             computed: false,
+                                             object: {
+                                                type: 'Identifier',
+                                                name: 'result'
+                                             },
+                                             property: {
+                                                type: 'Identifier',
+                                                name: 'prototype'
+                                             }
+                                          },
+                                          property: {
+                                             type: 'Identifier',
+                                             name: 'hasOwnProperty'
+                                          }
+                                       },
+                                       arguments: [
+                                          {
+                                             type: 'Literal',
+                                             value: '_moduleName',
+                                             raw: "'_moduleName'"
+                                          }
+                                       ]
+                                    },
+                                    prefix: true
+                                 }
+                              },
+                              consequent: {
+                                 type: 'BlockStatement',
+                                 body: [
+                                    {
+                                       type: 'ExpressionStatement',
+                                       expression: {
+                                          type: 'AssignmentExpression',
+                                          operator: '=',
+                                          left: {
+                                             type: 'MemberExpression',
+                                             computed: false,
+                                             object: {
+                                                type: 'MemberExpression',
+                                                computed: false,
+                                                object: {
+                                                   type: 'Identifier',
+                                                   name: 'result'
+                                                },
+                                                property: {
+                                                   type: 'Identifier',
+                                                   name: 'prototype'
+                                                }
+                                             },
+                                             property: {
+                                                type: 'Identifier',
+                                                name: '_moduleName'
+                                             }
+                                          },
+                                          right: {
+                                             type: 'Literal',
+                                             value: '<AMD-name for current exported property>',
+                                             raw: "'<AMD-name for current exported property>'"
+                                          }
+                                       }
+                                    }
+                                 ]
+                              },
+                              alternate: null
+                           },
+                           {
                               type: 'ReturnStatement',
                               argument: {
                                  type: 'Identifier',
-                                 name: 'variable'
+                                 name: 'result'
                               }
                            }
                         ]

@@ -37,7 +37,11 @@ define('Modul/testNativeNamesImports', [
     };
     Object.defineProperty(exports, 'fetch', {
         get: function () {
-            return Modul__es6_fetch_func();
+            var result = Modul__es6_fetch_func();
+            if (typeof result === 'function' && result.prototype && !result.prototype.hasOwnProperty('_moduleName')) {
+                result.prototype._moduleName = 'Modul/testNativeNamesImports:fetch';
+            }
+            return result;
         },
         enumerable: true
     });
