@@ -66,21 +66,37 @@ module.exports = {
                                  type: 'LogicalExpression',
                                  operator: '&&',
                                  left: {
-                                    type: 'BinaryExpression',
-                                    operator: '===',
+                                    type: 'LogicalExpression',
+                                    operator: '&&',
                                     left: {
-                                       type: 'UnaryExpression',
-                                       operator: 'typeof',
-                                       argument: {
+                                       type: 'BinaryExpression',
+                                       operator: '===',
+                                       left: {
+                                          type: 'UnaryExpression',
+                                          operator: 'typeof',
+                                          argument: {
+                                             type: 'Identifier',
+                                             name: 'result'
+                                          },
+                                          prefix: true
+                                       },
+                                       right: {
+                                          type: 'Literal',
+                                          value: 'function',
+                                          raw: "'function'"
+                                       }
+                                    },
+                                    right: {
+                                       type: 'MemberExpression',
+                                       computed: false,
+                                       object: {
                                           type: 'Identifier',
                                           name: 'result'
                                        },
-                                       prefix: true
-                                    },
-                                    right: {
-                                       type: 'Literal',
-                                       value: 'function',
-                                       raw: "function'"
+                                       property: {
+                                          type: 'Identifier',
+                                          name: 'prototype'
+                                       }
                                     }
                                  },
                                  right: {
