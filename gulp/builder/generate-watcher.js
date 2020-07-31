@@ -45,25 +45,25 @@ const REMOVED_FILE_ERROR = 'File not found with singular glob:';
 const REMOVED_FILE_SUGGESTION = '(if this was purposeful, use `allowEmpty` option)';
 
 /**
- * main class for watcher function -
- * what and how to execute when there is a file to rebuild
+ * Class of current build process. Stores and shows all of info
+ * that current build emits.
  */
-class WatcherTask {
-   constructor() {
+class ChildProcess {
+   constructor(executor) {
       this.errors = [];
       this.warnings = [];
       this.filesToRemove = [];
       this.hasErrors = false;
       this.hasWarnings = false;
-      this.childProcess = null;
+      this.executor = executor;
    }
 
    /**
-    * catch all of output from process to log everything that is happening
+    * Catches all of output from process to log everything that is happening
     * inside of child_process(executes gulp task to rebuild single file)
     */
    processOutputEmit() {
-      this.childProcess.stdout.on('data', (data) => {
+      this.executor.stdout.on('data', (data) => {
          const dataString = data.toString();
          logger.debug(data.toString());
          if (dataString.includes('[ERROR]')) {
@@ -76,6 +76,103 @@ class WatcherTask {
          }
       });
    }
+
+   /**
+    * catch all of critical errors from process that occurs inside
+    * of a child_process(executes gulp task to rebuild single file)
+    */
+   processErrorEmit() {
+      this.executor.stderr.on('data', (data) => {
+         if (data.includes(REMOVED_FILE_ERROR)) {
+            this.addFilesToRemove(data);
+            logger.debug("source wasn't found because it was moved or renamed which means it has to be removed from output!");
+            this.filesToRemove.forEach((currentPath) => {
+               fs.removeSync(currentPath);
+               logger.debug(`removed path ${currentPath}`);
+            });
+         } else {
+            logger.debug(data.toString());
+         }
+      });
+   }
+
+   /**
+    * Gets full path from error and adds whole list of files belonging to the source file
+    * in depend of gulp configuration(minimization, compression, etc.)
+    * @param data
+    */
+   addFilesToRemove(data) {
+      const startFilePath = data.indexOf(REMOVED_FILE_ERROR) + REMOVED_FILE_ERROR.length;
+      const endFilePath = data.indexOf(REMOVED_FILE_SUGGESTION);
+      const filePath = data.slice(startFilePath, endFilePath).trim();
+      const prettyPath = unixifyPath(filePath);
+      const relativePath = prettyPath.replace(SOURCE_ROOT, '');
+      const extension = relativePath.split('.').pop();
+
+      this.addPathsByExtension(
+         unixifyPath(path.join(OUTPUT_FOLDER, relativePath)),
+         extension
+      );
+      if (isReleaseMode) {
+         this.addPathsByExtension(
+            unixifyPath(path.join(CACHE_FOLDER, relativePath)),
+            extension
+         );
+      }
+   }
+
+   /**
+    * Post processing results of single file gulp task execution.
+    * Logs all errors/warning if it's occurred
+    * @param resolve
+    * @param reject
+    */
+   processSingleFileResult(watcherContext, filePath) {
+      this.executor.on('exit', (code, signal) => {
+         if (signal === 'SIGTERM') {
+            logger.info('current file build has been terminated');
+         } else {
+            if (this.hasErrors) {
+               logger.info(`watcher: build was completed with these errors:\n${this.errors.join('\n')}`);
+            }
+            if (this.hasWarnings) {
+               logger.info(`watcher: build was completed with these warnings:\n${this.errors.join('\n')}`);
+            }
+            if (!this.hasErrors) {
+               logger.info(`watcher: file ${filePath} has been built successfully!`);
+            }
+         }
+
+         // remove built file from current building files list.
+         delete watcherContext.filesToBuild.ready[filePath];
+      });
+   }
+
+   /**
+    * Post processing results of common gulp task execution(build)
+    * Logs all errors/warning if it's occurred
+    */
+   processCommonBuildResult(watcherContext) {
+      this.executor.on('exit', (code, signal) => {
+         if (signal === 'SIGTERM') {
+            logger.info('current file build has been terminated');
+         } else {
+            if (this.hasErrors) {
+               logger.info(`watcher: build was completed with errors. See for the errors in report ${gulpConfig.logs}`);
+            }
+            if (this.hasWarnings) {
+               logger.info(`watcher: build was completed with warnings. See for the warnings in report ${gulpConfig.logs}`);
+            }
+            if (!this.hasErrors) {
+               logger.info('watcher: build was completed successfully!');
+            }
+         }
+
+         // free up executor for next files in queue to be built
+         watcherContext.commonBuildStarted = false;
+      });
+   }
+
 
    // adds all paths for the given path with the given extensions to be replaced with
    addCompiledSource(filePath, from, to) {
@@ -105,104 +202,110 @@ class WatcherTask {
             break;
       }
    }
+}
 
-   /**
-    * Gets full path from error and adds whole list of files belonging to the source file
-    * in depend of gulp configuration(minimization, compression, etc.)
-    * @param data
-    */
-   addFilesToRemove(data) {
-      const startFilePath = data.indexOf(REMOVED_FILE_ERROR) + REMOVED_FILE_ERROR.length;
-      const endFilePath = data.indexOf(REMOVED_FILE_SUGGESTION);
-      const filePath = data.slice(startFilePath, endFilePath).trim();
-      const prettyPath = unixifyPath(filePath);
-      const relativePath = prettyPath.replace(SOURCE_ROOT, '');
-      const extension = relativePath.split('.').pop();
-
-      this.addPathsByExtension(
-         unixifyPath(path.join(OUTPUT_FOLDER, relativePath)),
-         extension
-      );
-      if (isReleaseMode) {
-         this.addPathsByExtension(
-            unixifyPath(path.join(CACHE_FOLDER, relativePath)),
-            extension
-         );
-      }
+/**
+ * main class for watcher function -
+ * what and how to execute when there is a file to rebuild
+ */
+class WatcherTask {
+   constructor() {
+      this.filesToBuild = {
+         awaits: {},
+         ready: {},
+         newChanged: false
+      };
+      this.newChanged = false;
+      this.commonBuildStarted = false;
    }
 
-   /**
-    * catch all of critical errors from process that occurs inside
-    * of a child_process(executes gulp task to rebuild single file)
-    */
-   processErrorEmit() {
-      this.childProcess.stderr.on('data', (data) => {
-         if (data.includes(REMOVED_FILE_ERROR)) {
-            this.addFilesToRemove(data);
-            logger.debug("source wasn't found because it was moved or renamed which means it has to be removed from output!");
-            this.filesToRemove.forEach((currentPath) => {
-               fs.removeSync(currentPath);
-               logger.debug(`removed path ${currentPath}`);
+   reset() {
+      this.filesToBuild = {
+         awaits: {},
+         ready: {}
+      };
+   }
+
+   debounce() {
+      const gulpBinPath = require.resolve('gulp/bin/gulp');
+      setInterval(() => {
+         try {
+            const changedFiles = Object.keys(this.filesToBuild.ready);
+
+            /**
+             * do rebuild only in case if all of changed files was caught.
+             * F.e. during branch checkout there are a lot of changed files
+             * and watcher needs extra time to catch them all. Better to skip
+             * one watcher iteration than do rebuild after rebuild one more time
+             * for all caught files during the first rebuild.
+             */
+            if (!this.newChanged) {
+               // run files rebuild only if there is anything to rebuild
+               // and common build isn't running yet
+               if (changedFiles.length > 0 && !this.commonBuildStarted) {
+                  if (changedFiles.length > 20) {
+                     // remove all of changed files from list to catch all
+                     // new changes after this common rebuild was started
+                     this.reset();
+                     this.commonBuildStarted = true;
+                     logger.info(`there are too many files changed. Running common build in this case. Number of changed files ${changedFiles.length}`);
+                     const currentExecutor = exec(
+                        `node ${gulpBinPath} build --config="${processParameters.config}"`,
+                        processOptions
+                     );
+                     const buildExecutor = new ChildProcess(currentExecutor);
+                     buildExecutor.processOutputEmit();
+                     buildExecutor.processErrorEmit();
+                     buildExecutor.processCommonBuildResult(this);
+                  } else {
+                     changedFiles.forEach((filePath) => {
+                        logger.info(`watcher: start file ${filePath} build!`);
+                        const currentExecutor = exec(
+                           `node ${gulpBinPath} buildOnChange --config="${processParameters.config}" --nativeWatcher=true --filePath="${filePath}"`,
+                           processOptions
+                        );
+                        const fileExecutor = new ChildProcess(currentExecutor);
+                        fileExecutor.processOutputEmit();
+                        fileExecutor.processErrorEmit();
+                        fileExecutor.processSingleFileResult(this, filePath);
+                     });
+                  }
+               } else {
+                  const awaitingFiles = Object.keys(this.filesToBuild.awaits);
+                  if (awaitingFiles.length > 0) {
+                     logger.info('There are some files awaiting for rebuild. Moving them into ready to build files list and process them');
+                     awaitingFiles.forEach((currentFile) => {
+                        delete this.filesToBuild.awaits[currentFile];
+                        this.filesToBuild.ready[currentFile] = true;
+                     });
+                  }
+               }
+            }
+
+            // reset newChanged flag after each iteration to properly check of
+            // changed files between watcher iterations
+            this.newChanged = false;
+         } catch (error) {
+            logger.error({
+               message: 'critical watcher error occurred!',
+               error
             });
-         } else {
-            logger.debug(data.toString());
+            process.exit(1);
          }
-      });
-   }
-
-   /**
-    * Post processing results of single file gulp task execution.
-    * Logs all errors/warning if it's occurred
-    * @param resolve
-    * @param reject
-    */
-   processResult(resolve, reject) {
-      this.childProcess.on('exit', (code, signal) => {
-         if (signal === 'SIGTERM') {
-            logger.info('watcher has been terminated');
-            reject();
-         } else {
-            if (this.hasErrors) {
-               logger.info(`watcher: build was completed with these errors:\n${this.errors.join('\n')}`);
-            }
-            if (this.hasWarnings) {
-               logger.info(`watcher: build was completed with these warnings:\n${this.errors.join('\n')}`);
-            }
-            if (!this.hasErrors) {
-               logger.info(`watcher: file ${this.filePath} has been built successfully!`);
-            }
-            resolve();
-         }
-      });
+      }, 1500);
    }
 
    // run single file gulp task for current file
-   execute(filePath) {
-      this.filePath = filePath;
-      this.reset();
-      logger.info(`watcher: start file ${filePath} build!`);
-      const gulpBinPath = require.resolve('gulp/bin/gulp');
-      this.childProcess = exec(
-         `node ${gulpBinPath} buildOnChange --config="${processParameters.config}" --nativeWatcher=true --filePath="${this.filePath}"`,
-         processOptions
-      );
-      this.processOutputEmit();
-      this.processErrorEmit();
+   updateChangedFiles(filePath) {
+      this.newChanged = true;
 
-      return new Promise((resolve, reject) => {
-         this.processResult(resolve, reject);
-      });
-   }
-
-   /**
-    * reset common watcher params list each time the watcher is triggering
-    */
-   reset() {
-      this.errors = [];
-      this.warnings = [];
-      this.filesToRemove = [];
-      this.hasErrors = false;
-      this.hasWarnings = false;
+      // add file into awaiting queue until common build or single build of this file
+      // is completed
+      if (this.filesToBuild.ready.hasOwnProperty(filePath) || this.commonBuildStarted) {
+         this.filesToBuild.awaits[filePath] = true;
+      } else {
+         this.filesToBuild.ready[filePath] = true;
+      }
    }
 }
 
