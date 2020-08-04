@@ -17,6 +17,7 @@ define('Modul/Modul', [
                     function debug() {
                         debugger;
                     }
+                    var thelpers = Executor.TClosure;
                     var deps = Array.prototype.slice.call(arguments);
                     var depsLocal = {};
                     var includedTemplates = {};
@@ -29,7 +30,7 @@ define('Modul/Modul', [
                             def: undefined
                         };
                         var viewController = thelpers.configResolver.calcParent(this, typeof currentPropertyName === 'undefined' ? undefined : currentPropertyName, data);
-                        var markupGenerator = Executor.getMarkupGenerator(isVdom);
+                        var markupGenerator = thelpers.getMarkupGenerator(isVdom);
                         try {
                             var out = markupGenerator.joinElements([markupGenerator.createTag('div', {
                                     'attributes': { 'class': 'test' },
