@@ -1,11 +1,11 @@
 define('Modul/Modul', [
     'tslib',
     'i18n!Modul',
-    'View/Executor/TClosure',
+    'UI/Executor',
     'require',
     'exports',
     'css!theme?Modul/_es6/test'
-], function (tslib_1, rk, thelpers, require, exports) {
+], function (tslib_1, rk, Executor, require, exports) {
     Object.defineProperty(exports, '__esModule', { value: true });
         exports['wml!Modul/_es6/test'] = true;
         var wml_Modul__es6_test;
@@ -13,10 +13,11 @@ define('Modul/Modul', [
         if (!wml_Modul__es6_test) {
             wml_Modul__es6_test = function () {
                 var exports = {};
-                var result = function (thelpers, rk) {
+                var result = function (Executor, rk) {
                     function debug() {
                         debugger;
                     }
+                    var thelpers = Executor.TClosure;
                     var deps = Array.prototype.slice.call(arguments);
                     var depsLocal = {};
                     var includedTemplates = {};
@@ -29,7 +30,7 @@ define('Modul/Modul', [
                             def: undefined
                         };
                         var viewController = thelpers.configResolver.calcParent(this, typeof currentPropertyName === 'undefined' ? undefined : currentPropertyName, data);
-                        var markupGenerator = thelpers.getMarkupGenerator(isVdom);
+                        var markupGenerator = thelpers.createGenerator(isVdom);
                         try {
                             var out = markupGenerator.joinElements([markupGenerator.createTag('div', {
                                     'attributes': { 'class': 'test' },
@@ -48,7 +49,7 @@ define('Modul/Modul', [
                     templateFunction.stable = true;
                     templateFunction.reactiveProps = [];
                     return templateFunction;
-                }(thelpers, rk);
+                }(Executor, rk);
                 if (result instanceof Function) {
                     return result;
                 } else if (result && Object.getPrototypeOf(result) !== Object.prototype) {
