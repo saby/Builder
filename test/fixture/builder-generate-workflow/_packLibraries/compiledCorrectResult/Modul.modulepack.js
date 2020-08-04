@@ -30,7 +30,7 @@ define('Modul/Modul', [
                             def: undefined
                         };
                         var viewController = thelpers.configResolver.calcParent(this, typeof currentPropertyName === 'undefined' ? undefined : currentPropertyName, data);
-                        var markupGenerator = thelpers.getMarkupGenerator(isVdom);
+                        var markupGenerator = thelpers.createGenerator(isVdom);
                         try {
                             var out = markupGenerator.joinElements([markupGenerator.createTag('div', {
                                     'attributes': { 'class': 'test' },
