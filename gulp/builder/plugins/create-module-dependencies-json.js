@@ -89,16 +89,16 @@ function getCssAndJstplFiles(inputFiles) {
    return [cssFiles, jstplFiles];
 }
 
-function getNodePath(prettyPath, ext) {
+function getNodePath(prettyPath, ext, suffix) {
    let result = prettyPath;
 
    // An AMD-module formatted json generates, so there should be corresponding path for it
    if (ext === '.json') {
-      return prettyPath.replace(ext, `${ext}.min.js`);
+      return prettyPath.replace(ext, `${ext}${suffix}.js`);
    }
 
-   if (!prettyPath.endsWith(`.min${ext}`)) {
-      result = prettyPath.replace(ext, `.min${ext}`);
+   if (!prettyPath.endsWith(`${suffix}${ext}`)) {
+      result = prettyPath.replace(ext, `${suffix}${ext}`);
    }
 
    if (ext === '.ts') {
@@ -114,6 +114,8 @@ function getNodePath(prettyPath, ext) {
  * @returns {stream}
  */
 module.exports = function declarePlugin(taskParameters, moduleInfo) {
+   // suffix of minimization. It'll be inserted if minimize is enabled and there isn't debugCustomPack enabled.
+   const suffix = !taskParameters.config.debugCustomPack ? '.min' : '';
    return through.obj(
       function onTransform(file, encoding, callback) {
          const startTime = Date.now();
@@ -146,7 +148,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                const prettyPath = helpers.prettifyPath(transliterate(rebasedRelativePath));
 
 
-               objectToStore.path = getNodePath(prettyPath, ext);
+               objectToStore.path = getNodePath(prettyPath, ext, suffix);
                mDeps.nodes[nodeName] = objectToStore;
 
                /**
