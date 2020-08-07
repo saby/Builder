@@ -103,7 +103,8 @@ function generateTaskForBundlesListGetter(bundlesList) {
  * @returns {Undertaker.TaskFunction|function(done)} В debug режиме вернёт пустышку, чтобы gulp не упал
  */
 function generateTaskForCustomPack(taskParameters) {
-   if (!taskParameters.config.customPack || !taskParameters.config.isReleaseMode) {
+   const isCustomPackEnabled = taskParameters.config.customPack || taskParameters.config.debugCustomPack;
+   if (!isCustomPackEnabled || !taskParameters.config.isReleaseMode) {
       return function skipCustomPack(done) {
          done();
       };
