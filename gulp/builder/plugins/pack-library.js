@@ -122,6 +122,15 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                      });
                      taskParameters.cache.addDependencies(library.history[0], result.fileDependencies);
                   }
+                  if (result.warnings) {
+                     result.warnings.forEach((currentWarning) => {
+                        logger.warning({
+                           message: currentWarning,
+                           filePath: library.history[0],
+                           moduleInfo
+                        });
+                     });
+                  }
                   library.library = true;
 
                   /**
