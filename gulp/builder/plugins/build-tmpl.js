@@ -190,10 +190,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                })
             );
             taskParameters.cache.addOutputFile(file.history[0], outputMinFile, moduleInfo);
-
-         // overwrite source tmpl in result only in case of enabled localization.
-         } else if (taskParameters.config.localizations.length > 0) {
-            file.contents = Buffer.from(newText);
          }
       } catch (error) {
          taskParameters.cache.markFileAsFailed(file.history[0]);
