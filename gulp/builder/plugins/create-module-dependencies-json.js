@@ -189,9 +189,19 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                if (info.hasOwnProperty('lessDependencies') && addAdditionalMeta) {
                   const result = new Set();
                   info.lessDependencies.forEach((currentDependency) => {
-                     const currentLessDependencies = taskParameters.cache.getDependencies(
+                     let currentLessDependencies = taskParameters.cache.getDependencies(
                         `${path.join(sourceRoot, currentDependency)}.less`
                      );
+
+                     // css dependency in component is now dynamic(_theme option). We need to use additional search
+                     // of less dependencies in corresponding default theme meta to use it to get widened coverage.
+                     if (currentLessDependencies.length === 0) {
+                        const dependencyParts = currentDependency.split('/');
+                        dependencyParts[0] = `${dependencyParts[0]}-default-theme`;
+                        currentLessDependencies = taskParameters.cache.getDependencies(
+                           `${path.join(sourceRoot, dependencyParts.join('/'))}.less`
+                        );
+                     }
                      result.add(`css!${currentDependency}`);
                      currentLessDependencies.forEach((currentLessDep) => {
                         result.add(`css!${helpers.removeLeadingSlashes(
