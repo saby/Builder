@@ -13,5 +13,6 @@ module.exports = new Set([
    'tensorru',
    'fed2',
    'devtools',
-   'booking-widget'
+   'booking-widget',
+   'wasabydev'
 ]);
