@@ -11,5 +11,6 @@
   "resources/Screenshot/packages/settings.package.min",
   "resources/NoticeCenterPlugin/NoticeCenterPluginNotice.package.min",
   "resources/NoticeCenterPlugin/NoticeCenterPluginList.package.min",
-  "resources/SBISPlugin/packages/sbisplugin_feed.package.min"
+  "resources/SBISPlugin/packages/sbisplugin_feed.package.min",
+  "resources/SBISPlugin/packages/sbisplugin_editor.package"
 ]
