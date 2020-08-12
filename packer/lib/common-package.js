@@ -301,8 +301,9 @@ async function limitingNativePackFiles(
 
                if (fullPath) {
                   /**
-                   * путь может содержать min.original.js, надо проверять конкретно .min.js
-                   * на совпадение с путём до кастомного пакета
+                   * Path can contain ".min.original.js" postfix. Replace it to ".min.js"
+                   * to avoid extension divergence in test - is current module is used as
+                   * current custom package packing result.
                    * @type {boolean}
                    */
                   const jsIsPackageOutput = fullPath.replace(/\.original\.js$/, '.js') === packageConfig.outputFile;
@@ -319,16 +320,16 @@ async function limitingNativePackFiles(
                   }
 
                   /**
-                   * 1)Мы не должны удалять модуль, если в него будет записан результат паковки.
-                   * 2)Все компоненты должны удаляться только в рамках Интерфейсного модуля, в котором
-                   * строится кастомный пакет.
+                   * 1) Module that is used as custom package result can't be further removed.
+                   * 2) All components can be removed only within interface module of current
+                   * custom package
                    */
                   if (
                      !taskParameters.config.sources &&
                      !jsIsPackageOutput &&
-                     fullPath.startsWith(packageConfig.moduleOutput)
+                     currentFileModuleName === packageConfig.moduleName
                   ) {
-                     taskParameters.filesToRemove.push(fullPath);
+                     taskParameters.filesToRemove.push(path.join(root, relativePath));
                      const removeMessage = `Module ${fullPath} was removed in namespace of Interface module ${packageConfig.moduleName}.` +
                         `Packed into ${packageConfig.output}`;
                      logger.debug(removeMessage);
@@ -342,11 +343,11 @@ async function limitingNativePackFiles(
                      );
 
                      /**
-                      * Если был запакован .min.original.js, тогда можно ещё удалить и
-                      * .min.js, поскольку он нам теперь тоже не нужен.
+                      * Remove .min.js along with the .min.original.js file, because
+                      * it's useless from moment it is packed into custom package
                       */
                      if (fullPath.endsWith('.original.js')) {
-                        const replacedPath = fullPath.replace(/\.original\.js$/, '.js');
+                        const replacedPath = path.join(root, relativePath.replace(/\.original\.js$/, '.js'));
                         taskParameters.filesToRemove.push(replacedPath);
                         const replacedRemoveMessage = `Module ${replacedPath} was removed in namespace of Interface module ${packageConfig.moduleName}.` +
                            `Packed into ${packageConfig.output}`;
