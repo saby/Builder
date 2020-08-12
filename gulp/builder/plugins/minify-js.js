@@ -31,6 +31,9 @@ const excludeRegexes = [
    /.*\.routes\.js$/,
    /.*\.test\.js$/,
 
+   // Dedicated folders for Node.js code https://online.sbis.ru/opendoc.html?guid=a2ba1417-2332-4828-a46b-01057408e295
+   /.*[/\\]third-party[/\\]server[/\\].*/,
+
    // https://online.sbis.ru/opendoc.html?guid=05e7f1be-9fa9-48d4-a0d9-5506ac8d2b12
    /.*\.json\.js$/,
    /.*\.worker\.js$/,
