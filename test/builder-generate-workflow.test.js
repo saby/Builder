@@ -1526,7 +1526,7 @@ describe('gulp/builder/generate-workflow.js', () => {
             {
                name: 'Модуль',
                path: path.join(sourceFolder, 'Модуль'),
-               depends: ['WS.Core', 'Types']
+               depends: ['WS.Core', 'Types', 'SBIS3.CONTROLS']
             },
             {
                name: 'ExternalInterfaceModule',
@@ -2138,6 +2138,80 @@ describe('gulp/builder/generate-workflow.js', () => {
                {
                   name: 'InterfaceModule1',
                   path: path.join(sourceFolder, 'InterfaceModule1')
+               }
+            ]
+         };
+         await fs.writeJSON(configPath, desktopConfig);
+
+         await runWorkflowWithTimeout();
+         await testResults();
+
+         await runWorkflowWithTimeout();
+         await testResults();
+
+         await clearWorkspace();
+      });
+      it('packed modules must be removed when "sources" flag has "false" value', async() => {
+         const fixtureFolder = path.join(__dirname, 'fixture/custompack');
+         await prepareTest(fixtureFolder);
+         await linkPlatform(sourceFolder);
+         const testResults = async() => {
+            (await isRegularFile(moduleOutputFolder, 'Page.min.wml')).should.equal(false);
+            (await isRegularFile(moduleOutputFolder, 'private.min.js')).should.equal(false);
+            (await isRegularFile(moduleOutputFolder, 'private.min.original.js')).should.equal(false);
+            (await isRegularFile(moduleOutputFolder, 'Stable.min.css')).should.equal(false);
+         };
+
+         const desktopConfig = {
+            cache: cacheFolder,
+            output: outputFolder,
+            typescript: true,
+            less: true,
+            wml: true,
+            builderTests: true,
+            customPack: true,
+            minimize: true,
+            sources: false,
+            modules: [
+               {
+                  name: 'Модуль',
+                  path: path.join(sourceFolder, 'Модуль')
+               },
+               {
+                  name: 'ExternalInterfaceModule',
+                  path: path.join(sourceFolder, 'ExternalInterfaceModule')
+               },
+               {
+                  name: 'InterfaceModule1',
+                  path: path.join(sourceFolder, 'InterfaceModule1')
+               },
+               {
+                  name: 'WS.Core',
+                  path: path.join(sourceFolder, 'WS.Core')
+               },
+               {
+                  name: 'View',
+                  path: path.join(sourceFolder, 'View')
+               },
+               {
+                  name: 'UI',
+                  path: path.join(sourceFolder, 'UI')
+               },
+               {
+                  name: 'Vdom',
+                  path: path.join(sourceFolder, 'Vdom')
+               },
+               {
+                  name: 'Router',
+                  path: path.join(sourceFolder, 'Router')
+               },
+               {
+                  name: 'Inferno',
+                  path: path.join(sourceFolder, 'Inferno')
+               },
+               {
+                  name: 'Types',
+                  path: path.join(sourceFolder, 'Types')
                }
             ]
          };
