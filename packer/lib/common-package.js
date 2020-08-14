@@ -250,10 +250,10 @@ async function limitingNativePackFiles(
        */
       let rootCache, base;
       if (taskParameters.config.cachePath) {
-         rootCache = `${taskParameters.config.cachePath}/incremental_build`;
+         rootCache = `${helpers.prettifyPath(taskParameters.config.cachePath)}/incremental_build`;
          base = `${taskParameters.config.cachePath}/incremental_build`;
       } else {
-         rootCache = root;
+         rootCache = helpers.prettifyPath(root);
          base = path.join(root, application);
       }
       const jsExternalModuleUsageMessages = new Set();
