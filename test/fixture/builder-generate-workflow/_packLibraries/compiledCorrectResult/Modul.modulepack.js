@@ -44,6 +44,7 @@ define('Modul/Modul', [
             };
             templateFunction.stable = true;
             templateFunction.reactiveProps = [];
+            templateFunction.isWasabyTemplate = true;
             return templateFunction;
         }(thelpers, rk);
         if (result instanceof Function) {
@@ -147,6 +148,6 @@ define('Modul/Modul', [
     }();
         var Modul_es_1 = Modul__es6_Modul;
     exports.default = Modul_es_1.default;
-    
+
     return exports;
 });
