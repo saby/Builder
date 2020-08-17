@@ -4,6 +4,7 @@
   "resources/base-superbundle.package.min",
   "resources/controller-superbundle.package.min",
   "resources/entity-superbundle.package.min",
+  "resources/page-superbundle.package.min",
   "resources/TestPacker/core.package.min",
   "resources/TestPacker/test.package.min",
   "resources/ACS/AcsPass.package.min",
