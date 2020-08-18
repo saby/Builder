@@ -307,7 +307,9 @@ async function limitingNativePackFiles(
                    * @type {boolean}
                    */
                   const jsIsPackageOutput = fullPath.replace(/\.original\.js$/, '.js') === packageConfig.outputFile;
-                  const relativePath = helpers.removeLeadingSlashes(fullPath.replace(rootCache, ''));
+                  const relativePath = helpers.unixifyPath(
+                     helpers.removeLeadingSlashes(fullPath.replace(rootCache, ''))
+                  );
                   const currentFileModuleName = relativePath.split('/').shift();
                   if (
                      currentFileModuleName !== packageConfig.moduleName &&
@@ -329,17 +331,18 @@ async function limitingNativePackFiles(
                      !jsIsPackageOutput &&
                      currentFileModuleName === packageConfig.moduleName
                   ) {
-                     taskParameters.filesToRemove.push(path.join(root, relativePath));
+                     const prettyOutputFile = helpers.unixifyPath(path.join(root, relativePath));
+                     taskParameters.filesToRemove.push(prettyOutputFile);
                      const removeMessage = `Module ${fullPath} was removed in namespace of Interface module ${packageConfig.moduleName}.` +
                         `Packed into ${packageConfig.output}`;
                      logger.debug(removeMessage);
                      helpers.removeFileFromBuilderMeta(
                         taskParameters.versionedModules[packageConfig.moduleName],
-                        fullPath
+                        prettyOutputFile
                      );
                      helpers.removeFileFromBuilderMeta(
                         taskParameters.cdnModules[packageConfig.moduleName],
-                        fullPath
+                        prettyOutputFile
                      );
 
                      /**
@@ -347,9 +350,9 @@ async function limitingNativePackFiles(
                       * it's useless from moment it is packed into custom package
                       */
                      if (fullPath.endsWith('.original.js')) {
-                        const replacedPath = path.join(root, relativePath.replace(/\.original\.js$/, '.js'));
+                        const replacedPath = helpers.unixifyPath(path.join(root, relativePath.replace(/\.original\.js$/, '.js')));
                         taskParameters.filesToRemove.push(replacedPath);
-                        const replacedRemoveMessage = `Module ${replacedPath} was removed in namespace of Interface module ${packageConfig.moduleName}.` +
+                        const replacedRemoveMessage = `Module ${replacedPath} and its .original.js version was removed in namespace of Interface module ${packageConfig.moduleName}.` +
                            `Packed into ${packageConfig.output}`;
                         logger.debug(replacedRemoveMessage);
                         helpers.removeFileFromBuilderMeta(
