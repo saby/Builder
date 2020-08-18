@@ -44,6 +44,7 @@ define('Modul/Modul', [
             };
             templateFunction.stable = true;
             templateFunction.reactiveProps = [];
+            templateFunction.isWasabyTemplate = true;
             return templateFunction;
         }(thelpers, rk);
         if (result instanceof Function) {
