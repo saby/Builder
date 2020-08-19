@@ -132,6 +132,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             const sourceRoot = helpers.unixifyPath(
                path.join(taskParameters.config.cachePath, 'temp-modules')
             );
+            const packedPrivateModules = {};
             const json = {
                links: {},
                nodes: {},
@@ -185,6 +186,18 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                }
                if (info.hasOwnProperty('libraryName')) {
                   json.packedLibraries[info.libraryName] = info.packedModules;
+
+                  /**
+                   * Fill in private modules meta by data of this format:
+                   * key: private module packed into library
+                   * value: list of libraries that has the private module
+                   */
+                  info.packedModules.forEach((currentPrivateModule) => {
+                     if (!packedPrivateModules.hasOwnProperty(currentPrivateModule)) {
+                        packedPrivateModules[currentPrivateModule] = [];
+                     }
+                     packedPrivateModules[currentPrivateModule].push(info.libraryName);
+                  });
                }
                if (info.hasOwnProperty('lessDependencies') && addAdditionalMeta) {
                   const result = new Set();
@@ -261,6 +274,28 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             }
 
             taskParameters.cache.storeLocalModuleDependencies(json);
+
+            /**
+             * Check libraries for interceptions between private modules.
+             * current private module should be packed only in 1 library,
+             * otherwise it should be declared as public dependency and be loaded as single
+             * dependency in all dependent libraries
+             */
+            Object.keys(packedPrivateModules)
+               .filter(currentKey => packedPrivateModules[currentKey].length > 1)
+               .forEach((currentDuplicatedKey) => {
+                  const message = `Module ${currentDuplicatedKey} was packed into several libraries:` +
+                     `"${packedPrivateModules[currentDuplicatedKey].join('","')}"`;
+
+                  /**
+                   * For now, log interceptions with information level. First of all,
+                   * we should assess the scale of a problem in common projects.
+                   */
+                  logger.info(
+                     message,
+                     moduleInfo
+                  );
+               });
          } catch (error) {
             logger.error({
                message: "Ошибка Builder'а",
