@@ -140,6 +140,15 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                    */
                   library.versioned = result.versioned;
                   library.cdnLinked = result.cdnLinked;
+
+                  // add extra logs from library packer into a single file
+                  // to have an ability to save logs in builder cache
+                  if (result.logs) {
+                     const logsFile = library.clone();
+                     logsFile.path = `${logsFile.path}.log`;
+                     logsFile.contents = result.logs;
+                     this.push(logsFile);
+                  }
                }
                this.push(library);
             },
