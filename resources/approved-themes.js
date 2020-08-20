@@ -14,5 +14,6 @@ module.exports = new Set([
    'fed2',
    'devtools',
    'booking-widget',
-   'wasabydev'
+   'wasabydev',
+   'sbisru'
 ]);
