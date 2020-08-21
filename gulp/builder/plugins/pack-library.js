@@ -146,7 +146,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   if (result.logs) {
                      const logsFile = library.clone();
                      logsFile.path = `${logsFile.path}.log`;
-                     logsFile.contents = result.logs;
+                     logsFile.contents = Buffer.from(result.logs);
                      this.push(logsFile);
                   }
                }
