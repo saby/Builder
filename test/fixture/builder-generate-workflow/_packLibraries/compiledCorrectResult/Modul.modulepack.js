@@ -31,7 +31,7 @@ define('Modul/Modul', [
                         };
                         var viewController = thelpers.configResolver.calcParent(this, typeof currentPropertyName === 'undefined' ? undefined : currentPropertyName, data);
                         if (typeof forceCompatible === 'undefined') {
-                           forceCompatible = false;
+                            forceCompatible = false;
                         }
                         var markupGenerator = thelpers.createGenerator(isVdom, forceCompatible);
                         try {
