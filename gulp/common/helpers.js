@@ -93,13 +93,13 @@ function generateTaskForInitWorkerPool(taskParameters) {
       const startTime = Date.now();
 
       // переменная окружения ws-core-path задана в тестах
-      let wsCorePath = process.env['ws-core-path'];
+      let RequireJsLoaderPath = process.env['require-loader-path'];
 
       // WS.Core - название модуля в SDK
-      if (!wsCorePath) {
-         const possibleWsCorePath = path.join(taskParameters.config.cachePath, 'platform/WS.Core');
-         if (await fs.pathExists(possibleWsCorePath)) {
-            wsCorePath = possibleWsCorePath;
+      if (!RequireJsLoaderPath) {
+         const possibleRequirePath = path.join(taskParameters.config.cachePath, 'platform/RequireJsLoader');
+         if (await fs.pathExists(possibleRequirePath)) {
+            RequireJsLoaderPath = possibleRequirePath;
          }
       }
 
@@ -124,7 +124,7 @@ function generateTaskForInitWorkerPool(taskParameters) {
          forkOpts: {
             env: {
                logs: getLogLevel(process.argv),
-               'ws-core-path': wsCorePath,
+               'require-loader-path': RequireJsLoaderPath,
                'main-process-cwd': process.cwd(),
                'required-modules': JSON.stringify(requiredModules)
             },
