@@ -17,7 +17,7 @@ define('Modul/Modul', [
             var deps = Array.prototype.slice.call(arguments);
             var depsLocal = {};
             var includedTemplates = {};
-            var templateFunction = function Modul__es6_test(data, attr, context, isVdom, sets) {
+            var templateFunction = function Modul__es6_test(data, attr, context, isVdom, sets, forceCompatible) {
                 var forCounter = 0;
                 var templateCount = 0;
                 var key = thelpers.validateNodeKey(attr && attr.key);
@@ -26,7 +26,10 @@ define('Modul/Modul', [
                     def: undefined
                 };
                 var viewController = thelpers.configResolver.calcParent(this, typeof currentPropertyName === 'undefined' ? undefined : currentPropertyName, data);
-                var markupGenerator = thelpers.getMarkupGenerator(isVdom);
+                if (typeof forceCompatible === 'undefined') {
+                    forceCompatible = false;
+                }
+                var markupGenerator = thelpers.getMarkupGenerator(isVdom, forceCompatible);
                 try {
                     var out = markupGenerator.joinElements([markupGenerator.createTag('div', {
                             'attributes': { 'class': 'test' },
