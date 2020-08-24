@@ -554,7 +554,6 @@
   "resources/ProjectManagement/packages/ProjectManagement/Projects/CommonTabs.package.min",
   "resources/ProjectManagement/packages/ProjectManagement/Projects/Forms/EditDialog/ProjectForm.package.min",
   "resources/ProjectManagement/packages/ProjectManagement/Projects/List/ProjDocList.package.min",
-  "resources/RequireJsLoader/plugins.package.min",
   "resources/Rights/packages/staffAccess.package.min",
   "resources/Rights/packages/editScopesStaff.package.min",
   "resources/RightsEmployee/packages/staffAccessEmployee.package.min",
