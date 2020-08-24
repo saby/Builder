@@ -82,7 +82,7 @@
       "wasaby-app": "git+https://platform-git.sbis.ru/saby/wasaby-app.git#rc-20.7000",
       "saby-ui": "git+https://platform-git.sbis.ru/saby/UI.git#rc-20.7000",
       "saby-inferno": "git+https://platform-git.sbis.ru/saby/inferno.git#rc-20.7000",
-      "wasaby-requirejs-loader": "git+https://platform-git.sbis.ru/saby/wasaby-requirejs-loader.git#rc-20.6000"
+      "wasaby-requirejs-loader": "git+https://platform-git.sbis.ru/saby/wasaby-requirejs-loader.git#rc-20.7000"
    },
    "engines": {
       "node": ">=10.14.2"
