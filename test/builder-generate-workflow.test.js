@@ -31,7 +31,8 @@ const workspaceFolder = path.join(__dirname, 'workspace'),
    moduleSourceFolder = path.join(sourceFolder, 'Модуль'),
    themesSourceFolder = path.join(sourceFolder, 'Тема Скрепка');
 
-const clearWorkspace = function() {
+const clearWorkspace = async function() {
+   await fs.remove(`${workspaceFolder}-1`);
    return fs.remove(workspaceFolder);
 };
 
