@@ -49,6 +49,7 @@ function getPlatformModules() {
    const ModuleInfo = require('../gulp/common/classes/base-module-info');
    return [
       new ModuleInfo('WS.Core', '', path.join(nodeModulesPath, 'sbis3-ws/WS.Core'), true),
+      new ModuleInfo('RequireJsLoader', '', path.join(nodeModulesPath, 'wasaby-requirejs-loader/RequireJsLoader'), true),
       new ModuleInfo('Application', '', path.join(nodeModulesPath, 'wasaby-app/src/Application'), true),
       new ModuleInfo('View', '', path.join(nodeModulesPath, 'sbis3-ws/View'), true),
       new ModuleInfo('Vdom', '', path.join(nodeModulesPath, 'sbis3-ws/Vdom'), true),
@@ -71,7 +72,7 @@ async function init() {
          const modules = getPlatformModules();
          await copyWS(modules);
          const requiredModules = modules.map(moduleInfo => moduleInfo.name);
-         process.env['ws-core-path'] = path.join(__dirname, 'fixtureWS/platform/WS.Core');
+         process.env['require-loader-path'] = path.join(__dirname, 'fixtureWS/platform/RequireJsLoader');
          require('../gulp/common/node-ws').init(requiredModules);
          initialized = true;
       } catch (e) {
