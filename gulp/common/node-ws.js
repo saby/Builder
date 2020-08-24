@@ -9,8 +9,6 @@ const path = require('path'),
    requireJS = require('saby-units/lib/requirejs/r'),
    logger = require('../../lib/logger').logger();
 
-const resourceRoot = '/';
-
 const formatMessage = function(message) {
    if (typeof message === 'string') {
       return message;
@@ -43,23 +41,14 @@ const wsLogger = {
 };
 
 function initWs(requiredModules) {
-   // Используем платформу из кода проекта.
-   // Это нужно для беспроблемного прохождения тестов WS и Controls, а также сборки онлайна.
-   // Часто код WS должен быть одинаковым на стенде и в билдере, иначе стенд разваливается.
-   // При этом API, которое предоставляет WS для Builder'а, меняется редко.
-   // Считаем, что все модули платформы лежат в одной директории.
-   logger.debug(`В worker передан параметр ws-core-path=${process.env['ws-core-path']}`);
-   const WSFullPath = process.env['ws-core-path'];
-   const appRoot = path.dirname(WSFullPath);
-
-
-   // для wsRoot слэш в начале обязателен
-   const wsRoot = `/${path.basename(WSFullPath)}`;
+   logger.debug(`В worker передан параметр require-loader-path=${process.env['require-loader-path']}`);
+   const RequireJsLoaderPath = process.env['require-loader-path'];
+   const appRoot = path.dirname(RequireJsLoaderPath);
 
    global.wsConfig = {
       appRoot,
-      wsRoot,
-      resourceRoot
+      wsRoot: path.join(appRoot, '/WS.Core'),
+      resourceRoot: appRoot
    };
    global.wsBindings = {
       ITransport() {
@@ -78,16 +67,21 @@ function initWs(requiredModules) {
       }
       return resultKey;
    };
-   global.requirejs = requireJS;
+
+   // set baseUrl to get AMD-based config of RequireJsLoader
+   global.requirejs = requireJS.config({
+      baseUrl: appRoot
+   });
    global.define = requireJS.define;
 
-   // eslint-disable-next-line global-require
-   const requireJSConfig = require(path.join(appRoot, wsRoot, 'ext/requirejs/config.js'));
-   const config = requireJSConfig(appRoot, WSFullPath, appRoot, {
-      waitSeconds: 20,
-      nodeRequire: require
-   });
-   global.requirejs = requireJS.config(config);
+
+   const requireJSConfig = global.requirejs('RequireJsLoader/config');
+
+   // apply RequireJsLoader/config for current requirejs from saby-units
+   requireJSConfig.applyConfig(requireJS, global.wsConfig);
+
+   // set configured requirejs as global for further needs
+   global.requirejs = requireJS;
    const loadContents = global.requirejs('Core/load-contents');
    const modulesForAppContents = {};
    requiredModules.forEach((currentModule) => {
