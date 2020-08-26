@@ -581,6 +581,7 @@
   "resources/RegulationEvents/packages/RegulationEventsBaseList.package.min",
   "resources/RegulationEvents/packages/RegulationEventsConfiguration.package.min",
   "resources/RegulationEvents/packages/RegulationEventsListMain.package.min",
+  "resources/RequireJsLoader/plugins.package.min",
   "resources/Retail/Base/Input.package.min",
   "resources/Retail/Common/Configuration/ConfigurationMain.package.min",
   "resources/Retail/Common/Configuration/SalesPoint/Wizard/AdditionalSettingsWizard.package.min",
