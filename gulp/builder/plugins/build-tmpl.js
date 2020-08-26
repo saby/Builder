@@ -82,7 +82,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
          }
 
          // Write original file if tmpl can't be compiled
-         // testing some sorta strange things happenning on builder servers
+         // testing some sorta strange things happenning on builder serverss
          let newText = file.contents.toString();
          let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
          relativeFilePath = path.join(path.basename(moduleInfo.path), relativeFilePath);
