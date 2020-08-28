@@ -100,7 +100,7 @@ try {
     * @param {string} componentsPropertiesFilePath путь до json-файла описания компонентов
     * @returns {Promise<{text, nodeName, dependencies}>}
     */
-   async function buildTemplate(text, relativeFilePath, componentsPropertiesFilePath) {
+   async function buildTemplate(text, relativeFilePath, componentsPropertiesFilePath, generateCodeForTranslations) {
       const startTime = Date.now();
       if (!processingTmpl) {
          initializeWSForWorker();
@@ -109,7 +109,8 @@ try {
       const result = await processingTmpl.buildTemplate(
          processingTmpl.minifyTmpl(text),
          relativeFilePath,
-         await readComponentsProperties(componentsPropertiesFilePath)
+         await readComponentsProperties(componentsPropertiesFilePath),
+         generateCodeForTranslations
       );
       return Object.assign(
          result,
