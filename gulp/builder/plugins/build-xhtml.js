@@ -54,7 +54,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
             const [errorBuild, resultBuild] = await execInPool(
                taskParameters.pool,
-               'buildXhtml',
+               'buildTemplate',
                [newText, relativeFilePath],
                relativeFilePath,
                moduleInfo
