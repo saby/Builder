@@ -13,6 +13,7 @@ describe('build template', () => {
    });
 
    it('basic xhtml', async() => {
+      let localization = true;
       const testResults = (result) => {
          result.text.startsWith('define("html!TestModule/TestWml"').should.equal(true);
          result.nodeName.should.equal('html!TestModule/TestWml');
@@ -20,20 +21,27 @@ describe('build template', () => {
             fileName: 'TestModule/TestWml.xhtml',
             fromBuilderTmpl: true,
             createResultDictionary: true,
-            componentsProperties: 'path/to/components-properties.json'
+            componentsProperties: 'path/to/components-properties.json',
+            generateCodeForTranslations: localization
+
          });
       };
 
       let result = await processingTmpl.buildTemplate(
          '<div>{{= 1+1}}</div>',
          path.normalize('TestModule/TestWml.xhtml'),
-         'path/to/components-properties.json'
+         'path/to/components-properties.json',
+         localization
       );
       testResults(result);
+
+      // disable localization, after new build localization should be disabled in result
+      localization = false;
       result = await processingTmpl.buildTemplate(
          '<div>{{= 1+1}}</div>',
          path.normalize('TestModule/TestWml.xhtml'),
-         'path/to/components-properties.json'
+         'path/to/components-properties.json',
+         localization
       );
       testResults(result);
    });
@@ -51,7 +59,7 @@ describe('build template', () => {
          });
       };
 
-      let result = await processingTmpl.buildTmpl(
+      let result = await processingTmpl.buildTemplate(
          '<div>{{1+1}}</div>',
          path.normalize('TestModule/TestWml.wml'),
          'path/to/components-properties.json',
@@ -61,7 +69,7 @@ describe('build template', () => {
 
       // disable localization, after new build localization should be disabled in result
       localization = false;
-      result = await processingTmpl.buildTmpl(
+      result = await processingTmpl.buildTemplate(
          '<div>{{1+1}}</div>',
          path.normalize('TestModule/TestWml.wml'),
          'path/to/components-properties.json',
