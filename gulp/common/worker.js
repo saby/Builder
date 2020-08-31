@@ -101,7 +101,7 @@ try {
     * @param {string} componentsPropertiesFilePath путь до json-файла описания компонентов
     * @returns {Promise<{text, nodeName, dependencies}>}
     */
-   async function buildTmpl(text, relativeFilePath, componentsPropertiesFilePath, templateExt) {
+   async function buildTmpl(text, relativeFilePath, componentsPropertiesFilePath, generateCodeForTranslations) {
       const startTime = Date.now();
       if (!processingTmpl) {
          initializeWSForWorker();
@@ -111,7 +111,7 @@ try {
          processingTmpl.minifyTmpl(text),
          relativeFilePath,
          await readComponentsProperties(componentsPropertiesFilePath),
-         templateExt
+         generateCodeForTranslations
       );
       return Object.assign(
          result,
