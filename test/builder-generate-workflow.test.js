@@ -797,8 +797,8 @@ describe('gulp/builder/generate-workflow.js', () => {
 
          // test common types of this map properties for validity.
          const substitutions = mDeps.requireJsSubstitutions;
-         substitutions.hasOwnProperty('html').should.equal(true);
-         substitutions.html.should.equal('WS.Core/ext/requirejs/plugins/html.js');
+         substitutions.hasOwnProperty('Core/app').should.equal(true);
+         substitutions['Core/app'].should.equal('WS.Core/core/app.js');
          substitutions.hasOwnProperty('css!WS/css/core').should.equal(true);
          substitutions['css!WS/css/core'].should.equal('WS.Core/css/core.css');
       };
