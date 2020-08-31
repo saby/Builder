@@ -60,8 +60,7 @@ try {
     * для работы. Поэтому обьявление данных функций выполняем только
     * в случае инициализации ядра.
     */
-   let processingTmpl, prepareXHTMLPrimitive,
-      buildXhtmlPrimitive, collectWordsPrimitive;
+   let processingTmpl, prepareXHTMLPrimitive, collectWordsPrimitive;
 
    const fs = require('fs-extra'),
       workerPool = require('workerpool'),
@@ -70,7 +69,7 @@ try {
       parseJsComponent = require('../../lib/parse-js-component'),
       processingRoutes = require('../../lib/processing-routes'),
       runMinifyCss = require('../../lib/run-minify-css'),
-      runMinifyXhtmlAndHtml = require('../../lib/run-minify-xhtml-and-html'),
+      runMinifyHtml = require('../../lib/run-minify-html'),
       uglifyJs = require('../../lib/run-uglify-js'),
       { wrapWorkerFunction } = require('./helpers'),
       { packLibrary } = require('../../lib/pack/library-packer'),
@@ -101,17 +100,17 @@ try {
     * @param {string} componentsPropertiesFilePath путь до json-файла описания компонентов
     * @returns {Promise<{text, nodeName, dependencies}>}
     */
-   async function buildTmpl(text, relativeFilePath, componentsPropertiesFilePath, templateExt) {
+   async function buildTemplate(text, relativeFilePath, componentsPropertiesFilePath, generateCodeForTranslations) {
       const startTime = Date.now();
       if (!processingTmpl) {
          initializeWSForWorker();
          processingTmpl = require('../../lib/templates/processing-tmpl');
       }
-      const result = await processingTmpl.buildTmpl(
+      const result = await processingTmpl.buildTemplate(
          processingTmpl.minifyTmpl(text),
          relativeFilePath,
          await readComponentsProperties(componentsPropertiesFilePath),
-         templateExt
+         generateCodeForTranslations
       );
       return Object.assign(
          result,
@@ -172,22 +171,6 @@ try {
    }
 
    /**
-    * Компиляция xhtml в js
-    * @param {string} text содержимое файла
-    * @param {string} relativeFilePath относительный путь до файла (начинается с имени модуля)
-    * @returns {Promise<{nodeName, text}>}
-    */
-   async function buildXhtml(text, relativeFilePath) {
-      const startTime = Date.now();
-      if (!buildXhtmlPrimitive) {
-         initializeWSForWorker();
-         buildXhtmlPrimitive = require('../../lib/templates/processing-xhtml').buildXhtml;
-      }
-      const content = await buildXhtmlPrimitive(await runMinifyXhtmlAndHtml(text), relativeFilePath);
-      return Object.assign(content, { passedTime: Date.now() - startTime });
-   }
-
-   /**
     * Сбор локализуемых фрах для конкретного файла
     * @param {string} modulePath путь до модуля
     * @param {string} filePath путь до файла
@@ -227,12 +210,11 @@ try {
       parseRoutes: wrapWorkerFunction(processingRoutes.parseRoutes),
       buildLess: wrapWorkerFunction(buildLess),
       compileEsAndTs: wrapWorkerFunction(compileEsAndTs),
-      buildTmpl: wrapWorkerFunction(buildTmpl),
+      buildTemplate: wrapWorkerFunction(buildTemplate),
       buildHtmlTmpl: wrapWorkerFunction(buildHtmlTmpl),
       prepareXHTML: wrapWorkerFunction(prepareXHTML),
-      buildXhtml: wrapWorkerFunction(buildXhtml),
       minifyCss: wrapWorkerFunction(runMinifyCss),
-      minifyXhtmlAndHtml: wrapWorkerFunction(runMinifyXhtmlAndHtml),
+      minifyHtml: wrapWorkerFunction(runMinifyHtml),
       uglifyJs: wrapWorkerFunction(uglifyJs),
       compress: wrapWorkerFunction(compress),
       collectWords: wrapWorkerFunction(collectWords),

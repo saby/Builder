@@ -30,7 +30,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo, gd) {
             return;
          }
 
-         const [error, minText] = await execInPool(taskParameters.pool, 'minifyXhtmlAndHtml', [file.contents.toString()]);
+         const [error, minText] = await execInPool(taskParameters.pool, 'minifyHtml', [file.contents.toString()]);
          if (error) {
             logger.error({
                message: 'Ошибка при минификации html',

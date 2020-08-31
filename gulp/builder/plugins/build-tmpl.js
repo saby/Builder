@@ -89,8 +89,13 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
          const [error, result] = await execInPool(
             taskParameters.pool,
-            'buildTmpl',
-            [newText, relativeFilePath, componentsPropertiesFilePath],
+            'buildTemplate',
+            [
+               newText,
+               relativeFilePath,
+               componentsPropertiesFilePath,
+               taskParameters.config.localizations.length > 0
+            ],
             relativeFilePath,
             moduleInfo
          );
