@@ -34,7 +34,7 @@ class ModuleCache {
    removeUnnededProperties(object) {
       for (const property in object) {
          if (object.hasOwnProperty(property) && !this.markupProperties.includes(property)) {
-            delete object.property;
+            delete object[property];
          }
       }
    }
