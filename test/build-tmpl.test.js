@@ -17,13 +17,6 @@ describe('build tmpl', () => {
       const testResults = (result) => {
          result.text.startsWith('define(\'wml!TestModule/TestWml\'').should.equal(true);
          result.nodeName.should.equal('wml!TestModule/TestWml');
-         result.config.should.deep.equal({
-            fileName: 'TestModule/TestWml.wml',
-            fromBuilderTmpl: true,
-            createResultDictionary: true,
-            componentsProperties: 'path/to/components-properties.json',
-            generateCodeForTranslations: localization
-         });
       };
 
       let result = await processingTmpl.buildTmpl(
