@@ -202,7 +202,6 @@ function generateTaskForSaveCache(taskParameters) {
    return async function saveCache() {
       const startTime = Date.now();
       await taskParameters.cache.save();
-      process.env['changed-modules'] = [...taskParameters.changedModules];
       taskParameters.storeTaskTime('save cache', startTime);
    };
 }
