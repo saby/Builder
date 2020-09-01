@@ -197,6 +197,9 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                newFile.path = outputPath;
                newFile.base = moduleInfo.output;
                newFile.lessSource = file.contents;
+               if (taskParameters.config.staticServer) {
+                  newFile.pushToServer = true;
+               }
                this.push(newFile);
             }
          } catch (error) {

@@ -142,20 +142,27 @@ class BuildConfiguration {
       // native watcher executing state. If true,
       // source modules symlinks can't be recreated, because watcher watches theirs directories
       this.nativeWatcher = !!nativeWatcher;
+
+      // address of static server that is listening for changes from builder
+      // side to update those on a server side.
+      this.staticServer = false;
    }
 
    /**
     * Configuring all common flags for Builder plugins
     */
    configureBuildFlags() {
-      // write all bool parameters of readed config. Builder will use only known flags.
+      // write all bool and string parameters of read config. Builder will use only known flags.
       Object.keys(this.rawConfig).forEach((currentOption) => {
-         if (this.rawConfig.hasOwnProperty(currentOption) && typeof this.rawConfig[currentOption] === 'boolean') {
+         if (
+            this.rawConfig.hasOwnProperty(currentOption) &&
+            (typeof this.rawConfig[currentOption] === 'boolean' || typeof this.rawConfig[currentOption] === 'string')
+         ) {
             this[currentOption] = this.rawConfig[currentOption];
          }
       });
 
-      // autoprefixer option - input value can be bollean or object
+      // autoprefixer option - input value can be boolean or object
       if (this.rawConfig.hasOwnProperty('autoprefixer')) {
          const { autoprefixer } = this.rawConfig;
          switch (typeof autoprefixer) {
@@ -169,13 +176,6 @@ class BuildConfiguration {
                break;
             default:
                break;
-         }
-      }
-
-      if (this.rawConfig.hasOwnProperty('checkModuleDependencies')) {
-         const { checkModuleDependencies } = this.rawConfig;
-         if (typeof checkModuleDependencies === 'boolean' || typeof checkModuleDependencies === 'string') {
-            this.checkModuleDependencies = checkModuleDependencies;
          }
       }
    }

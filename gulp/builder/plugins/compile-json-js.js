@@ -106,6 +106,9 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             newFile.contents = Buffer.from(result);
             newFile.path = outputPath;
             newFile.base = moduleInfo.output;
+            if (taskParameters.config.staticServer) {
+               newFile.pushToServer = true;
+            }
             this.push(newFile);
          } catch (error) {
             taskParameters.cache.markFileAsFailed(file.history[0]);

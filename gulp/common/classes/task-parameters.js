@@ -28,6 +28,7 @@ class TaskParameters {
       this.versionedModules = {};
       this.cdnModules = {};
       this.librariesMeta = {};
+      this.changedModules = new Set();
    }
 
    /**
@@ -71,6 +72,10 @@ class TaskParameters {
 
    setCurrentTask(currentTask) {
       this.currentTask = currentTask;
+   }
+
+   addChangedFile(fileName) {
+      this.changedModules.add(fileName);
    }
 
    normalizePluginsTime() {

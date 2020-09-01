@@ -92,7 +92,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo, modulesMap) 
                      new Vinyl({
                         base: moduleInfo.output,
                         path: outputPath,
-                        contents: Buffer.from(result.text)
+                        contents: Buffer.from(result.text),
+                        pushToServer: taskParameters.config.staticServer
                      })
                   );
                }
