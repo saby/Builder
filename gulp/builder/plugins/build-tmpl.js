@@ -191,7 +191,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   base: moduleInfo.output,
                   path: outputMinFile,
                   contents: Buffer.from(newText),
-                  history: [...file.history]
+                  history: [...file.history],
+                  pushToServer: taskParameters.config.staticServer
                })
             );
             taskParameters.cache.addOutputFile(file.history[0], outputMinFile, moduleInfo);

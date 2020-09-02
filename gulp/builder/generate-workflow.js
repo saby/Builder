@@ -24,7 +24,8 @@ const generateTaskForBuildModules = require('./generate-task/build-modules'),
    generateTaskForSaveLoggerReport = require('../common/generate-task/save-logger-report'),
    Cache = require('./classes/cache'),
    Configuration = require('./classes/configuration.js'),
-   TaskParameters = require('../common/classes/task-parameters');
+   TaskParameters = require('../common/classes/task-parameters'),
+   pushChanges = require('../../lib/push-changes');
 
 const {
    generateTaskForLoadCache,
@@ -76,10 +77,22 @@ function generateWorkflow(processArgv) {
       generateTaskForSaveJoinedMeta(taskParameters),
       generateTaskForSaveLoggerReport(taskParameters),
       generateTaskForSaveTimeReport(taskParameters),
+      generateTaskForPushOfChanges(taskParameters),
 
       // generateTaskForUnlock's after all
       guardSingleProcess.generateTaskForUnlock()
    );
+}
+
+function generateTaskForPushOfChanges(taskParameters) {
+   if (!taskParameters.config.staticServer) {
+      return function skipPushOfChangedFiles(done) {
+         done();
+      };
+   }
+   return function pushOfChangedFiles() {
+      return pushChanges(taskParameters);
+   };
 }
 
 function generateTaskForSaveTimeReport(taskParameters) {

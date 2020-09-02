@@ -195,7 +195,7 @@ function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap
             // createStaticTemplatesJson зависит от buildStaticHtml и gulpBuildHtmlTmpl
             .pipe(gulpIf(config.presentationServiceMeta, createStaticTemplatesJson(taskParameters, moduleInfo)))
             .pipe(gulpIf(needModuleDependencies, createModuleDependenciesJson(taskParameters, moduleInfo)))
-            .pipe(filterCached())
+            .pipe(filterCached(taskParameters, moduleInfo))
             .pipe(gulpIf(config.isSourcesOutput, filterSources()))
             .pipe(gulpIf(!config.sources, copySources(taskParameters, moduleInfo)))
             .pipe(gulpChmod({ read: true, write: true }))

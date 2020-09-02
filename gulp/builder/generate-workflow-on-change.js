@@ -15,7 +15,8 @@ const path = require('path'),
    gulpChmod = require('gulp-chmod'),
    plumber = require('gulp-plumber'),
    helpers = require('../../lib/helpers'),
-   startTask = require('../../gulp/common/start-task-with-timer');
+   startTask = require('../../gulp/common/start-task-with-timer'),
+   mapStream = require('map-stream');
 
 const Cache = require('./classes/cache'),
    Configuration = require('./classes/configuration.js'),
@@ -26,6 +27,7 @@ const Cache = require('./classes/cache'),
    compileEsAndTs = require('./plugins/compile-es-and-ts'),
    logger = require('../../lib/logger').logger(),
    transliterate = require('../../lib/transliterate'),
+   pushChanges = require('../../lib/push-changes'),
    { generateDownloadModuleCache, generateSaveModuleCache } = require('./classes/modules-cache');
 
 const {
@@ -64,8 +66,20 @@ function generateBuildWorkflowOnChange(processArgv) {
       generateTaskForInitWorkerPool(taskParameters),
       generateTaskForMarkThemeModules(taskParameters, config),
       generateTaskForBuildFile(taskParameters, filePath),
+      generateTaskForPushOfChanges(taskParameters),
       generateTaskForTerminatePool(taskParameters)
    );
+}
+
+function generateTaskForPushOfChanges(taskParameters) {
+   if (!taskParameters.config.staticServer) {
+      return function skipPushOfChangedFiles(done) {
+         done();
+      };
+   }
+   return function pushOfChangedFiles() {
+      return pushChanges(taskParameters);
+   };
 }
 
 function generateTaskForBuildFile(taskParameters, filePath) {
@@ -144,6 +158,16 @@ function generateTaskForBuildFile(taskParameters, filePath) {
             })
          )
          .pipe(gulpChmod({ read: true, write: true }))
+         .pipe(mapStream((file, callback) => {
+            if (file.pushToServer) {
+               const outputFilePath = path.join(
+                  currentModuleInfo.runtimeModuleName,
+                  file.relative
+               ).replace(/\\/g, '/');
+               taskParameters.addChangedFile(outputFilePath);
+            }
+            callback(null, file);
+         }))
          .pipe(
             gulpIf(
                needSymlink(taskParameters.config, currentModuleInfo),
