@@ -2350,7 +2350,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          minimize: true,
          less: true,
          inlineScripts: false,
-         'url-service-path': '/testService/',
+         'ui-service-path': '/testService/',
          modules: [
             {
                name: 'TestModule',
