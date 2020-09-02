@@ -146,6 +146,10 @@ class BuildConfiguration {
       // address of static server that is listening for changes from builder
       // side to update those on a server side.
       this.staticServer = false;
+
+      // root for current ui-service. Needed to download resources
+      // from correct static server
+      this.uiServicePath = '/';
    }
 
    /**
@@ -300,30 +304,11 @@ class BuildConfiguration {
          this.urlServicePath = this.rawConfig['url-service-path'];
       }
 
-      if (this.multiService && this.urlServicePath) {
-         /** Temporarily decision: for multi-service auth application don't add UI-service name into
-          * styles URL's. Why we need this? Because of there are 2 projects with the same configuration:
-          * SBISDisk and authentication-ps for billing - both of them are multi-service applications, but
-          * at the same time "SBISDisk" needs "/shared/" service to be added in their custom packages,
-          * on the other hand "authentication-ps for billing" needs URLs without service name.
-          * Permanent decision for this situation is to add an opportunity for set special flag in project's
-          * s3* configuration files.
-          * TODO remove it after task completion.
-          * https://online.sbis.ru/opendoc.html?guid=fbf769d7-9879-4c13-8ec2-419374da510f
-          */
-         if (
-            this.urlServicePath.includes('/auth') ||
-            this.urlServicePath.includes('/service')
-         ) {
-            this.applicationForRebase = '/';
-         } else {
-            this.applicationForRebase = this.urlServicePath;
-         }
-      } else if (this.urlServicePath && !this.urlServicePath.includes('/service')) {
-         this.applicationForRebase = this.urlServicePath;
-      } else {
-         this.applicationForRebase = '/';
+      if (this.rawConfig.hasOwnProperty('ui-service-path')) {
+         this.uiServicePath = this.rawConfig['ui-service-path'];
       }
+
+      this.applicationForRebase = this.uiServicePath || '/';
 
       if (this.rawConfig['url-default-service-path']) {
          this.urlDefaultServicePath = this.rawConfig['url-default-service-path'];

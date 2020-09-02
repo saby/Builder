@@ -8,7 +8,6 @@ const path = require('path');
 const fs = require('fs-extra');
 const workspaceFolder = path.join(__dirname, 'workspace');
 const cacheFolder = path.join(workspaceFolder, 'cache');
-const outputFolder = path.join(workspaceFolder, 'output');
 const configPath = path.join(workspaceFolder, 'gulp_config.json');
 
 describe('gulp configuration reader', () => {
@@ -153,75 +152,14 @@ describe('gulp configuration set', () => {
       }
    };
 
-   describe('application for rebasing in packages must be configured properly', () => {
-      it('1st case - single service application without UI-service', () => {
-         const runParameters = new Configuration();
-         const { rawConfig } = config;
-         rawConfig['url-service-path'] = '/service/';
-         rawConfig['multi-service'] = false;
-         runParameters.rawConfig = rawConfig;
-         runParameters.configMainBuildInfo();
-         runParameters.applicationForRebase.should.equal('/');
-      });
-      it('2nd case - single service application with UI-service', () => {
-         let runParameters = new Configuration();
-         const { rawConfig } = config;
-         const testResult = (currentService) => {
-            runParameters.rawConfig = rawConfig;
-            runParameters.configMainBuildInfo();
-            runParameters.applicationForRebase.should.equal(currentService);
-         };
-         rawConfig['multi-service'] = false;
-
-         rawConfig['url-service-path'] = '/auth/';
-         testResult('/auth/');
-
-         runParameters = new Configuration();
-         rawConfig['url-service-path'] = '/anotherCustomService/';
-         testResult('/anotherCustomService/');
-      });
-      it('3rd case - multi service application without UI-service', () => {
-         const runParameters = new Configuration();
-         const { rawConfig } = config;
-         rawConfig['url-service-path'] = '/service/';
-         rawConfig['multi-service'] = true;
-         runParameters.rawConfig = rawConfig;
-         runParameters.configMainBuildInfo();
-         runParameters.applicationForRebase.should.equal('/');
-      });
-      it('4th case - multi service application with UI-service - add service except auth', () => {
-         let runParameters = new Configuration();
-         const { rawConfig } = config;
-         const testResult = (currentService) => {
-            runParameters.rawConfig = rawConfig;
-            runParameters.configMainBuildInfo();
-            runParameters.applicationForRebase.should.equal(currentService);
-         };
-
-         rawConfig['url-service-path'] = '/auth/';
-         rawConfig['multi-service'] = true;
-         testResult('/');
-
-         runParameters = new Configuration();
-         rawConfig['url-service-path'] = '/anotherCustomService/';
-         testResult('/anotherCustomService/');
-      });
-      it('5th case - no option for url-service-path - must be selected default value', () => {
-         let runParameters = new Configuration();
-         const { rawConfig } = config;
-         const testResult = (currentService) => {
-            runParameters.rawConfig = rawConfig;
-            runParameters.configMainBuildInfo();
-            runParameters.applicationForRebase.should.equal(currentService);
-         };
-
-         delete rawConfig['url-service-path'];
-         rawConfig['multi-service'] = true;
-         testResult('/');
-
-         runParameters = new Configuration();
-         rawConfig['multi-service'] = false;
-         testResult('/');
-      });
+   it('application for rebasing in packages must be configured properly', () => {
+      const runParameters = new Configuration();
+      const { rawConfig } = config;
+      rawConfig['url-service-path'] = '/service/';
+      rawConfig['ui-service-path'] = '/someCustomService/';
+      rawConfig['multi-service'] = false;
+      runParameters.rawConfig = rawConfig;
+      runParameters.configMainBuildInfo();
+      runParameters.applicationForRebase.should.equal('/someCustomService/');
    });
 });
