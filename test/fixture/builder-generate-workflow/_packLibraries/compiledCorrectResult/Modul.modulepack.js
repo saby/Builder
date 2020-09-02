@@ -1,11 +1,12 @@
 define('Modul/Modul', [
     'tslib',
+    'i18n!Modul/_es6/Modul',
     'i18n!Modul',
     'UI/Executor',
     'require',
     'exports',
     'css!theme?Modul/_es6/test'
-], function (tslib_1, rk, Executor, require, exports) {
+], function (tslib_1, rk_1, rk, Executor, require, exports) {
     Object.defineProperty(exports, '__esModule', { value: true });
         exports['wml!Modul/_es6/test'] = true;
         var wml_Modul__es6_test;
@@ -148,16 +149,16 @@ define('Modul/Modul', [
             Modul__es6_Modul = function () {
                 'use strict';
                 var exports = {};
-                var result = function (require, exports, Module_js_1) {
+                var result = function (require, exports, rk, Module_js_1) {
                     'use strict';
                     Object.defineProperty(exports, '__esModule', { value: true });
                     exports.default = Module_js_1.default;
                     function someTest() {
-                        var test1 = 'Тестовое сообщение';
+                        var test1 = rk('Тестовое сообщение');
                         return test1;
                     }
                     exports.someTest = someTest;
-                }(require, exports, Modul__es5_Module_func());
+                }(require, exports, rk_1, Modul__es5_Module_func());
                 if (result instanceof Function) {
                     return result;
                 } else if (result && Object.getPrototypeOf(result) !== Object.prototype) {
