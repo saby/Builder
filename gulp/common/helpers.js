@@ -126,7 +126,8 @@ function generateTaskForInitWorkerPool(taskParameters) {
                logs: getLogLevel(process.argv),
                'require-loader-path': RequireJsLoaderPath,
                'main-process-cwd': process.cwd(),
-               'required-modules': JSON.stringify(requiredModules)
+               'required-modules': JSON.stringify(requiredModules),
+               logsPath: taskParameters.config.logs
             },
 
             // sometimes worker needs more space size, f.e. "Specs" interface module

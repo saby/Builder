@@ -5,53 +5,57 @@
 
 /* eslint-disable no-console, global-require, no-inner-declarations */
 'use strict';
-
-/**
- * Trying to get worker's working directory.
- * If occurs an error, we will get working
- * directory from node.js main process cwd
- * stashed in workerpool environment
- * @returns {*}
- */
-function checkCWDAvailability() {
-   try {
-      const currentDir = process.cwd();
-      return currentDir;
-   } catch (error) {
-      console.log('cwd lost. Probably directory of current node.js process was removed.');
-      return false;
-   }
-}
-
-// не всегда понятно по 10 записям, откуда пришёл вызов.
-Error.stackTraceLimit = 100;
-
-if (!checkCWDAvailability()) {
-   console.log('Changing worker\'s cwd to node.js main process cwd');
-   process.chdir(process.env['main-process-cwd']);
-}
-
-// логгер - прежде всего
-require('../../lib/logger').setWorkerLogger(process.env.logs);
-
-const logger = require('../../lib/logger').logger();
-function initializeWSForWorker() {
-   const requiredModules = JSON.parse(process.env['required-modules']);
-
-   // ws должен быть вызван раньше чем первый global.requirejs
-   const nodeWS = require('./node-ws');
-   nodeWS.init(requiredModules);
-}
-
+const fs = require('fs-extra');
+const path = require('path');
 try {
+   /**
+    * Trying to get worker's working directory.
+    * If occurs an error, we will get working
+    * directory from node.js main process cwd
+    * stashed in workerpool environment
+    * @returns {*}
+    */
+   function checkCWDAvailability() {
+      try {
+         const currentDir = process.cwd();
+         return currentDir;
+      } catch (error) {
+         console.log('cwd lost. Probably directory of current node.js process was removed.');
+         return false;
+      }
+   }
+
+   // не всегда понятно по 10 записям, откуда пришёл вызов.
+   Error.stackTraceLimit = 100;
+
+   if (!checkCWDAvailability()) {
+      console.log('Changing worker\'s cwd to node.js main process cwd');
+      process.chdir(process.env['main-process-cwd']);
+   }
+
+   // логгер - прежде всего
+   require('../../lib/logger').setWorkerLogger(process.env.logs);
+
+   function initializeWSForWorker() {
+      const requiredModules = JSON.parse(process.env['required-modules']);
+
+      // ws должен быть вызван раньше чем первый global.requirejs
+      const nodeWS = require('./node-ws');
+      nodeWS.init(requiredModules);
+   }
+
    process.on('unhandledRejection', (reason, p) => {
-      console.log(
-         "[00:00:00] [ERROR] worker's critical error.",
-         'Unhandled Rejection at:\n',
-         p,
-         '\nreason:\n',
-         reason
-      );
+      const error = {
+         message: `worker's critical error. Unhandled Rejection at:\n ${p}\nreason:\n ${reason}`
+      };
+      console.log(error.message);
+
+      /**
+       * write critical initialize error into a single file. workerpool has a problem with emit
+       * of this errors - all of this errors emits with message "Worker terminated unexpectedly"
+       * without any message about what's exactly happened inside worker that cause process exit.
+       */
+      fs.outputJsonSync(path.join(process.env.logsPath, `worker/worker-critical-error-${process.pid}.json`), error);
       process.exit(1);
    });
 
@@ -63,7 +67,7 @@ try {
    let processingTmpl, prepareXHTMLPrimitive,
       buildXhtmlPrimitive, collectWordsPrimitive;
 
-   const fs = require('fs-extra'),
+   const
       workerPool = require('workerpool'),
       { compileEsAndTs } = require('../../lib/compile-es-and-ts'),
       { buildLess } = require('../../lib/less/build-less'),
@@ -239,8 +243,13 @@ try {
       packLibrary: wrapWorkerFunction(packLibrary)
    });
 } catch (workerInitError) {
-   logger.error({
-      message: 'Ошибка инициализации Worker\'а',
-      error: workerInitError
-   });
+   const error = { message: `Worker initialize error: ${workerInitError.message} Stack: ${workerInitError.stack}` };
+   console.log(error.message);
+
+   /**
+    * write critical initialize error into a single file. workerpool has a problem with emit
+    * of this errors - all of this errors emits with message "Worker terminated unexpectedly"
+    * without any message about what's exactly happened inside worker that cause process exit.
+    */
+   fs.outputJson(path.join(process.env.logsPath, `worker/worker-initialize-error-${process.pid}.json`), error);
 }
