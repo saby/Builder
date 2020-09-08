@@ -3,6 +3,7 @@
  * @author Kolbeshin F.A.
  */
 
+/* eslint-disable no-console */
 'use strict';
 
 const path = require('path'),
@@ -95,6 +96,14 @@ function initWs(requiredModules) {
    loadContents(appContents, true, { resources: '/' });
    global.requirejs('Core/core');
    global.requirejs('Lib/core');
+
+   const parser = global.requirejs('Core/markup/ParserUtilities');
+   if (!(typeof parser.parse === 'function')) {
+      console.log(`parser has this as API: ${JSON.stringify(parser)}`);
+      console.log(`requirejs has this configuration below: ${global.requirejs.s.contexts._.config}`);
+      console.log(`is this module defined: ${global.requirejs.defined('Core/markup/ParserUtilities')}`);
+      console.log(`require has this cached info for module: ${global.requirejs.s.contexts._.defined['Core/markup/ParserUtilities']}`);
+   }
 }
 
 let initialized = false;
