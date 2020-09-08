@@ -306,10 +306,11 @@ async function limitingNativePackFiles(
                    * current custom package packing result.
                    * @type {boolean}
                    */
-                  const jsIsPackageOutput = fullPath.replace(/\.original\.js$/, '.js') === packageConfig.outputFile;
                   const relativePath = helpers.unixifyPath(
                      helpers.removeLeadingSlashes(fullPath.replace(rootCache, ''))
                   );
+                  const prettyOutputFile = helpers.unixifyPath(path.join(root, relativePath));
+                  const jsIsPackageOutput = prettyOutputFile.replace(/\.original\.js$/, '.js') === packageConfig.outputFile;
                   const currentFileModuleName = relativePath.split('/').shift();
                   if (
                      currentFileModuleName !== packageConfig.moduleName &&
@@ -331,7 +332,6 @@ async function limitingNativePackFiles(
                      !jsIsPackageOutput &&
                      currentFileModuleName === packageConfig.moduleName
                   ) {
-                     const prettyOutputFile = helpers.unixifyPath(path.join(root, relativePath));
                      taskParameters.filesToRemove.push(prettyOutputFile);
                      const removeMessage = `Module ${fullPath} was removed in namespace of Interface module ${packageConfig.moduleName}.` +
                         `Packed into ${packageConfig.output}`;
