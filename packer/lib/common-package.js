@@ -249,7 +249,7 @@ async function limitingNativePackFiles(
        * same base root to get proper relative paths in packing styles
        */
       let rootCache, base;
-      if (taskParameters.config.cachePath) {
+      if (taskParameters.config.cachePath && taskParameters.config.distributive) {
          rootCache = `${helpers.prettifyPath(taskParameters.config.cachePath)}/incremental_build`;
          base = `${taskParameters.config.cachePath}/incremental_build`;
       } else {
