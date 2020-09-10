@@ -142,6 +142,17 @@ class BuildConfiguration {
       // native watcher executing state. If true,
       // source modules symlinks can't be recreated, because watcher watches theirs directories
       this.nativeWatcher = !!nativeWatcher;
+
+      /**
+       * A sign of type of building project. Needed to choose whether or not project should use
+       * additional cache folder as a storage of all of built files. If it's used, files will be
+       * written into cache folder first, and only after that they will be copied into output folder.
+       * Otherwise compiled files will be instantaneously written into output folder without any
+       * additional cache storages. It's useful for large projects(as inside_all, with approximately
+       * 500 interface modules) where copying of files is heavy task that sometimes longs within
+       * unacceptable 5-25 minutes(common issue on Windows OS due to its file system)
+       */
+      this.distributive = true;
    }
 
    /**
@@ -212,14 +223,14 @@ class BuildConfiguration {
       this.cachePath = this.rawConfig.cache;
       this.isReleaseMode = this.getBuildMode() === 'release';
 
-      if (!this.isReleaseMode) {
-         this.outputPath = this.rawConfig.output;
+      if (!this.isReleaseMode || !this.distributive) {
+         this.outputPath = this.rawConfig.output.replace(/\\/g, '/');
       } else {
          /**
           * Some of builder tasks for building of the distributive aren't compatible with incremental build.
           * Therefore project'll be built into the cache folder and copy results into the targeting directory then.
           */
-         this.outputPath = path.join(this.cachePath, 'incremental_build');
+         this.outputPath = path.join(this.cachePath, 'incremental_build').replace(/\\/g, '/');
 
          // always enable tsc compiler in release mode
          this.tsc = true;
