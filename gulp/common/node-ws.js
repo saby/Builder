@@ -104,6 +104,13 @@ function initWs(requiredModules) {
       console.log(`is this module defined: ${global.requirejs.defined('Core/markup/ParserUtilities')}`);
       console.log(`require has this cached info for module: ${global.requirejs.s.contexts._.defined['Core/markup/ParserUtilities']}`);
    }
+   const DoT = global.requirejs('Core/js-template-doT');
+   if (!(typeof DoT.getSettings === 'function')) {
+      console.log(`DoT has this as API: ${JSON.stringify(DoT)}`);
+      console.log(`requirejs has this configuration below: ${global.requirejs.s.contexts._.config}`);
+      console.log(`is this module defined: ${global.requirejs.defined('Core/js-template-doT')}`);
+      console.log(`require has this cached info for module: ${global.requirejs.s.contexts._.defined['Core/js-template-doT']}`);
+   }
 }
 
 let initialized = false;
