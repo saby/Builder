@@ -223,14 +223,14 @@ class BuildConfiguration {
       this.cachePath = this.rawConfig.cache;
       this.isReleaseMode = this.getBuildMode() === 'release';
 
-      if (!this.isReleaseMode || !this.config.distributive) {
-         this.outputPath = this.rawConfig.output;
+      if (!this.isReleaseMode || !this.distributive) {
+         this.outputPath = this.rawConfig.output.replace(/\\/g, '/');
       } else {
          /**
           * Some of builder tasks for building of the distributive aren't compatible with incremental build.
           * Therefore project'll be built into the cache folder and copy results into the targeting directory then.
           */
-         this.outputPath = path.join(this.cachePath, 'incremental_build');
+         this.outputPath = path.join(this.cachePath, 'incremental_build').replace(/\\/g, '/');
 
          // always enable tsc compiler in release mode
          this.tsc = true;

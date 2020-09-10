@@ -49,7 +49,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo, gd) {
             let dom = domHelpers.domify(minText);
 
             // sets application root as builder cache, for proper html packing in patch build
-            const root = taskParameters.config.cachePath ? `${taskParameters.config.cachePath}/incremental_build` : path.dirname(taskParameters.config.rawConfig.output),
+            const root = taskParameters.config.outputPath,
                buildNumber = taskParameters.config.multiService ? `%{MODULE_VERSION_STUB=${path.basename(moduleInfo.output)}}` : taskParameters.config.version,
                replacePath = !taskParameters.config.multiService;
 

@@ -244,18 +244,8 @@ async function limitingNativePackFiles(
       result = {};
 
    if (filesToPack && filesToPack.length) {
-      /**
-       * All modules are reading from builder cache, so we need to set the
-       * same base root to get proper relative paths in packing styles
-       */
-      let rootCache, base;
-      if (taskParameters.config.cachePath && taskParameters.config.distributive) {
-         rootCache = `${helpers.prettifyPath(taskParameters.config.cachePath)}/incremental_build`;
-         base = `${taskParameters.config.cachePath}/incremental_build`;
-      } else {
-         rootCache = helpers.prettifyPath(root);
-         base = path.join(root, application);
-      }
+      const rootCache = taskParameters.config.outputPath;
+      const base = taskParameters.config.outputPath;
       const jsExternalModuleUsageMessages = new Set();
 
       await pMap(
