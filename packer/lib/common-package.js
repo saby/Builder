@@ -244,8 +244,8 @@ async function limitingNativePackFiles(
       result = {};
 
    if (filesToPack && filesToPack.length) {
-      const rootCache = taskParameters.config.outputPath;
-      const base = taskParameters.config.outputPath;
+      const rootCache = taskParameters.config.outputPath || root;
+      const base = taskParameters.config.outputPath || root;
       const jsExternalModuleUsageMessages = new Set();
 
       await pMap(
