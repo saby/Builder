@@ -2031,24 +2031,6 @@ describe('gulp/builder/generate-workflow.js', () => {
          await fs.writeJSON(configPath, config);
          await runWorkflowWithTimeout();
       });
-      it('output directory must include only modules for patch without any another project modules(root builder meta must be saved if needed)', async() => {
-         const directories = await fs.readdir(outputFolder);
-         directories.should.have.members([
-            'ExternalInterfaceModule',
-            'Modul',
-            'bundles.js',
-            'bundles.json',
-            'bundles.min.js',
-            'bundlesRoute.json',
-            'contents.js',
-            'contents.json',
-            'contents.min.js',
-            'module-dependencies.json',
-            'module-dependencies.min.json',
-            'router.js',
-            'router.min.js'
-         ]);
-      });
       it('finish patch tests pack', async() => {
          await clearWorkspace();
       });
@@ -2126,6 +2108,7 @@ describe('gulp/builder/generate-workflow.js', () => {
             builderTests: true,
             minimize: true,
             debugCustomPack: true,
+            distributive: false,
             joinedMeta: true,
             modules: [
                {

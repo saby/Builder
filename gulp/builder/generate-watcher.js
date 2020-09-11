@@ -113,7 +113,12 @@ class ChildProcess {
          unixifyPath(path.join(OUTPUT_FOLDER, relativePath)),
          extension
       );
-      if (isReleaseMode) {
+
+      // If "distributive" flag is equal "false", output
+      // folder and cache folders are equal, so we don't
+      // need further processing of paths for cache folder,
+      // it was already processed before
+      if (isReleaseMode && gulpConfig.distributive) {
          this.addPathsByExtension(
             unixifyPath(path.join(CACHE_FOLDER, relativePath)),
             extension
