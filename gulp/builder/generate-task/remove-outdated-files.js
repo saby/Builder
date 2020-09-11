@@ -65,7 +65,7 @@ class MetaClass {
 function generateTaskForRemoveFiles(taskParameters) {
    return async function removeOutdatedFiles() {
       const startTime = Date.now();
-      const normalizedCacheDirectory = `${taskParameters.config.outputPath.replace(/\\/g, '/')}/`;
+      const normalizedCacheDirectory = `${taskParameters.config.outputPath}/`;
       const normalizedOutputDirectory = `${taskParameters.config.rawConfig.output.replace(/\\/g, '/')}/`;
       const filesForRemove = await taskParameters.cache.getListForRemoveFromOutputDir(
          normalizedCacheDirectory,
