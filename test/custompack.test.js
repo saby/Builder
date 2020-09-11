@@ -28,7 +28,8 @@ describe('custompack', () => {
          sources: true,
          resourcesUrl: true,
          urlServicePath: '/fixture/custompack/',
-         applicationForRebase: '/fixture/custompack/'
+         applicationForRebase: '/fixture/custompack/',
+         localStand: true
       },
       {}
    );
