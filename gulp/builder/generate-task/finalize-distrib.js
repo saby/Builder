@@ -18,7 +18,7 @@ const logger = require('../../../lib/logger').logger(),
  * @returns {Undertaker.TaskFunction|function(done)} В debug режиме вернёт пустышку, чтобы gulp не упал
  */
 function generateTaskForFinalizeDistrib(taskParameters) {
-   if (!taskParameters.config.isReleaseMode) {
+   if (!taskParameters.config.isReleaseMode || taskParameters.config.localStand) {
       return function skipFinalizeDistrib(done) {
          done();
       };
