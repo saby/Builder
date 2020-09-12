@@ -33,7 +33,7 @@ function postProcessCompressTask(taskParameters) {
  */
 function generateTaskForCompress(taskParameters) {
    // for local stands there is no practical need of using archives, it just increases build time.
-   if (!taskParameters.config.compress || taskParameters.config.outputPath.includes('.genie')) {
+   if (!taskParameters.config.compress || taskParameters.config.localStand) {
       return function skipCompress(done) {
          done();
       };
