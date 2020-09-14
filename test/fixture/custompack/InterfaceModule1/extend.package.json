@@ -1,6 +1,7 @@
 [{
   "include": [
-    "InterfaceModule1/*"
+    "InterfaceModule1/*",
+    "InterfaceModule1-default-theme/*"
   ],
   "exclude": [
     "InterfaceModule1/_private/*"
