@@ -10,7 +10,8 @@
   "includeCore": true,
   "platformPackage": true,
   "include": [
-    "InterfaceModule1/*"
+    "InterfaceModule1/*",
+    "InterfaceModule1-default-theme/*"
   ],
   "exclude": [
     "InterfaceModule1/_private/*"
@@ -18,7 +19,8 @@
   "packagesRules": {
     "InterfaceModule1/interfacemodule1.package.js": {
       "include": [
-        "InterfaceModule1/*"
+        "InterfaceModule1/*",
+        "InterfaceModule1-default-theme/*"
       ],
       "exclude": [
         "InterfaceModule1/_private/*"
@@ -26,6 +28,7 @@
     }
   },
   "modules": [
-    "InterfaceModule1/*"
+    "InterfaceModule1/*",
+    "InterfaceModule1-default-theme/*"
   ]
 }
