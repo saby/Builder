@@ -1538,6 +1538,10 @@ describe('gulp/builder/generate-workflow.js', () => {
                path: path.join(sourceFolder, 'InterfaceModule1')
             },
             {
+               name: 'InterfaceModule1-default-theme',
+               path: path.join(sourceFolder, 'InterfaceModule1-default-theme')
+            },
+            {
                name: 'InterfaceModule2',
                path: path.join(sourceFolder, 'InterfaceModule2')
             },
@@ -1693,6 +1697,7 @@ describe('gulp/builder/generate-workflow.js', () => {
                modules: [
                   'InterfaceModule1/amdModule',
                   'InterfaceModule1/library',
+                  'css!InterfaceModule1-default-theme/themedStyle',
                   'css!InterfaceModule1/amdModule',
                   'css!InterfaceModule1/moduleStyle'
                ],

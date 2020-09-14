@@ -29,6 +29,11 @@ class TaskParameters {
       this.cdnModules = {};
       this.librariesMeta = {};
       this.changedModules = new Set();
+      this.themedModulesMap = new Map();
+   }
+
+   setThemedModule(themedModuleName, originModuleName) {
+      this.themedModulesMap.set(themedModuleName, originModuleName);
    }
 
    /**

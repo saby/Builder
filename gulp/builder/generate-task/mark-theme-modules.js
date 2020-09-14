@@ -32,14 +32,18 @@ function parseThemeName(modulesList, currentModuleParts) {
    let interfaceModuleParsed = false;
    while (!interfaceModuleParsed && currentModuleParts.length > 0) {
       themeNameParts.unshift(currentModuleParts.pop());
-      if (modulesList.has(currentModuleParts.join('-'))) {
-         interfaceModuleParsed = true;
+      const presumedModuleName = currentModuleParts.join('-');
+      if (modulesList.has(presumedModuleName)) {
+         interfaceModuleParsed = presumedModuleName;
       }
    }
 
    // remove "theme" postfix from array to get exact theme name
    themeNameParts.pop();
-   return themeNameParts.join('-');
+   return {
+      themeName: themeNameParts.join('-'),
+      originModule: interfaceModuleParsed
+   };
 }
 
 /**
@@ -95,7 +99,8 @@ function generateTaskForMarkThemeModules(taskParameters) {
                    * Other Interface modules will be ignored from new theme's processing
                    */
                   if (currentModuleNameParts.length > 2) {
-                     const themeName = parseThemeName(buildModulesNames, currentModuleNameParts);
+                     const { themeName, originModule } = parseThemeName(buildModulesNames, currentModuleNameParts);
+                     taskParameters.setThemedModule(path.basename(moduleInfo.output), originModule);
 
                      // if unapproved theme has already been declared in unapproved themes list,
                      // we don't need to log it then.
