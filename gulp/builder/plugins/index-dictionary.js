@@ -70,7 +70,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   });
                   taskParameters.cache.markFileAsFailed(file.history[0]);
                }
-               indexer.addLocalizationCSS(file.path.replace(/\.less$/, '.css'), locale, file.contents.toString());
+               indexer.addLocalizationCSS(file.path, locale, file.contents.toString());
             }
          } catch (error) {
             logger.error({

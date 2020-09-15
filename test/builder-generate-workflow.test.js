@@ -260,12 +260,18 @@ describe('gulp/builder/generate-workflow.js', () => {
             'global.requirejs(["Core/i18n","Modul/lang/en/en.json"],function(i18n,dict){i18n.setDict(dict, "Modul/lang/en/en.json", "en");' +
             'if(i18n.getLang()=="en"){global.requirejs(["native-css!Modul/lang/en/en"]);}});'
          ).should.equal(true);
+         (await fs.readFile(path.join(currentDictDirectory, 'en.css'), 'utf8')).should.equal(
+            '.en .test {\n' +
+            '  width: 686px;\n' +
+            '}\n'
+         );
       };
       const config = {
          cache: cacheFolder,
          output: outputFolder,
          'default-localization': 'ru-RU',
          localization: ['en-US', 'ru-RU', 'en'],
+         less: true,
          contents: true,
          modules: [
             {
