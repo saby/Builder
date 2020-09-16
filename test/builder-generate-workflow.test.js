@@ -2804,15 +2804,14 @@ describe('gulp/builder/generate-workflow.js', () => {
          removeRSymbol(packedCompiledEsContent.toString()).should.equal(correctModulesContent['testNativeNamesImports.modulepack.js']);
       });
       it('test-recurse-library-dependencies-in-store', async() => {
-         const moduleSourcePath = helpers.unixifyPath(path.join(cacheFolder, 'temp-modules/Modul/Модуль.es'));
          const correctStoreDepsForModule = [
-            helpers.unixifyPath(path.join(cacheFolder, 'temp-modules/Modul/_es5/Module.js')),
-            helpers.unixifyPath(path.join(cacheFolder, 'temp-modules/Modul/_es6/Модуль.es')),
-            helpers.unixifyPath(path.join(cacheFolder, 'temp-modules/Modul/_es6/Модуль2.es')),
-            helpers.unixifyPath(path.join(cacheFolder, 'temp-modules/Modul/_es6/test.wml'))
+            'Modul/_es5/Module.js',
+            'Modul/_es6/Модуль.es',
+            'Modul/_es6/Модуль2.es',
+            'Modul/_es6/test.wml'
          ];
          const dependenciesStore = await fs.readJson(path.join(cacheFolder, 'dependencies.json'));
-         dependenciesStore[moduleSourcePath].should.have.members(correctStoreDepsForModule);
+         dependenciesStore['Modul/Модуль.es'].should.have.members(correctStoreDepsForModule);
       });
       it('test-cycle-private-dependency', async() => {
          const compiledEsOutputPath = path.join(moduleOutputFolder, 'privateDepCycle.js');
@@ -2885,15 +2884,14 @@ describe('gulp/builder/generate-workflow.js', () => {
          removeRSymbol(packedCompiledEsContent.toString()).should.equal(correctModulesContent['external_public_deps.modulepack.js']);
       });
       it('test-recurse-library-dependencies-in-store-after-rebuild', async() => {
-         const moduleSourcePath = helpers.unixifyPath(path.join(cacheFolder, 'temp-modules/Modul/Модуль.es'));
          const correctStoreDepsForModule = [
-            helpers.unixifyPath(path.join(cacheFolder, 'temp-modules/Modul/_es5/Module.js')),
-            helpers.unixifyPath(path.join(cacheFolder, 'temp-modules/Modul/_es6/Модуль.es')),
-            helpers.unixifyPath(path.join(cacheFolder, 'temp-modules/Modul/_es6/Модуль2.es')),
-            helpers.unixifyPath(path.join(cacheFolder, 'temp-modules/Modul/_es6/test.wml'))
+            'Modul/_es5/Module.js',
+            'Modul/_es6/Модуль.es',
+            'Modul/_es6/Модуль2.es',
+            'Modul/_es6/test.wml'
          ];
          const dependenciesStore = await fs.readJson(path.join(cacheFolder, 'dependencies.json'));
-         dependenciesStore[moduleSourcePath].should.have.members(correctStoreDepsForModule);
+         dependenciesStore['Modul/Модуль.es'].should.have.members(correctStoreDepsForModule);
       });
       it('test-recurse-after-rerun-workflow', async() => {
          const resultsFiles = await fs.readdir(moduleOutputFolder);

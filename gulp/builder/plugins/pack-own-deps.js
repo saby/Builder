@@ -74,6 +74,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                const filesDepsForCache = new Set();
                const ownDeps = [];
                const prettyFilePath = helpers.prettifyPath(jsFile.history[0]);
+               const prettyRelativePath = helpers.unixifyPath(path.join(moduleInfo.name, jsFile.relative));
                if (componentsInfo.hasOwnProperty(prettyFilePath)) {
                   const componentInfo = componentsInfo[prettyFilePath];
                   if (componentInfo.componentName && componentInfo.componentDep) {
@@ -124,7 +125,11 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   }
                }
                if (filesDepsForCache.size > 0) {
-                  taskParameters.cache.addDependencies(prettyFilePath, [...filesDepsForCache]);
+                  taskParameters.cache.addDependencies(
+                     path.dirname(moduleInfo.path),
+                     prettyRelativePath,
+                     [...filesDepsForCache]
+                  );
                }
                this.push(jsFile);
             }
