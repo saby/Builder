@@ -1685,5 +1685,6 @@
   "Upload/Action.ts(118,33): error TS2461:",
   "View/Executor/_Utils/RequireHelper.ts(61,14): error TS2554:",
   "WS.Core/res/js/_revive-controls/control.ts(15,43): error TS2554:",
-  "EngineUnit"
+  "EngineUnit",
+  "LongOperations/_notifier"
 ]
