@@ -252,10 +252,15 @@ class Cache {
     * @returns {Promise<boolean>}
     */
    async isFileChanged(filePath, fileContents, hashByContent, fileTimeStamp, moduleInfo) {
-      const prettyPath = helpers.prettifyPath(filePath);
+      const prettyPath = helpers.unixifyPath(filePath);
+      const prettyRelativePath = helpers.unixifyPath(
+         helpers.removeLeadingSlashes(
+            filePath.replace(path.dirname(moduleInfo.path), '')
+         )
+      );
 
       const hash = getFileHash(fileContents, hashByContent, fileTimeStamp);
-      const isChanged = await this._isFileChanged(hashByContent, prettyPath, hash);
+      const isChanged = await this._isFileChanged(hashByContent, prettyRelativePath, prettyPath, hash);
 
       const relativePath = path.relative(moduleInfo.path, filePath);
       const outputFullPath = path.join(moduleInfo.output, transliterate(relativePath));
@@ -287,15 +292,21 @@ class Cache {
          if (lastModuleCache.cdnModules.hasOwnProperty(prettyPath)) {
             currentModuleCache.cdnModules[prettyPath] = lastModuleCache.cdnModules[prettyPath];
          }
-         if (this.lastStore.dependencies.hasOwnProperty(prettyPath)) {
-            this.currentStore.dependencies[prettyPath] = this.lastStore.dependencies[prettyPath];
+         const fileRelativePath = helpers.unixifyPath(
+            path.join(
+               path.basename(moduleInfo.path),
+               relativePath
+            )
+         );
+         if (this.lastStore.dependencies.hasOwnProperty(fileRelativePath)) {
+            this.currentStore.dependencies[fileRelativePath] = this.lastStore.dependencies[fileRelativePath];
          }
       }
 
       return isChanged;
    }
 
-   async _isFileChanged(hashByContent, prettyPath, hash) {
+   async _isFileChanged(hashByContent, prettyRelativePath, prettyPath, hash) {
       // кеша не было, значит все файлы новые
       if (!this.lastStore.startBuildTime) {
          return true;
@@ -345,7 +356,7 @@ class Cache {
       }
 
       if (prettyPath.endsWith('.less') || prettyPath.endsWith('.js') || prettyPath.endsWith('.es') || prettyPath.endsWith('.ts')) {
-         const isChanged = await this._isDependenciesChanged(hashByContent, prettyPath);
+         const isChanged = await this._isDependenciesChanged(hashByContent, prettyRelativePath);
          this.cacheChanges[prettyPath] = isChanged;
          return isChanged;
       }
@@ -439,24 +450,33 @@ class Cache {
     * @param {string} filePath путь до исходного файла
     * @param {string} imports список зависимостей (пути до исходников)
     */
-   addDependencies(filePath, imports) {
-      const prettyPath = helpers.prettifyPath(filePath);
-      if (!this.currentStore.dependencies.hasOwnProperty(prettyPath)) {
-         this.currentStore.dependencies[prettyPath] = [];
+   addDependencies(root, filePath, imports) {
+      const prettyRoot = helpers.unixifyPath(root);
+      const prettyRelativePath = helpers.removeLeadingSlashes(
+         helpers.unixifyPath(filePath).replace(prettyRoot, '')
+      );
+      if (!this.currentStore.dependencies.hasOwnProperty(prettyRelativePath)) {
+         this.currentStore.dependencies[prettyRelativePath] = [];
       }
 
       // add new imports into less dependencies
       imports.forEach((currentImport) => {
-         const prettyImport = helpers.unixifyPath(currentImport);
-         if (!this.currentStore.dependencies[prettyPath].includes(prettyImport)) {
-            this.currentStore.dependencies[prettyPath].push(prettyImport);
+         const prettyRelativeImport = helpers.removeLeadingSlashes(
+            helpers.unixifyPath(currentImport).replace(prettyRoot, '')
+         );
+         if (!this.currentStore.dependencies[prettyRelativePath].includes(prettyRelativeImport)) {
+            this.currentStore.dependencies[prettyRelativePath].push(prettyRelativeImport);
          }
       });
    }
 
-   getDependencies(filePath) {
-      const prettyPath = helpers.prettifyPath(filePath);
-      return this.currentStore.dependencies[prettyPath] || [];
+   getDependencies(relativePath) {
+      const prettyRelativePath = helpers.prettifyPath(relativePath);
+      return this.currentStore.dependencies[prettyRelativePath] || [];
+   }
+
+   getLastStoreDependencies() {
+      return this.lastStore.dependencies;
    }
 
    /**

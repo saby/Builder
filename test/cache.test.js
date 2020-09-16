@@ -14,10 +14,10 @@ describe('builder cache', () => {
          dependencies: {}
       };
       const currentDependencies = currentCache.currentStore.dependencies;
-      currentCache.addDependencies('myModule/style', ['firstTheme/styles']);
+      currentCache.addDependencies('', 'myModule/style', ['firstTheme/styles']);
       currentDependencies.hasOwnProperty('myModule/style').should.equal(true);
       currentDependencies['myModule/style'].should.have.members(['firstTheme/styles']);
-      currentCache.addDependencies('myModule/style', ['secondTheme/styles']);
+      currentCache.addDependencies('', 'myModule/style', ['secondTheme/styles']);
       currentDependencies.hasOwnProperty('myModule/style').should.equal(true);
       currentDependencies['myModule/style'].should.have.members(['firstTheme/styles', 'secondTheme/styles']);
    });

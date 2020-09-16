@@ -129,9 +129,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
          const addAdditionalMeta = taskParameters.config.branchTests || taskParameters.config.builderTests;
          try {
             const { resourcesUrl } = taskParameters.config;
-            const sourceRoot = helpers.unixifyPath(
-               path.join(taskParameters.config.cachePath, 'temp-modules')
-            );
             const packedPrivateModules = {};
             const json = {
                links: {},
@@ -203,7 +200,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   const result = new Set();
                   info.lessDependencies.forEach((currentDependency) => {
                      let currentLessDependencies = taskParameters.cache.getDependencies(
-                        `${path.join(sourceRoot, currentDependency)}.less`
+                        `${currentDependency}.less`
                      );
 
                      // css dependency in component is now dynamic(_theme option). We need to use additional search
@@ -212,16 +209,12 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                         const dependencyParts = currentDependency.split('/');
                         dependencyParts[0] = `${dependencyParts[0]}-default-theme`;
                         currentLessDependencies = taskParameters.cache.getDependencies(
-                           `${path.join(sourceRoot, dependencyParts.join('/'))}.less`
+                           `${dependencyParts.join('/')}.less`
                         );
                      }
                      result.add(`css!${currentDependency}`);
                      currentLessDependencies.forEach((currentLessDep) => {
-                        result.add(`css!${helpers.removeLeadingSlashes(
-                           currentLessDep
-                              .replace(sourceRoot, '')
-                              .replace('.less', '')
-                        )}`);
+                        result.add(`css!${currentLessDep.replace('.less', '')}`);
                      });
                   });
                   json.lessDependencies[info.componentName] = Array.from(result);
