@@ -120,7 +120,16 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                         packedModules: result.packedModules,
                         libraryName: result.name
                      });
-                     taskParameters.cache.addDependencies(library.history[0], result.fileDependencies);
+                     const prettyRelativePath = helpers.unixifyPath(
+                        helpers.removeLeadingSlashes(
+                           library.history[0].replace(path.dirname(moduleInfo.path), '')
+                        )
+                     );
+                     taskParameters.cache.addDependencies(
+                        path.dirname(moduleInfo.path),
+                        prettyRelativePath,
+                        result.fileDependencies
+                     );
                   }
                   if (result.warnings) {
                      result.warnings.forEach((currentWarning) => {
