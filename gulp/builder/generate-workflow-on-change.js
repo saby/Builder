@@ -37,6 +37,19 @@ const {
    generateTaskForTerminatePool
 } = require('../common/helpers');
 
+function getFilesToBuild(projectRoot, filePath, dependencies) {
+   const filesToBuild = [filePath];
+   const relativeFilePath = helpers.removeLeadingSlashes(
+      filePath.replace(projectRoot, '')
+   );
+   Object.keys(dependencies).forEach((currentFile) => {
+      if (dependencies[currentFile].includes(relativeFilePath)) {
+         filesToBuild.push(path.join(projectRoot, currentFile));
+      }
+   });
+   return filesToBuild;
+}
+
 /**
  * Генерирует поток выполнения сборки одного less файла при измении
  * @param {string[]} processArgv массив аргументов запуска утилиты
@@ -85,7 +98,7 @@ function generateTaskForPushOfChanges(taskParameters) {
 function generateTaskForBuildFile(taskParameters, filePath) {
    let currentModuleInfo;
    const pathsForImportSet = new Set();
-   let filePathInProject = filePath;
+   let filePathInProject = helpers.unixifyPath(filePath);
    const gulpModulesPaths = {};
    for (const moduleInfo of taskParameters.config.modules) {
       gulpModulesPaths[moduleInfo.name] = moduleInfo.path;
@@ -113,7 +126,9 @@ function generateTaskForBuildFile(taskParameters, filePath) {
                );
                if (!relativePath.includes('..') && !path.isAbsolute(relativePath)) {
                   currentModuleInfo = moduleInfo;
-                  filePathInProject = path.join(moduleInfo.path, relativePath);
+                  filePathInProject = helpers.unixifyPath(
+                     path.join(moduleInfo.path, relativePath)
+                  );
                }
             }
          }
@@ -135,8 +150,15 @@ function generateTaskForBuildFile(taskParameters, filePath) {
       currentModuleInfo.runtimeModuleName
    );
    const buildModule = function buildModule() {
+      const projectRoot = path.dirname(currentModuleInfo.path);
+      const filesToBuild = getFilesToBuild(
+         projectRoot,
+         filePathInProject,
+         taskParameters.cache.getLastStoreDependencies()
+      );
+      logger.info(`These are files to be rebuilt: ${JSON.stringify(filesToBuild, null, 3)}`);
       return gulp
-         .src(filePathInProject, { dot: false, nodir: true, base: currentModuleInfo.path })
+         .src(filesToBuild, { dot: false, nodir: true, base: currentModuleInfo.path })
          .pipe(
             plumber({
                errorHandler(err) {

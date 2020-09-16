@@ -190,7 +190,11 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                const { compiled } = result;
                const outputPath = getOutput(file, '.css');
                taskParameters.cache.addOutputFile(file.history[0], outputPath, moduleInfo);
-               taskParameters.cache.addDependencies(file.history[0], compiled.imports);
+               taskParameters.cache.addDependencies(
+                  path.dirname(moduleInfo.path),
+                  file.history[0],
+                  compiled.imports
+               );
 
                const newFile = file.clone();
                newFile.contents = Buffer.from(compiled.text);
