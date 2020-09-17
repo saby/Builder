@@ -16,5 +16,6 @@ module.exports = new Set([
    'booking-widget',
    'wasabydev',
    'sbisru',
-   'videoPlayer'
+   'videoPlayer',
+   'consultant'
 ]);
