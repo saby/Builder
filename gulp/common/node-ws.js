@@ -3,7 +3,6 @@
  * @author Kolbeshin F.A.
  */
 
-/* eslint-disable no-console */
 'use strict';
 
 const path = require('path'),
