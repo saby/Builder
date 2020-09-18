@@ -36,11 +36,9 @@ require('../../lib/logger').setWorkerLogger(process.env.logs);
 
 const logger = require('../../lib/logger').logger();
 function initializeWSForWorker() {
-   const requiredModules = JSON.parse(process.env['required-modules']);
-
    // ws должен быть вызван раньше чем первый global.requirejs
    const nodeWS = require('./node-ws');
-   nodeWS.init(requiredModules);
+   nodeWS.init(JSON.parse(process.env['required-modules']));
 }
 
 try {
