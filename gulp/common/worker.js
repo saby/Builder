@@ -37,11 +37,9 @@ try {
    require('../../lib/logger').setWorkerLogger(process.env.logs);
 
    function initializeWSForWorker() {
-      const requiredModules = JSON.parse(process.env['required-modules']);
-
       // ws должен быть вызван раньше чем первый global.requirejs
       const nodeWS = require('./node-ws');
-      nodeWS.init(requiredModules);
+      nodeWS.init(JSON.parse(process.env['required-modules']));
    }
 
    process.on('unhandledRejection', (reason, p) => {
