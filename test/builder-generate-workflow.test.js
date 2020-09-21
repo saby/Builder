@@ -2381,6 +2381,7 @@ describe('gulp/builder/generate-workflow.js', () => {
       const config = {
          cache: cacheFolder,
          output: outputFolder,
+         typescript: true,
          wml: true,
          minimize: true,
          deprecatedOwnDependencies: true,
@@ -2436,7 +2437,7 @@ describe('gulp/builder/generate-workflow.js', () => {
       testJsOutputContent.includes('testFunctionWmlOld').should.equal(true);
 
       // поменяем js
-      const testJsInputPath = path.join(moduleSourceFolder, 'Test.js');
+      const testJsInputPath = path.join(moduleSourceFolder, 'Test.ts');
       const testJsInputContent = await fs.readFile(testJsInputPath);
       const newTestJsInputContent = testJsInputContent.toString()
          .replace(/testFunctionTmplOld/g, 'testFunctionTmplNew')
