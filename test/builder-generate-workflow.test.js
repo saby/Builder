@@ -1778,12 +1778,94 @@ describe('gulp/builder/generate-workflow.js', () => {
          // decompressed brotli must be equal source css content
          cssDecompressed.toString().should.equal(cssContent.toString());
       });
+      it('versioned modules meta should have correct members', async() => {
+         const versionedModules = await fs.readJson(path.join(moduleOutputFolder, '.builder/versioned_modules.json'));
+         versionedModules.should.have.members([
+            'Modul/Page.min.wml',
+            'Modul/Test/test.package.min.css',
+            'Modul/Test/test.package.min.js',
+            'Modul/TestASort/test.package.min.css',
+            'Modul/TestASort/test.package.min.js',
+            'Modul/TestBSort/test-projectExtDeps.package.min.css',
+            'Modul/TestBSort/test-projectExtDeps.package.min.js',
+            'Modul/TestBSort/test-projectMDeps.package.min.css',
+            'Modul/TestBSort/test-projectMDeps.package.min.js',
+            'Modul/TestBSort/test-superbundle.package.min.css',
+            'Modul/TestBSort/test-superbundle.package.min.js',
+            'Modul/contents.json',
+            'Modul/private.min.css',
+            'Modul/private.min.js',
+            'Modul/test-brotli.package.min.css',
+            'Modul/test-brotli.package.min.js'
+         ]);
+         const cdnModules = await fs.readJson(path.join(moduleOutputFolder, '.builder/cdn_modules.json'));
+         cdnModules.should.have.members([
+            'Modul/Test/test.package.min.css',
+            'Modul/Test/test.package.min.js',
+            'Modul/TestASort/test.package.min.css',
+            'Modul/TestASort/test.package.min.js',
+            'Modul/TestBSort/test-projectExtDeps.package.min.css',
+            'Modul/TestBSort/test-projectExtDeps.package.min.js',
+            'Modul/TestBSort/test-projectMDeps.package.min.css',
+            'Modul/TestBSort/test-projectMDeps.package.min.js',
+            'Modul/TestBSort/test-superbundle.package.min.css',
+            'Modul/TestBSort/test-superbundle.package.min.js',
+            'Modul/private.min.css',
+            'Modul/private.min.js',
+            'Modul/test-brotli.package.min.css',
+            'Modul/test-brotli.package.min.js'
+         ]);
+      });
       it('patch module to another output', async() => {
-         config.modules[0].rebuild = true;
          config.modules[1].rebuild = true;
          config.output = `${config.output}-patch`;
          await fs.writeJSON(configPath, config);
          await runWorkflowWithTimeout();
+
+         config.modules[0].rebuild = true;
+         await fs.writeJSON(configPath, config);
+
+         // rebuild again to make sure incremental rebuild of patch doesn't break anything
+         await runWorkflowWithTimeout();
+         await runWorkflowWithTimeout();
+      });
+      it('versioned modules meta should have correct members for patch build', async() => {
+         const versionedModules = await fs.readJson(path.join(moduleOutputFolder, '.builder/versioned_modules.json'));
+         versionedModules.should.have.members([
+            'Modul/Page.min.wml',
+            'Modul/Test/test.package.min.css',
+            'Modul/Test/test.package.min.js',
+            'Modul/TestASort/test.package.min.css',
+            'Modul/TestASort/test.package.min.js',
+            'Modul/TestBSort/test-projectExtDeps.package.min.css',
+            'Modul/TestBSort/test-projectExtDeps.package.min.js',
+            'Modul/TestBSort/test-projectMDeps.package.min.css',
+            'Modul/TestBSort/test-projectMDeps.package.min.js',
+            'Modul/TestBSort/test-superbundle.package.min.css',
+            'Modul/TestBSort/test-superbundle.package.min.js',
+            'Modul/contents.json',
+            'Modul/private.min.css',
+            'Modul/private.min.js',
+            'Modul/test-brotli.package.min.css',
+            'Modul/test-brotli.package.min.js'
+         ]);
+         const cdnModules = await fs.readJson(path.join(moduleOutputFolder, '.builder/cdn_modules.json'));
+         cdnModules.should.have.members([
+            'Modul/Test/test.package.min.css',
+            'Modul/Test/test.package.min.js',
+            'Modul/TestASort/test.package.min.css',
+            'Modul/TestASort/test.package.min.js',
+            'Modul/TestBSort/test-projectExtDeps.package.min.css',
+            'Modul/TestBSort/test-projectExtDeps.package.min.js',
+            'Modul/TestBSort/test-projectMDeps.package.min.css',
+            'Modul/TestBSort/test-projectMDeps.package.min.js',
+            'Modul/TestBSort/test-superbundle.package.min.css',
+            'Modul/TestBSort/test-superbundle.package.min.js',
+            'Modul/private.min.css',
+            'Modul/private.min.js',
+            'Modul/test-brotli.package.min.css',
+            'Modul/test-brotli.package.min.js'
+         ]);
       });
       it('check base output - custompack and regular compressed artifacts should be on its places', async() => {
          // check current list of files to be existing in checking folder

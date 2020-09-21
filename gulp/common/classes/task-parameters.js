@@ -109,6 +109,20 @@ class TaskParameters {
          this.filesToRemoveFromOutput
       );
    }
+
+   addVersionedModules(moduleName, versionedModules) {
+      if (!this.versionedModules.hasOwnProperty(moduleName)) {
+         this.versionedModules[moduleName] = [];
+      }
+      versionedModules.forEach(currentModule => this.versionedModules[moduleName].push(currentModule));
+   }
+
+   addCdnModules(moduleName, cdnModules) {
+      if (!this.cdnModules.hasOwnProperty(moduleName)) {
+         this.cdnModules[moduleName] = [];
+      }
+      cdnModules.forEach(currentModule => this.versionedModules[moduleName].push(currentModule));
+   }
 }
 
 module.exports = TaskParameters;

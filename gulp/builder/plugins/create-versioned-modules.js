@@ -18,7 +18,6 @@ const through = require('through2'),
  * @returns {stream}
  */
 module.exports = function declarePlugin(taskParameters, moduleInfo) {
-   taskParameters.versionedModules = {};
    return through.obj(
       function onTransform(file, encoding, callback) {
          const startTime = Date.now();
@@ -73,7 +72,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
              * оставляем версионированные модули, могут пригодиться в дальнейшем при паковке
              * @type {string[]}
              */
-            taskParameters.versionedModules[currentModuleName] = versionedModulesPaths;
+            taskParameters.addVersionedModules(currentModuleName, versionedModulesPaths);
          } catch (error) {
             logger.error({
                message: "Ошибка Builder'а",
