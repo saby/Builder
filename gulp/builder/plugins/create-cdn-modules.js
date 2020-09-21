@@ -80,6 +80,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
              * @type {string[]}
              */
             taskParameters.cdnModules[currentModuleName] = cdnModulesPaths;
+            //taskParameters.addCdnModules(currentModuleName, cdnModulesPaths);
          } catch (error) {
             logger.error({
                message: "Ошибка Builder'а",

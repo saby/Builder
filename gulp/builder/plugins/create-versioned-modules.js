@@ -59,6 +59,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             });
 
             if (taskParameters.config.contents) {
+               console.log('ЗАПИСАЛИ в taskParameters.versionedModules информацию о модуле ' + currentModuleName);
                versionedModulesPaths.push(`${currentModuleName}/contents.json`);
             }
 
@@ -74,6 +75,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
              * @type {string[]}
              */
             taskParameters.versionedModules[currentModuleName] = versionedModulesPaths;
+            //taskParameters.addVersionedModules(currentModuleName, versionedModulesPaths);
+            //taskParameters.addVersionedModules(currentModuleName, versionedModulesPaths);
          } catch (error) {
             logger.error({
                message: "Ошибка Builder'а",
