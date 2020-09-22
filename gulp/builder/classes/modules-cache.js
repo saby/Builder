@@ -55,9 +55,9 @@ class ModuleCache {
     * @param filePath - full path to file
     * @returns {*}
     */
-   getCurrentComponentInfo(filePath) {
-      const prettyPath = helpers.unixifyPath(filePath);
-      return this.currentStore.componentsInfo[prettyPath];
+   getCurrentComponentInfo(relativePath) {
+      const prettyRelativePath = helpers.unixifyPath(relativePath);
+      return this.currentStore.componentsInfo[prettyRelativePath];
    }
 
    /**
@@ -190,18 +190,18 @@ class ModuleCache {
     * @param {string} filePath путь до файла
     * @param {Object} componentInfo объект с информацией о компоненте
     */
-   storeComponentInfo(filePath, componentInfo) {
-      const prettyPath = helpers.prettifyPath(filePath);
+   storeComponentInfo(relativePath, componentInfo) {
+      const prettyRelativePath = helpers.unixifyPath(relativePath);
       if (componentInfo) {
-         this.currentStore.componentsInfo[prettyPath] = componentInfo;
+         this.currentStore.componentsInfo[prettyRelativePath] = componentInfo;
       }
    }
 
-   storeComponentParameters(filePath, additionalParameters) {
-      const prettyPath = helpers.prettifyPath(filePath);
-      if (this.currentStore.componentsInfo[prettyPath]) {
+   storeComponentParameters(relativePath, additionalParameters) {
+      const prettyRelativePath = helpers.unixifyPath(relativePath);
+      if (this.currentStore.componentsInfo[prettyRelativePath]) {
          Object.keys(additionalParameters).forEach((currentKey) => {
-            this.currentStore.componentsInfo[prettyPath][currentKey] = additionalParameters[currentKey];
+            this.currentStore.componentsInfo[prettyRelativePath][currentKey] = additionalParameters[currentKey];
          });
       }
    }

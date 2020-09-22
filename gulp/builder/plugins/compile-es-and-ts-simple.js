@@ -50,7 +50,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                return;
             }
             let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
-            relativeFilePath = path.join(path.basename(moduleInfo.path), relativeFilePath);
+            relativeFilePath = path.join(moduleInfo.name, relativeFilePath);
 
             const jsInSources = file.history[0].replace(esExt, '.js');
             if (await fs.pathExists(jsInSources)) {

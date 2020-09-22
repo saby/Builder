@@ -81,7 +81,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             }
 
             let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
-            relativeFilePath = path.join(path.basename(moduleInfo.path), relativeFilePath);
+            relativeFilePath = path.join(moduleInfo.name, relativeFilePath);
 
             const [error, result] = await execInPool(
                taskParameters.pool,

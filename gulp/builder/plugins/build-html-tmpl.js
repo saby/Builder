@@ -43,7 +43,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
             const relativeTmplPath = path.relative(moduleInfo.path, file.history[0]);
             const relativeTmplPathWithModuleName = helpers.prettifyPath(
-               path.join(path.basename(moduleInfo.path), relativeTmplPath)
+               path.join(moduleInfo.name, relativeTmplPath)
             );
             const [error, result] = await execInPool(
                taskParameters.pool,

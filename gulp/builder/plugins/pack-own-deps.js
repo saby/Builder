@@ -126,7 +126,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                }
                if (filesDepsForCache.size > 0) {
                   taskParameters.cache.addDependencies(
-                     path.dirname(moduleInfo.path),
+                     moduleInfo.appRoot,
                      normalizedRelativePath,
                      [...filesDepsForCache]
                   );

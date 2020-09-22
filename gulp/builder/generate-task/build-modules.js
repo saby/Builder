@@ -68,7 +68,7 @@ function generateTaskForBuildModules(taskParameters) {
 
    const modulesMap = new Map();
    for (const moduleInfo of config.modules) {
-      modulesMap.set(path.basename(moduleInfo.path), moduleInfo.path);
+      modulesMap.set(moduleInfo.name, moduleInfo.path);
    }
 
    for (const moduleInfo of modulesForBuild) {

@@ -84,7 +84,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
          // Write original file if tmpl can't be compiled
          let newText = file.contents.toString();
          let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
-         relativeFilePath = path.join(path.basename(moduleInfo.path), relativeFilePath);
+         relativeFilePath = path.join(moduleInfo.name, relativeFilePath);
          const extension = file.extname.slice(1, file.extname.length);
 
          const [error, result] = await execInPool(
