@@ -58,7 +58,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             });
 
             if (taskParameters.config.contents) {
-               console.log('ЗАПИСАЛИ в taskParameters.versionedModules информацию о модуле ' + currentModuleName);
                versionedModulesPaths.push(`${currentModuleName}/contents.json`);
             }
 
