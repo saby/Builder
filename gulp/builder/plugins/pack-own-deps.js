@@ -124,9 +124,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   }
                }
                if (filesDepsForCache.size > 0) {
+                  const normalizedRelativePath = jsFile.compiled ? prettyRelativePath.replace('.js', '.ts') : prettyRelativePath;
                   taskParameters.cache.addDependencies(
                      moduleInfo.appRoot,
-                     prettyRelativePath,
+                     normalizedRelativePath,
                      [...filesDepsForCache]
                   );
                }
