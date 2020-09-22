@@ -42,7 +42,7 @@ class GrabberConfiguration {
       }
 
       for (const module of this.rawConfig.modules) {
-         const moduleInfo = new ModuleInfo(module.name, module.responsible, module.path, module.required);
+         const moduleInfo = new ModuleInfo(module);
          moduleInfo.symlinkInputPathToAvoidProblems(this.cachePath, false);
          this.modules.push(moduleInfo);
       }

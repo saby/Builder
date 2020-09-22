@@ -12,15 +12,18 @@ const transliterate = require('../../../lib/transliterate'),
  * Класс для работы с модулями проекта. Накапливает данные о модулях, которые плохо ложатся на кеш
  */
 class ModuleInfo extends BaseModuleInfo {
-   constructor(moduleName, moduleResponsible, modulePath, commonOutputPath, required, rebuild, depends) {
-      super(moduleName, moduleResponsible, modulePath, required, rebuild, depends);
-      this.output = path.join(commonOutputPath, transliterate(path.basename(modulePath)));
+   constructor(baseModuleInfo, commonOutputPath, staticServer) {
+      super(baseModuleInfo);
+      this.output = path.join(commonOutputPath, transliterate(path.basename(baseModuleInfo.path)));
 
       // объект для записи contents.json
       // availableLanguage, defaultLanguage добавляются только при локализации
       const runtimeModuleInfo = {};
       if (this.folderName !== this.runtimeModuleName) {
          runtimeModuleInfo.name = this.folderName;
+      }
+      if (staticServer && baseModuleInfo.name === 'HotReload') {
+         runtimeModuleInfo.staticServer = staticServer;
       }
       this.contents = {
          htmlNames: {},

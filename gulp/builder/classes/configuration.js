@@ -364,15 +364,7 @@ class BuildConfiguration {
          UI: false
       };
       for (const module of this.rawConfig.modules) {
-         const moduleInfo = new ModuleInfo(
-            module.name,
-            module.responsible,
-            module.path,
-            this.outputPath,
-            module.required,
-            module.rebuild,
-            module.depends
-         );
+         const moduleInfo = new ModuleInfo(module, this.outputPath, this.staticServer);
 
          moduleInfo.isUnitTestModule = this.branchTests &&
             (
@@ -407,6 +399,9 @@ class BuildConfiguration {
             for (const local of this.localizations) {
                moduleInfo.contents.availableLanguage[local] = getLanguageByLocale(local);
             }
+         }
+         if (moduleInfo.name === 'HotReload' && this.staticServer) {
+            moduleInfo.staticServer = this.staticServer;
          }
          this.modules.push(moduleInfo);
       }
