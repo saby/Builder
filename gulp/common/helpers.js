@@ -118,17 +118,13 @@ function generateTaskForInitWorkerPool(taskParameters) {
       const requiredModules = taskParameters.config.modules
          .filter(currentModule => currentModule.required)
          .map(currentModule => currentModule.name);
-
+      process.env.logs = getLogLevel(process.argv);
+      process.env['require-loader-path'] = RequireJsLoaderPath;
+      process.env['main-process-cwd'] = process.cwd();
+      process.env['required-modules'] = JSON.stringify(requiredModules);
       const workerPoolConfig = {
          maxWorkers: maxWorkers || 1,
          forkOpts: {
-            env: {
-               logs: getLogLevel(process.argv),
-               'require-loader-path': RequireJsLoaderPath,
-               'main-process-cwd': process.cwd(),
-               'required-modules': JSON.stringify(requiredModules),
-               logsPath: taskParameters.config.logs
-            },
 
             // sometimes worker needs more space size, f.e. "Specs" interface module
             // contains bunch of different kinds of document forms.
