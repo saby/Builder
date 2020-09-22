@@ -78,7 +78,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
              * оставляем версионированные модули, могут пригодиться в дальнейшем при паковке
              * @type {string[]}
              */
-            taskParameters.addCdnModules(currentModuleName, cdnModulesPaths);
+            taskParameters.setCdnModules(currentModuleName, cdnModulesPaths);
          } catch (error) {
             logger.error({
                message: "Ошибка Builder'а",

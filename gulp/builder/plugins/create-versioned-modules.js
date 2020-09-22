@@ -72,7 +72,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
              * оставляем версионированные модули, могут пригодиться в дальнейшем при паковке
              * @type {string[]}
              */
-            taskParameters.addVersionedModules(currentModuleName, versionedModulesPaths);
+            taskParameters.setVersionedModules(currentModuleName, versionedModulesPaths);
          } catch (error) {
             logger.error({
                message: "Ошибка Builder'а",

@@ -110,18 +110,16 @@ class TaskParameters {
       );
    }
 
-   addVersionedModules(moduleName, versionedModules) {
-      if (!this.versionedModules.hasOwnProperty(moduleName)) {
-         this.versionedModules[moduleName] = [];
-      }
-      versionedModules.forEach(currentModule => this.versionedModules[moduleName].push(currentModule));
+   setVersionedModules(moduleName, versionedModules) {
+      this.versionedModules[moduleName] = versionedModules;
    }
 
-   addCdnModules(moduleName, cdnModules) {
-      if (!this.cdnModules.hasOwnProperty(moduleName)) {
-         this.cdnModules[moduleName] = [];
-      }
-      cdnModules.forEach(currentModule => this.versionedModules[moduleName].push(currentModule));
+   setCdnModules(moduleName, cdnModules) {
+      this.cdnModules[moduleName] = cdnModules;
+   }
+
+   filterMeta(moduleName, metaName, filterFunction) {
+      this[metaName][moduleName] = this[metaName][moduleName].filter(filterFunction);
    }
 }
 
