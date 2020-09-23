@@ -58,7 +58,7 @@
       "saby-units": "git+https://platform-git.sbis.ru/saby/Units.git#rc-20.7000",
       "uglify-js": "3.3.23",
       "vinyl": "2.2.0",
-      "workerpool": "2.3.0",
+      "workerpool": "6.0.0",
       "semver": "6.3.0"
    },
    "devDependencies": {
