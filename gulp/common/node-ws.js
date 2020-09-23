@@ -93,15 +93,24 @@ function initWs(requiredModules) {
       modules: modulesForAppContents
    };
    loadContents(appContents, true, { resources: '/' });
+
+   // common core
    global.requirejs('Core/core');
    global.requirejs('Lib/core');
 
    /**
-    * These utilities must be downloaded immediately to make sure it'll be saved in requirejs
+    * These utilities below must be downloaded immediately to make sure it'll be saved in requirejs
     * cache properly and will have correct API to work further with
     */
+   // needed for xhtml localization
    global.requirejs('Core/markup/ParserUtilities');
+
+   // needed for xhtml build
    global.requirejs('Core/js-template-doT');
+
+   // needed by templates processor
+   global.requirejs('Application/Initializer');
+   global.requirejs('UI/Builder');
 }
 
 let initialized = false;
