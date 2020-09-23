@@ -225,15 +225,11 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
          }
          if (taskParameters.config.version) {
             if (taskParameters.versionedModules[currentModuleName]) {
+               const filterFunction = currentPath => !modulesToRemoveFromMeta.has(currentPath);
+
                // remove private parts of libraries from versioned and cdn meta
-               taskParameters.versionedModules[currentModuleName] = taskParameters.versionedModules[currentModuleName]
-                  .filter(
-                     currentPath => !modulesToRemoveFromMeta.has(currentPath)
-                  );
-               taskParameters.cdnModules[currentModuleName] = taskParameters.cdnModules[currentModuleName]
-                  .filter(
-                     currentPath => !modulesToRemoveFromMeta.has(currentPath)
-                  );
+               taskParameters.filterMeta(currentModuleName, 'versionedModules', filterFunction);
+               taskParameters.filterMeta(currentModuleName, 'cdnModules', filterFunction);
                versionedMetaFile.contents = Buffer.from(JSON.stringify(
                   taskParameters.versionedModules[currentModuleName].sort()
                ));

@@ -114,6 +114,18 @@ class TaskParameters {
          this.filesToRemoveFromOutput
       );
    }
+
+   setVersionedModules(moduleName, versionedModules) {
+      this.versionedModules[moduleName] = versionedModules;
+   }
+
+   setCdnModules(moduleName, cdnModules) {
+      this.cdnModules[moduleName] = cdnModules;
+   }
+
+   filterMeta(moduleName, metaName, filterFunction) {
+      this[metaName][moduleName] = this[metaName][moduleName].filter(filterFunction);
+   }
 }
 
 module.exports = TaskParameters;
