@@ -47,21 +47,27 @@ process.on('unhandledRejection', (reason, p) => {
 function getPlatformModules() {
    const nodeModulesPath = path.normalize(path.join(__dirname, '../node_modules'));
    const ModuleInfo = require('../gulp/common/classes/base-module-info');
+   const getModuleInfo = function(moduleName, relativePath) {
+      return {
+         name: moduleName,
+         path: path.join(nodeModulesPath, relativePath),
+         required: true
+      };
+   };
    return [
-      new ModuleInfo('WS.Core', '', path.join(nodeModulesPath, 'sbis3-ws/WS.Core'), true),
-      new ModuleInfo('RequireJsLoader', '', path.join(nodeModulesPath, 'wasaby-requirejs-loader/RequireJsLoader'), true),
-      new ModuleInfo('Application', '', path.join(nodeModulesPath, 'wasaby-app/src/Application'), true),
-      new ModuleInfo('View', '', path.join(nodeModulesPath, 'sbis3-ws/View'), true),
-      new ModuleInfo('Vdom', '', path.join(nodeModulesPath, 'sbis3-ws/Vdom'), true),
-      new ModuleInfo('Router', '', path.join(nodeModulesPath, 'Router/Router'), true),
-      new ModuleInfo('Inferno', '', path.join(nodeModulesPath, 'sbis3-ws/Inferno'), true),
-      new ModuleInfo('Inferno', '', path.join(nodeModulesPath, 'saby-inferno/Inferno'), true),
-      new ModuleInfo('Types', '', path.join(nodeModulesPath, 'saby-types/Types'), true),
-      new ModuleInfo('I18n', '', path.join(nodeModulesPath, 'saby-i18n/I18n'), true),
-      new ModuleInfo('Env', '', path.join(nodeModulesPath, 'rmi/src/client/Env'), true),
-      new ModuleInfo('SbisEnv', '', path.join(nodeModulesPath, 'rmi/src/client/SbisEnv'), true),
-      new ModuleInfo('Browser', '', path.join(nodeModulesPath, 'rmi/src/client/Browser'), true),
-      new ModuleInfo('UI', '', path.join(nodeModulesPath, 'saby-ui/UI'), true)
+      new ModuleInfo(getModuleInfo('WS.Core', 'sbis3-ws/WS.Core')),
+      new ModuleInfo(getModuleInfo('RequireJsLoader', 'wasaby-requirejs-loader/RequireJsLoader')),
+      new ModuleInfo(getModuleInfo('Application', 'wasaby-app/src/Application')),
+      new ModuleInfo(getModuleInfo('View', 'sbis3-ws/View')),
+      new ModuleInfo(getModuleInfo('Vdom', 'sbis3-ws/Vdom')),
+      new ModuleInfo(getModuleInfo('Router', 'Router/Router')),
+      new ModuleInfo(getModuleInfo('Inferno', 'saby-inferno/Inferno')),
+      new ModuleInfo(getModuleInfo('Types', 'saby-types/Types')),
+      new ModuleInfo(getModuleInfo('I18n', 'saby-i18n/I18n')),
+      new ModuleInfo(getModuleInfo('Env', 'rmi/src/client/Env')),
+      new ModuleInfo(getModuleInfo('SbisEnv', 'rmi/src/client/SbisEnv')),
+      new ModuleInfo(getModuleInfo('Browser', 'rmi/src/client/Browser')),
+      new ModuleInfo(getModuleInfo('UI', 'saby-ui/UI'))
    ];
 }
 
