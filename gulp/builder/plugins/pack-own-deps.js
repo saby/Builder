@@ -74,8 +74,9 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                const filesDepsForCache = new Set();
                const ownDeps = [];
                const prettyRelativePath = helpers.unixifyPath(path.join(moduleInfo.name, jsFile.relative));
-               if (componentsInfo.hasOwnProperty(prettyRelativePath)) {
-                  const componentInfo = componentsInfo[prettyRelativePath];
+               const normalizedRelativePath = jsFile.compiled ? prettyRelativePath.replace('.js', '.ts') : prettyRelativePath;
+               if (componentsInfo.hasOwnProperty(normalizedRelativePath)) {
+                  const componentInfo = componentsInfo[normalizedRelativePath];
                   if (componentInfo.componentName && componentInfo.componentDep) {
                      for (const dep of componentInfo.componentDep) {
                         if (dep.startsWith('html!') || dep.startsWith('tmpl!') || dep.startsWith('wml!')) {
@@ -124,7 +125,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   }
                }
                if (filesDepsForCache.size > 0) {
-                  const normalizedRelativePath = jsFile.compiled ? prettyRelativePath.replace('.js', '.ts') : prettyRelativePath;
                   taskParameters.cache.addDependencies(
                      moduleInfo.appRoot,
                      normalizedRelativePath,
