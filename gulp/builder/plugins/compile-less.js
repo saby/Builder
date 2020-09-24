@@ -191,7 +191,7 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                const outputPath = getOutput(file, '.css');
                taskParameters.cache.addOutputFile(file.history[0], outputPath, moduleInfo);
                taskParameters.cache.addDependencies(
-                  path.dirname(moduleInfo.path),
+                  moduleInfo.appRoot,
                   file.history[0],
                   compiled.imports
                );
