@@ -27,7 +27,7 @@ define('Modul/Modul', [
                     id: [],
                     def: undefined
                 };
-                var viewController = thelpers.calcParent(this, typeof currentPropertyName === 'undefined' ? undefined : currentPropertyName, data);
+                var viewController = thelpers.configResolver.calcParent(this, typeof currentPropertyName === 'undefined' ? undefined : currentPropertyName, data);
                 if (typeof forceCompatible === 'undefined') {
                     forceCompatible = false;
                 }
