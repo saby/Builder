@@ -32,6 +32,5 @@ define('Modul/external_public_deps', [
         simpleArrayFunction: testFunction_1,
         removeArrayDuplicates: testFunction_2
     };
-    exports._packedLibrary = true;
     return exports;
 });

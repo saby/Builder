@@ -30,6 +30,5 @@ define('Modul/testNativeNamesImports', [
         return exports;
     }();
     exports.fetch = Modul__es6_fetch;
-    exports._packedLibrary = true;
     return exports;
 });

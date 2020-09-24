@@ -153,6 +153,5 @@ define('Modul/Modul', [
     }();
         var Modul_es_1 = Modul__es6_Modul;
     exports.default = Modul_es_1.default;
-    exports._packedLibrary = true;
     return exports;
 });

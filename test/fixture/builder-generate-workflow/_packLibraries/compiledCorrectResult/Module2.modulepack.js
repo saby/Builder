@@ -67,6 +67,5 @@ define('Modul2/Module2', [
     }();
         var Module_es6 = Modul2__private_withNotAmdImport;
     exports.default = Module_es6;
-    exports._packedLibrary = true;
     return exports;
 });
