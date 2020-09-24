@@ -133,7 +133,7 @@ function generateTaskForBuildFile(taskParameters, filePath) {
             }
          }
       }
-      pathsForImportSet.add(moduleInfo.appRoot);
+      pathsForImportSet.add(path.dirname(moduleInfo.path));
    }
    const gulpModulesInfo = {
       pathsForImport: [...pathsForImportSet],

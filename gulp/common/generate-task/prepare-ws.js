@@ -13,7 +13,6 @@ const path = require('path'),
    gulpChmod = require('gulp-chmod'),
    pluginCompileEsAndTs = require('../../builder/plugins/compile-es-and-ts-simple'),
    gulpIf = require('gulp-if'),
-   filterCached = require('../../../gulp/builder/plugins/filter-cached'),
    changedInPlace = require('../../common/plugins/changed-in-place'),
    TaskParameters = require('../../common/classes/task-parameters'),
    startTask = require('../start-task-with-timer'),
@@ -59,7 +58,7 @@ function generateTaskForPrepareWS(taskParameters) {
 function generateTaskForPrepareWSModule(localTaskParameters, moduleInfo) {
    function buildWSModule() {
       const moduleInput = path.join(moduleInfo.path, '/**/*.*');
-      const moduleOutput = path.join(localTaskParameters.config.cachePath, 'platform', moduleInfo.name);
+      const moduleOutput = path.join(localTaskParameters.config.cachePath, 'platform', path.basename(moduleInfo.path));
       logger.debug(`Задача buildWSModule. moduleInput: "${moduleInput}", moduleOutput: "${moduleOutput}"`);
       return gulp
          .src(moduleInput, { dot: false, nodir: true })
@@ -79,7 +78,6 @@ function generateTaskForPrepareWSModule(localTaskParameters, moduleInfo) {
          // builder unit tests dont have cache
          .pipe(gulpIf(!!localTaskParameters.cache, changedInPlace(localTaskParameters, moduleInfo)))
          .pipe(pluginCompileEsAndTs(localTaskParameters, moduleInfo))
-         .pipe(filterCached(localTaskParameters, moduleInfo))
          .pipe(gulpChmod({ read: true, write: true }))
          .pipe(gulp.dest(moduleOutput));
    }
