@@ -73,10 +73,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                // важно сохранить в зависимости для js все файлы, которые должны приводить к пересборке файла
                const filesDepsForCache = new Set();
                const ownDeps = [];
+               const prettyFilePath = helpers.prettifyPath(jsFile.history[0]);
                const prettyRelativePath = helpers.unixifyPath(path.join(moduleInfo.name, jsFile.relative));
-               const normalizedRelativePath = jsFile.compiled ? prettyRelativePath.replace('.js', '.ts') : prettyRelativePath;
-               if (componentsInfo.hasOwnProperty(normalizedRelativePath)) {
-                  const componentInfo = componentsInfo[normalizedRelativePath];
+               if (componentsInfo.hasOwnProperty(prettyFilePath)) {
+                  const componentInfo = componentsInfo[prettyFilePath];
                   if (componentInfo.componentName && componentInfo.componentDep) {
                      for (const dep of componentInfo.componentDep) {
                         if (dep.startsWith('html!') || dep.startsWith('tmpl!') || dep.startsWith('wml!')) {
@@ -125,8 +125,9 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   }
                }
                if (filesDepsForCache.size > 0) {
+                  const normalizedRelativePath = jsFile.compiled ? prettyRelativePath.replace('.js', '.ts') : prettyRelativePath;
                   taskParameters.cache.addDependencies(
-                     moduleInfo.appRoot,
+                     path.dirname(moduleInfo.path),
                      normalizedRelativePath,
                      [...filesDepsForCache]
                   );

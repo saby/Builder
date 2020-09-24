@@ -53,7 +53,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             if (!routeInfo) {
                // if current file parse was completed with error, remove file
                // from inputPaths to repeat this error further in next build.
-               taskParameters.cache.deleteFailedFromCacheInputs(file.history[0], moduleInfo);
+               taskParameters.cache.deleteFailedFromCacheInputs(file.history[0]);
             }
             moduleInfo.cache.storeRouteInfo(file.history[0], routeInfo);
          }
@@ -72,7 +72,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             const { resourcesUrl } = taskParameters.config;
             Object.keys(routesInfoBySourceFiles).forEach((filePath) => {
                const routeInfo = routesInfoBySourceFiles[filePath];
-               const relativePath = path.relative(moduleInfo.appRoot, filePath);
+               const relativePath = path.relative(path.dirname(moduleInfo.path), filePath);
                const rebasedRelativePath = resourcesUrl ? path.join('resources', relativePath) : relativePath;
                const relativeResultPath = helpers.prettifyPath(transliterate(rebasedRelativePath));
                resultRoutesInfo[relativeResultPath.replace(/\.ts$/, '.js')] = routeInfo;

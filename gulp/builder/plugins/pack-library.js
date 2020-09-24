@@ -38,6 +38,8 @@ function getPrivatePartsCache(moduleInfo) {
 module.exports = function declarePlugin(taskParameters, moduleInfo) {
    const libraries = [];
 
+   // sourceRoot variable is already have unixified module path.
+   const sourceRoot = path.dirname(moduleInfo.path);
    return through.obj(
 
       /* @this Stream */
@@ -49,7 +51,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
             // Correctly get the relative path from the surface of path-ancestors of the compiling library
             !libPackHelpers.isPrivate(
-               helpers.removeLeadingSlashes(file.history[0].replace(moduleInfo.appRoot, ''))
+               helpers.removeLeadingSlashes(file.history[0].replace(sourceRoot, ''))
             )
          ) {
             libraries.push(file);
@@ -67,9 +69,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
          await pMap(
             libraries,
             async(library) => {
-               const currentComponentInfo = componentsInfo[helpers.unixifyPath(
-                  path.relative(moduleInfo.appRoot, library.history[0])
-               )];
+               const currentComponentInfo = componentsInfo[helpers.unixifyPath(library.history[0])];
 
                // ignore ts modules without private dependencies
                if (!currentComponentInfo.privateDependencies) {
@@ -80,7 +80,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   taskParameters.pool,
                   'packLibrary',
                   [
-                     moduleInfo.appRoot,
+                     sourceRoot,
                      library.contents.toString(),
                      getPrivatePartsCache(moduleInfo)
                   ],
@@ -108,24 +108,26 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                    * @type {string}
                    */
                   if (result.newModuleDependencies) {
-                     moduleInfo.cache.storeComponentParameters(path.relative(moduleInfo.appRoot, library.history[0]), {
+                     moduleInfo.cache.storeComponentParameters(library.history[0], {
                         componentDep: result.newModuleDependencies
                      });
-                     moduleInfo.cache.storeComponentParameters(
-                        path.relative(moduleInfo.appRoot, library.history[0]).replace(/\.(ts|es)$/, '.js'),
-                        {
-                           componentDep: result.newModuleDependencies
-                        }
-                     );
+                     moduleInfo.cache.storeComponentParameters(library.history[0].replace(/\.(ts|es)$/, '.js'), {
+                        componentDep: result.newModuleDependencies
+                     });
                   }
                   if (result.fileDependencies && result.fileDependencies.length > 0) {
-                     moduleInfo.cache.storeComponentParameters(path.relative(moduleInfo.appRoot, library.history[0]), {
+                     moduleInfo.cache.storeComponentParameters(library.history[0], {
                         packedModules: result.packedModules,
                         libraryName: result.name
                      });
+                     const prettyRelativePath = helpers.unixifyPath(
+                        helpers.removeLeadingSlashes(
+                           library.history[0].replace(path.dirname(moduleInfo.path), '')
+                        )
+                     );
                      taskParameters.cache.addDependencies(
-                        moduleInfo.appRoot,
-                        library.history[0],
+                        path.dirname(moduleInfo.path),
+                        prettyRelativePath,
                         result.fileDependencies
                      );
                   }

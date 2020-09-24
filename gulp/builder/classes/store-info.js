@@ -164,21 +164,24 @@ class StoreInfo {
     * @param{Array} modulesForPatch - interface modules to be patched
     * @returns {Set<any>}
     */
-   getOutputFilesSet(modulesForPatch) {
+   getOutputFilesSet(outputPath, modulesForPatch) {
       const resultSet = new Set();
       for (const filePath in this.inputPaths) {
          if (!this.inputPaths.hasOwnProperty(filePath)) {
             continue;
          }
-         for (const relativeFilePath of this.inputPaths[filePath].output) {
+         for (const outputFilePath of this.inputPaths[filePath].output) {
             // get only paths for patching modules in patch build
             if (modulesForPatch && modulesForPatch.length > 0) {
-               const currentModuleName = relativeFilePath.split('/').shift();
+               const currentModuleName = outputFilePath
+                  .replace(outputPath, '')
+                  .split('/')
+                  .shift();
                if (modulesForPatch.includes(currentModuleName)) {
-                  resultSet.add(relativeFilePath);
+                  resultSet.add(outputFilePath);
                }
             } else {
-               resultSet.add(relativeFilePath);
+               resultSet.add(outputFilePath);
             }
          }
       }

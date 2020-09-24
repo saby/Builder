@@ -26,9 +26,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
          // check for library from builder cache. Works in incremental build and always has actual
          // meta about every ts file processed by builder
-         const currentComponentInfo = moduleInfo.cache.getCurrentComponentInfo(
-            path.relative(moduleInfo.appRoot, file.history[0])
-         );
+         const currentComponentInfo = moduleInfo.cache.getCurrentComponentInfo(file.history[0]);
          if (file.library || (currentComponentInfo && currentComponentInfo.libraryName)) {
             libraries.push(file);
             callback(null);

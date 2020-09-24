@@ -97,7 +97,9 @@ describe('check-module-dependencies', () => {
          responsible: 'some responsible of WS.Core'
       }
    ];
-   const projectModulesNames = modules.map(moduleInfo => moduleInfo.name);
+   const projectModulesNames = modules.map(
+      moduleInfo => path.basename(moduleInfo.path)
+   );
    const buildConfig = {
       rawConfig: {
          output: path.join(__dirname, 'fixture/check-module-dependencies')
