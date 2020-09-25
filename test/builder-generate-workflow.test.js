@@ -2029,7 +2029,8 @@ describe('gulp/builder/generate-workflow.js', () => {
             'moduleStyle.min.css',
             'contents.js',
             'contents.json',
-            'contents.min.json'
+            'contents.min.json',
+            'packages'
          ]);
 
          // check builder meta
@@ -2183,7 +2184,7 @@ describe('gulp/builder/generate-workflow.js', () => {
 
          const testResults = async() => {
             const correctPackagePath = path.join(fixtureFolder, 'correctResult/superbundle-part-with-debug');
-            const packagePath = path.join(outputFolder, 'InterfaceModule1/superbundle-for-builder-tests.package.min');
+            const packagePath = path.join(outputFolder, 'InterfaceModule1/packages/superbundle-for-builder-tests.package.min');
             const compiledCssPackage = await fs.readFile(`${packagePath}.css`, 'utf8');
             const compiledJsPackage = await fs.readFile(`${packagePath}.js`, 'utf8');
             const correctCssPackage = await fs.readFile(`${correctPackagePath}.css`, 'utf8');
