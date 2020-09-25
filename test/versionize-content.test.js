@@ -62,30 +62,31 @@ describe('versionize-content', () => {
    it('versionize style content', () => {
       let result;
       const currentModuleInfo = new ModuleInfo(
-         'MyModule',
-         'some responsible',
-         'someRoot/MyModule',
-         'someCache',
-         false,
-         ['SBIS3.CONTROLS']
+         {
+            name: 'MyModule',
+            responsible: 'some responsible',
+            path: 'someRoot/MyModule',
+            depends: ['SBIS3.CONTROLS']
+         },
+         'someCache'
       );
       const moduleInfoWithSpace = new ModuleInfo(
-         'MyModule with space',
-         'some responsible',
-         'someRoot/MyModule with space',
-         'someCache',
-         false,
-         false,
-         ['View', 'SBIS3.CONTROLS', 'WS3Page']
+         {
+            name: 'MyModule with space',
+            responsible: 'some responsible',
+            path: 'someRoot/MyModule with space',
+            depends: ['View', 'SBIS3.CONTROLS', 'WS3Page']
+         },
+         'someCache'
       );
       const wscoreModuleInfo = new ModuleInfo(
-         'WS.Core',
-         'some responsible',
-         'someRoot/WS.Core',
-         'someCache',
-         false,
-         false,
-         []
+         {
+            name: 'WS.Core',
+            responsible: 'some responsible',
+            path: 'someRoot/WS.Core',
+            depends: []
+         },
+         'someCache'
       );
 
       let base = path.join(__dirname, 'someRoot/MyModule');
@@ -192,22 +193,22 @@ describe('versionize-content', () => {
 
    it('versionize templates content', () => {
       const currentModuleInfo = new ModuleInfo(
-         'MyModule',
-         'some responsible',
-         'someRoot/MyModule',
-         'someCache/MyModule',
-         false,
-         false,
-         ['View', 'SBIS3.CONTROLS', 'WS3Page']
+         {
+            name: 'MyModule',
+            responsible: 'some responsible',
+            path: 'someRoot/MyModule',
+            depends: ['View', 'SBIS3.CONTROLS', 'WS3Page']
+         },
+         'someCache/MyModule'
       );
       const wscoreModuleInfo = new ModuleInfo(
-         'WS.Core',
-         'some responsible',
-         'someRoot/WS.Core',
-         'someCache',
-         false,
-         false,
-         []
+         {
+            name: 'WS.Core',
+            responsible: 'some responsible',
+            path: 'someRoot/WS.Core',
+            depends: []
+         },
+         'someCache'
       );
 
       const base = path.join(__dirname, 'someRoot/MyModule');
