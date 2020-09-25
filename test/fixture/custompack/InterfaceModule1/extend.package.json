@@ -8,11 +8,6 @@
   ],
   "output": "interfacemodule1.package.js"
 }, {
-  "includePackages": [
-    "InterfaceModule1/interfacemodule1.package.js"
-  ],
-  "extendsTo": "superbundle-for-builder-tests.package.js"
-}, {
   "include": [
     "InterfaceModule1/*"
   ],
