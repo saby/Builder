@@ -1652,7 +1652,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          extendBundlesConfig.should.deep.equal(correctExtendBundlesConfig);
          const currentCssPackage = await fs.readFile(path.join(
             outputFolder,
-            'InterfaceModule1',
+            'InterfaceModule1/packages',
             'superbundle-for-builder-tests.package.min.css'
          ));
          const sourceCssPackage = await fs.readFile(path.join(
@@ -1662,7 +1662,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          ));
          const currentJsPackage = await fs.readFile(path.join(
             outputFolder,
-            'InterfaceModule1',
+            'InterfaceModule1/packages',
             'superbundle-for-builder-tests.package.min.js'
          ));
          const sourceJsPackage = await fs.readFile(path.join(
@@ -1694,11 +1694,11 @@ describe('gulp/builder/generate-workflow.js', () => {
          // build result must have correct meta about extendable bundles
          const resultExtendBundlesMeta = await fs.readJson(path.join(outputFolder, 'InterfaceModule1/extend-bundles.json'));
          resultExtendBundlesMeta.should.deep.equal({
-            'InterfaceModule1/superbundle-for-builder-tests.package.min.css': {
+            'InterfaceModule1/packages/superbundle-for-builder-tests.package.min.css': {
                extendsTo: 'superbundle-for-builder-tests.package.min.css',
-               config: '/InterfaceModule1/extend.package.json:superbundle-for-builder-tests.package.js'
+               config: '/InterfaceModule1/packages/extendable-bundle.package.json:superbundle-for-builder-tests.package.js'
             },
-            'InterfaceModule1/superbundle-for-builder-tests.package.min.js': {
+            'InterfaceModule1/packages/superbundle-for-builder-tests.package.min.js': {
                extendsTo: 'superbundle-for-builder-tests.package.min.js',
                modules: [
                   'InterfaceModule1/amdModule',
@@ -1707,7 +1707,7 @@ describe('gulp/builder/generate-workflow.js', () => {
                   'css!InterfaceModule1/amdModule',
                   'css!InterfaceModule1/moduleStyle'
                ],
-               config: '/InterfaceModule1/extend.package.json:superbundle-for-builder-tests.package.js'
+               config: '/InterfaceModule1/packages/extendable-bundle.package.json:superbundle-for-builder-tests.package.js'
             }
          });
 
