@@ -91,7 +91,12 @@ class Cache {
          async(moduleInfo) => {
             const currentModuleCachePath = path.join(this.config.cachePath, 'modules-cache', `${moduleInfo.name}.json`);
             this.setDefaultStore(moduleInfo);
-            if (patchBuild && await fs.pathExists(currentModuleCachePath) && !moduleInfo.rebuild) {
+            if (
+               patchBuild &&
+               await fs.pathExists(currentModuleCachePath) &&
+               !moduleInfo.rebuild &&
+               this.lastStore.inputPaths[moduleInfo.path]
+            ) {
                this.currentStore.inputPaths[moduleInfo.path] = this.lastStore.inputPaths[moduleInfo.path];
             }
          }
