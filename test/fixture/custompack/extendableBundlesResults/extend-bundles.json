@@ -1,9 +1,9 @@
 {
-  "InterfaceModule1/superbundle-for-builder-tests.package.min.css": {
+  "InterfaceModule1/packages/superbundle-for-builder-tests.package.min.css": {
     "extendsTo": "superbundle-for-builder-tests.package.min.css",
-    "config": "/InterfaceModule1/extend.package.json:superbundle-for-builder-tests.package.js"
+    "config": "/InterfaceModule1/packages/extendable-bundle.package.json:superbundle-for-builder-tests.package.js"
   },
-  "InterfaceModule1/superbundle-for-builder-tests.package.min.js": {
+  "InterfaceModule1/packages/superbundle-for-builder-tests.package.min.js": {
     "extendsTo": "superbundle-for-builder-tests.package.min.js",
     "modules": [
       "InterfaceModule1/amdModule",
@@ -12,6 +12,6 @@
       "css!InterfaceModule1/amdModule",
       "css!InterfaceModule1/moduleStyle"
     ],
-    "config": "/InterfaceModule1/extend.package.json:superbundle-for-builder-tests.package.js"
+    "config": "/InterfaceModule1/packages/extendable-bundle.package.json:superbundle-for-builder-tests.package.js"
   }
 }
