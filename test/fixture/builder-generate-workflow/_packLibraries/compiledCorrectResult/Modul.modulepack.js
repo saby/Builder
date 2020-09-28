@@ -22,7 +22,8 @@ define('Modul/Modul', [
                     var deps = Array.prototype.slice.call(arguments);
                     var depsLocal = {};
                     var includedTemplates = {};
-                    var templateFunction = function Modul__es6_test(data, attr, context, isVdom, sets, forceCompatible) {
+                    var scopeForTemplate, attrsForTemplate;
+                    var templateFunction = function Modul__es6_test(data, attr, context, isVdom, sets, forceCompatible, generatorConfig) {
                         var forCounter = 0;
                         var templateCount = 0;
                         var key = thelpers.validateNodeKey(attr && attr.key);
@@ -34,7 +35,7 @@ define('Modul/Modul', [
                         if (typeof forceCompatible === 'undefined') {
                             forceCompatible = false;
                         }
-                        var markupGenerator = thelpers.createGenerator(isVdom, forceCompatible);
+                        var markupGenerator = thelpers.createGenerator(isVdom, forceCompatible, generatorConfig);
                         try {
                             var out = markupGenerator.joinElements([markupGenerator.createTag('div', {
                                     'attributes': { 'class': 'test' },
