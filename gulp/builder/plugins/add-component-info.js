@@ -10,6 +10,7 @@
 const through = require('through2'),
    logger = require('../../../lib/logger').logger(),
    { componentCantBeParsed } = require('../../../lib/helpers'),
+   path = require('path'),
    execInPool = require('../../common/exec-in-pool');
 
 /**
@@ -58,9 +59,9 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
          if (!componentInfo) {
             // if current file parse was completed with error, remove file
             // from inputPaths to repeat this error further in next build.
-            taskParameters.cache.deleteFailedFromCacheInputs(file.history[0]);
+            taskParameters.cache.deleteFailedFromCacheInputs(file.history[0], moduleInfo);
          }
-         moduleInfo.cache.storeComponentInfo(file.history[0], componentInfo);
+         moduleInfo.cache.storeComponentInfo(path.relative(moduleInfo.appRoot, file.history[0]), componentInfo);
          callback(null, file);
       },
       function onFlush(callback) {

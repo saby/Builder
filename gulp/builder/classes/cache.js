@@ -64,7 +64,7 @@ class Cache {
 
    // setting default store values for current interface module
    setDefaultStore(moduleInfo) {
-      this.currentStore.inputPaths[moduleInfo.path] = {
+      this.currentStore.inputPaths[moduleInfo.name] = {
          hash: '',
          output: []
       };
@@ -97,7 +97,7 @@ class Cache {
                !moduleInfo.rebuild &&
                this.lastStore.inputPaths[moduleInfo.path]
             ) {
-               this.currentStore.inputPaths[moduleInfo.path] = this.lastStore.inputPaths[moduleInfo.path];
+               this.currentStore.inputPaths[moduleInfo.name] = this.lastStore.inputPaths[moduleInfo.name];
             }
          }
       );
@@ -258,28 +258,30 @@ class Cache {
     */
    async isFileChanged(filePath, fileContents, hashByContent, fileTimeStamp, moduleInfo) {
       const prettyPath = helpers.unixifyPath(filePath);
-      const prettyRelativePath = helpers.unixifyPath(
-         helpers.removeLeadingSlashes(
-            filePath.replace(path.dirname(moduleInfo.path), '')
-         )
-      );
+      const prettyRelativePath = helpers.getRelativePath(moduleInfo.appRoot, prettyPath);
 
       const hash = getFileHash(fileContents, hashByContent, fileTimeStamp);
-      const isChanged = await this._isFileChanged(hashByContent, prettyRelativePath, prettyPath, hash);
+      const isChanged = await this._isFileChanged(
+         hashByContent,
+         moduleInfo.appRoot,
+         prettyRelativePath,
+         prettyPath,
+         hash
+      );
 
       const relativePath = path.relative(moduleInfo.path, filePath);
-      const outputFullPath = path.join(moduleInfo.output, transliterate(relativePath));
-      this.currentStore.inputPaths[prettyPath] = {
+      const outputRelativePath = path.join(path.basename(moduleInfo.output), transliterate(relativePath));
+      this.currentStore.inputPaths[prettyRelativePath] = {
          hash,
-         output: [helpers.prettifyPath(outputFullPath)]
+         output: [helpers.unixifyPath(outputRelativePath)]
       };
 
       if (!isChanged) {
          // вытащим данные из старого кеша в новый кеш
          const lastModuleCache = moduleInfo.cache.lastStore;
          const currentModuleCache = moduleInfo.cache.currentStore;
-         if (lastModuleCache.componentsInfo.hasOwnProperty(prettyPath)) {
-            currentModuleCache.componentsInfo[prettyPath] = lastModuleCache.componentsInfo[prettyPath];
+         if (lastModuleCache.componentsInfo.hasOwnProperty(prettyRelativePath)) {
+            currentModuleCache.componentsInfo[prettyRelativePath] = lastModuleCache.componentsInfo[prettyRelativePath];
          }
          if (lastModuleCache.markupCache.hasOwnProperty(prettyPath)) {
             currentModuleCache.markupCache[prettyPath] = lastModuleCache.markupCache[prettyPath];
@@ -297,21 +299,15 @@ class Cache {
          if (lastModuleCache.cdnModules.hasOwnProperty(prettyPath)) {
             currentModuleCache.cdnModules[prettyPath] = lastModuleCache.cdnModules[prettyPath];
          }
-         const fileRelativePath = helpers.unixifyPath(
-            path.join(
-               path.basename(moduleInfo.path),
-               relativePath
-            )
-         );
-         if (this.lastStore.dependencies.hasOwnProperty(fileRelativePath)) {
-            this.currentStore.dependencies[fileRelativePath] = this.lastStore.dependencies[fileRelativePath];
+         if (this.lastStore.dependencies.hasOwnProperty(prettyRelativePath)) {
+            this.currentStore.dependencies[prettyRelativePath] = this.lastStore.dependencies[prettyRelativePath];
          }
       }
 
       return isChanged;
    }
 
-   async _isFileChanged(hashByContent, prettyRelativePath, prettyPath, hash) {
+   async _isFileChanged(hashByContent, root, prettyRelativePath, prettyPath, hash) {
       // кеша не было, значит все файлы новые
       if (!this.lastStore.startBuildTime) {
          return true;
@@ -327,7 +323,7 @@ class Cache {
       }
 
       // новый файл
-      if (!this.lastStore.inputPaths.hasOwnProperty(prettyPath)) {
+      if (!this.lastStore.inputPaths.hasOwnProperty(prettyRelativePath)) {
          return true;
       }
 
@@ -336,7 +332,7 @@ class Cache {
          return true;
       }
 
-      if (this.lastStore.inputPaths[prettyPath].hash !== hash) {
+      if (this.lastStore.inputPaths[prettyRelativePath].hash !== hash) {
          /**
           * if View/Builder components were changed, we need to rebuild all templates in project
           * with current templates processor changes. Also check UI components for changing between
@@ -360,9 +356,9 @@ class Cache {
          return true;
       }
 
-      if (prettyPath.endsWith('.less') || prettyPath.endsWith('.js') || prettyPath.endsWith('.es') || prettyPath.endsWith('.ts')) {
-         const isChanged = await this._isDependenciesChanged(hashByContent, prettyRelativePath);
-         this.cacheChanges[prettyPath] = isChanged;
+      if (prettyRelativePath.endsWith('.less') || prettyRelativePath.endsWith('.js') || prettyRelativePath.endsWith('.es') || prettyRelativePath.endsWith('.ts')) {
+         const isChanged = await this._isDependenciesChanged(hashByContent, prettyRelativePath, root);
+         this.cacheChanges[prettyRelativePath] = isChanged;
          return isChanged;
       }
 
@@ -377,13 +373,15 @@ class Cache {
     * @param {ModuleInfo} moduleInfo информация о модуле.
     */
    addOutputFile(filePath, outputFilePath, moduleInfo) {
-      const prettyFilePath = helpers.prettifyPath(filePath);
-      const outputPrettyPath = helpers.prettifyPath(outputFilePath);
-      if (this.currentStore.inputPaths.hasOwnProperty(prettyFilePath)) {
-         this.currentStore.inputPaths[prettyFilePath].output.push(outputPrettyPath);
+      const prettyRoot = helpers.unixifyPath(moduleInfo.appRoot);
+      const prettyOutput = helpers.unixifyPath(path.dirname(moduleInfo.output));
+      const prettyRelativePath = helpers.getRelativePath(prettyRoot, filePath);
+      const outputPrettyRelativePath = helpers.getRelativePath(prettyOutput, outputFilePath);
+      if (this.currentStore.inputPaths.hasOwnProperty(prettyRelativePath)) {
+         this.currentStore.inputPaths[prettyRelativePath].output.push(outputPrettyRelativePath);
       } else {
          // некоторые файлы являются производными от всего модуля. например en-US.js, en-US.css
-         this.currentStore.inputPaths[moduleInfo.path].output.push(outputPrettyPath);
+         this.currentStore.inputPaths[moduleInfo.name].output.push(outputPrettyRelativePath);
       }
    }
 
@@ -413,10 +411,11 @@ class Cache {
       return this.currentStore.cachedMinified;
    }
 
-   getOutputForFile(filePath) {
-      const prettyFilePath = helpers.prettifyPath(filePath);
-      if (this.currentStore.inputPaths.hasOwnProperty(prettyFilePath)) {
-         return this.currentStore.inputPaths[prettyFilePath].output;
+   getOutputForFile(filePath, moduleInfo) {
+      const prettyRoot = helpers.unixifyPath(moduleInfo.appRoot);
+      const prettyRelativeFilePath = helpers.getRelativePath(prettyRoot, filePath);
+      if (this.currentStore.inputPaths.hasOwnProperty(prettyRelativeFilePath)) {
+         return this.currentStore.inputPaths[prettyRelativeFilePath].output;
       }
       return [];
    }
@@ -426,13 +425,8 @@ class Cache {
     * @param {string} modulePath путь до модуля
     * @returns {string[]}
     */
-   getInputPathsByFolder(modulePath) {
-      /**
-       * Current interface module name may be a part of another interface module.
-       * Make sure we get paths only for current interface module.
-       */
-      const prettyModulePath = helpers.prettifyPath(`${modulePath}/`);
-      return Object.keys(this.currentStore.inputPaths).filter(filePath => filePath.startsWith(prettyModulePath));
+   getInputPathsByFolder(moduleName) {
+      return Object.keys(this.currentStore.inputPaths).filter(filePath => filePath.startsWith(`${moduleName}/`));
    }
 
    /**
@@ -476,7 +470,7 @@ class Cache {
    }
 
    getDependencies(relativePath) {
-      const prettyRelativePath = helpers.prettifyPath(relativePath);
+      const prettyRelativePath = helpers.unixifyPath(relativePath);
       return this.currentStore.dependencies[prettyRelativePath] || [];
    }
 
@@ -489,24 +483,25 @@ class Cache {
     * @param {string} filePath путь до файла
     * @returns {Promise<boolean>}
     */
-   async _isDependenciesChanged(hashByContent, filePath) {
-      const dependencies = this.getAllDependencies(filePath);
+   async _isDependenciesChanged(hashByContent, relativePath, root) {
+      const dependencies = this.getAllDependencies(relativePath);
       if (dependencies.length === 0) {
          return false;
       }
       const listChangedDeps = await pMap(
          dependencies,
-         async(currentPath) => {
-            if (this.cacheChanges.hasOwnProperty(currentPath)) {
-               return this.cacheChanges[currentPath];
+         async(currentRelativePath) => {
+            if (this.cacheChanges.hasOwnProperty(currentRelativePath)) {
+               return this.cacheChanges[currentRelativePath];
             }
             if (
-               !this.lastStore.inputPaths.hasOwnProperty(currentPath) ||
-               !this.lastStore.inputPaths[currentPath].hash
+               !this.lastStore.inputPaths.hasOwnProperty(currentRelativePath) ||
+               !this.lastStore.inputPaths[currentRelativePath].hash
             ) {
                return true;
             }
             let isChanged = false;
+            const currentPath = path.join(root, currentRelativePath);
             if (await fs.pathExists(currentPath)) {
                if (hashByContent) {
                   const fileContents = await fs.readFile(currentPath);
@@ -514,15 +509,15 @@ class Cache {
                      .createHash('sha1')
                      .update(fileContents)
                      .digest('base64');
-                  isChanged = this.lastStore.inputPaths[currentPath].hash !== hash;
+                  isChanged = this.lastStore.inputPaths[currentRelativePath].hash !== hash;
                } else {
-                  const fileStats = await fs.stat(currentPath);
-                  isChanged = this.lastStore.inputPaths[currentPath].hash !== fileStats.mtime.toString();
+                  const fileStats = await fs.stat(currentRelativePath);
+                  isChanged = this.lastStore.inputPaths[currentRelativePath].hash !== fileStats.mtime.toString();
                }
             } else {
                isChanged = true;
             }
-            this.cacheChanges[currentPath] = isChanged;
+            this.cacheChanges[currentRelativePath] = isChanged;
             return isChanged;
          },
          {
@@ -556,10 +551,11 @@ class Cache {
       return Array.from(results);
    }
 
-   deleteFailedFromCacheInputs(filePath) {
-      const prettyPath = helpers.prettifyPath(filePath);
-      if (this.currentStore.inputPaths.hasOwnProperty(prettyPath)) {
-         delete this.currentStore.inputPaths[prettyPath];
+   deleteFailedFromCacheInputs(filePath, moduleInfo) {
+      const prettyRoot = helpers.unixifyPath(moduleInfo.appRoot);
+      const prettyRelativePath = helpers.getRelativePath(prettyRoot, filePath);
+      if (this.currentStore.inputPaths.hasOwnProperty(prettyRelativePath)) {
+         delete this.currentStore.inputPaths[prettyRelativePath];
       }
    }
 
@@ -606,10 +602,12 @@ class Cache {
        * builder cache and get artifacts in next patch builds.
        * @type {Set<string>}
        */
-      const lastOutputSet = this.lastStore.getOutputFilesSet(cachePath, modulesForPatch.map(
-         currentModule => path.basename(currentModule.output)
-      ));
-      let removeFiles = Array.from(lastOutputSet).filter(filePath => !currentOutputSet.has(filePath));
+      const lastOutputSet = this.lastStore.getOutputFilesSet(
+         modulesForPatch.map(currentModule => path.basename(currentModule.output))
+      );
+      let removeFiles = Array.from(lastOutputSet)
+         .filter(relativeFilePath => !currentOutputSet.has(relativeFilePath))
+         .map(relativeFilePath => path.join(cachePath, relativeFilePath));
 
       /**
        * in case of release mode there are 2 folder to remove outdated files therefrom:

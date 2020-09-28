@@ -31,6 +31,7 @@ class ModuleInfo {
       this.rebuild = rebuild;
       this.depends = depends || [];
       this.cache = {};
+      this.appRoot = path.dirname(modulePath).replace(/\\/g, '/');
 
       // TODO learn jinnee to set SDK identity for modules in gulp_config
       this.sdkElement = modulePath.includes('link_to_sdk');
@@ -70,6 +71,7 @@ class ModuleInfo {
             throw new Error(errorMessage);
          }
          this.path = newPath;
+         this.appRoot = path.dirname(newPath).replace(/\\/g, '/');
       }
    }
 }

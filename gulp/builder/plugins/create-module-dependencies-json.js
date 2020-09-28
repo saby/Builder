@@ -139,9 +139,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                json.lessDependencies = {};
                json.requireJsSubstitutions = {};
             }
-            const storeNode = (mDeps, nodeName, objectToStore, filePath) => {
-               const ext = path.extname(filePath);
-               const relativePath = path.relative(path.dirname(moduleInfo.path), filePath);
+            const storeNode = (mDeps, nodeName, objectToStore, relativePath) => {
+               const ext = path.extname(relativePath);
                const rebasedRelativePath = resourcesUrl ? path.join('resources', relativePath) : relativePath;
                const prettyPath = helpers.prettifyPath(transliterate(rebasedRelativePath));
 
@@ -154,12 +153,12 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                 * Store all of these for branch tests.
                  */
                if (moduleInfo.name === 'WS.Core' && addAdditionalMeta) {
-                  mDeps.requireJsSubstitutions[`${nodeName}`] = helpers.prettifyPath(relativePath);
+                  mDeps.requireJsSubstitutions[`${nodeName}`] = helpers.unixifyPath(relativePath);
                }
             };
             const componentsInfo = moduleInfo.cache.getComponentsInfo();
-            Object.keys(componentsInfo).forEach((filePath) => {
-               const info = componentsInfo[filePath];
+            Object.keys(componentsInfo).forEach((relativePath) => {
+               const info = componentsInfo[relativePath];
                if (info.hasOwnProperty('componentName')) {
                   const depsOfLink = new Set();
                   if (info.hasOwnProperty('componentDep')) {
@@ -179,7 +178,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                      }
                   }
                   json.links[info.componentName] = [...depsOfLink];
-                  storeNode(json, info.componentName, { amd: true }, filePath);
+                  storeNode(json, info.componentName, { amd: true }, relativePath);
                }
                if (info.hasOwnProperty('libraryName')) {
                   json.packedLibraries[info.libraryName] = info.packedModules;
@@ -234,24 +233,23 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   if (markupObj.nodeName.startsWith('tmpl!') || markupObj.nodeName.startsWith('wml!')) {
                      json.links[markupObj.nodeName] = markupObj.dependencies || [];
                   }
-                  storeNode(json, markupObj.nodeName, { amd: true }, filePath);
+                  const relativePath = path.relative(moduleInfo.appRoot, filePath);
+                  storeNode(json, markupObj.nodeName, { amd: true }, relativePath);
                }
             }
 
             const [cssFiles, jstplFiles] = getCssAndJstplFiles(
-               taskParameters.cache.getInputPathsByFolder(moduleInfo.path)
+               taskParameters.cache.getInputPathsByFolder(moduleInfo.name)
             );
-            for (const filePath of cssFiles) {
-               const relativePath = path.relative(path.dirname(moduleInfo.path), filePath);
-               const prettyPath = modulePathToRequire.getPrettyPath(helpers.prettifyPath(transliterate(relativePath)));
-               const nodeName = `css!${prettyPath.replace('.css', '')}`;
-               storeNode(json, nodeName, {}, filePath);
+            for (const relativePath of cssFiles) {
+               const prettyRelativePath = modulePathToRequire.getPrettyPath(transliterate(relativePath));
+               const nodeName = `css!${prettyRelativePath.replace('.css', '')}`;
+               storeNode(json, nodeName, {}, relativePath);
             }
-            for (const filePath of jstplFiles) {
-               const relativePath = path.relative(path.dirname(moduleInfo.path), filePath);
-               const prettyPath = modulePathToRequire.getPrettyPath(helpers.prettifyPath(transliterate(relativePath)));
+            for (const relativePath of jstplFiles) {
+               const prettyPath = modulePathToRequire.getPrettyPath(transliterate(relativePath));
                const nodeName = `text!${prettyPath}`;
-               storeNode(json, nodeName, {}, filePath);
+               storeNode(json, nodeName, {}, relativePath);
             }
 
             /**
