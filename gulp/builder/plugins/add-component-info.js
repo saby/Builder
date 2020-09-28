@@ -26,6 +26,9 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             callback(null, file);
             return;
          }
+         if (taskParameters.config.staticServer) {
+            file.pushToServer = true;
+         }
 
          if (componentCantBeParsed(file)) {
             callback(null, file);
