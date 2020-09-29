@@ -79,6 +79,9 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                callback(null, file);
                return;
             }
+            if (taskParameters.config.staticServer) {
+               file.pushToServer = true;
+            }
 
             let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
             relativeFilePath = path.join(moduleInfo.name, relativeFilePath);
@@ -118,9 +121,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             newFile.compiled = true;
             newFile.path = outputPath;
             newFile.base = moduleInfo.output;
-            if (taskParameters.config.staticServer) {
-               newFile.pushToServer = true;
-            }
             this.push(newFile);
          } catch (error) {
             taskParameters.cache.markFileAsFailed(file.history[0]);

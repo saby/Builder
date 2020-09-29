@@ -79,6 +79,9 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                taskParameters.storePluginTime('jsonJs', startTime);
                return;
             }
+            if (taskParameters.config.staticServer) {
+               file.pushToServer = true;
+            }
 
             let
                relativeFilePath = path.relative(currentFileBase, file.history[0]),
