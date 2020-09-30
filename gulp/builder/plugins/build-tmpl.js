@@ -80,9 +80,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             callback(null, file);
             return;
          }
-         if (taskParameters.config.staticServer) {
-            file.pushToServer = true;
-         }
 
          // Write original file if tmpl can't be compiled
          let newText = file.contents.toString();

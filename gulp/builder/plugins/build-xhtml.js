@@ -46,9 +46,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                callback(null, file);
                return;
             }
-            if (taskParameters.config.staticServer) {
-               file.pushToServer = true;
-            }
 
             // если xhtml не возможно скомпилировать, то запишем оригинал
             let newText = file.contents.toString();

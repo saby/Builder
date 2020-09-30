@@ -79,9 +79,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                callback(null, file);
                return;
             }
-            if (taskParameters.config.staticServer) {
-               file.pushToServer = true;
-            }
 
             let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
             relativeFilePath = path.join(moduleInfo.name, relativeFilePath);
