@@ -51,9 +51,12 @@ function needSymlink(config, moduleInfo) {
          return false;
       }
 
-      // symlinks can't be used if localization changes templates files
-      // or we have to save compiled template into source for custom packer needing.
-      if ((hasLocalization || config.debugCustomPack) && ['.html', '.tmpl', '.xhtml', '.wml'].includes(file.extname)) {
+      if (file.extname === '.html' && (hasLocalization || config.debugCustomPack)) {
+         return false;
+      }
+
+      // symlinks can't be used if we have to save compiled template into source for custom packer needs.
+      if ((config.debugCustomPack) && ['.tmpl', '.xhtml', '.wml'].includes(file.extname)) {
          return false;
       }
 
