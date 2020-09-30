@@ -345,6 +345,9 @@ class BuildConfiguration {
       if (this.rawConfig.hasOwnProperty('builderTests')) {
          this.builderTests = this.rawConfig.builderTests;
       }
+      if (this.compiled) {
+         this.additionalCachePath = path.dirname(this.compiled);
+      }
    }
 
    /**

@@ -46,7 +46,7 @@ function generateWorkflow(processArgv) {
    const taskParameters = new TaskParameters(
       config,
       new Cache(config),
-      config.localizations.length > 0
+      config.localizations.length > 0 && config.isReleaseMode
    );
 
    return gulp.series(
