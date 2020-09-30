@@ -59,7 +59,10 @@ function generateTaskForGenerateJson(taskParameters) {
          // если локализация не нужна, то и ругаться, что json-generator нет, не нужно.
          // eslint-disable-next-line global-require
          const runJsonGenerator = require('../../../lib/i18n/run-json-generator');
-         if (await fs.pathExists(path.join(taskParameters.config.additionalCachePath, 'json-generator-cache.json'))) {
+         if (
+            taskParameters.config.additionalCachePath &&
+            await fs.pathExists(path.join(taskParameters.config.additionalCachePath, 'json-generator-cache.json'))
+         ) {
             await prepareJsonGeneratorCache(
                path.join(taskParameters.config.cachePath, 'temp-modules'),
                taskParameters.config.cachePath,

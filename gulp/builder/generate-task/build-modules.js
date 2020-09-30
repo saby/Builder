@@ -94,9 +94,9 @@ function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap
 
    // there is no need in module-dependencies meta in debug mode. It's only needed by templates that
    // delivers now "as is" and doesn't compile in debug mode. Thus, module-dependencies meta now can be
-   // disabled in debug mode too.
-   const needModuleDependencies = config.isReleaseMode && (config.dependenciesGraph || config.customPack ||
-      config.deprecatedStaticHtml || config.checkModuleDependencies);
+   // disabled in debug mode too. Also enable it in builder unit test to check if it's properly working.
+   const needModuleDependencies = (config.isReleaseMode || config.builderTests) &&
+      (config.dependenciesGraph || config.customPack || config.deprecatedStaticHtml || config.checkModuleDependencies);
 
    const pathsForImportSet = new Set();
    for (const modulePath of modulesMap.values()) {
