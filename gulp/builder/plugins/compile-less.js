@@ -85,9 +85,6 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
              * always ignore css source files if the same .less source files exists
              */
             if (file.extname === '.css') {
-               if (taskParameters.config.staticServer) {
-                  file.pushToServer = true;
-               }
                const lessInSource = await fs.pathExists(file.path.replace(cssExt, '.less'));
                if (lessInSource) {
                   const
@@ -128,9 +125,6 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                taskParameters.cache.addOutputFile(file.history[0], getOutput(file, '.css'), moduleInfo);
                callback(null, file);
                return;
-            }
-            if (taskParameters.config.staticServer) {
-               file.pushToServer = true;
             }
 
             const [error, result] = await execInPool(
@@ -207,9 +201,6 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                newFile.path = outputPath;
                newFile.base = moduleInfo.output;
                newFile.lessSource = file.contents;
-               if (taskParameters.config.staticServer) {
-                  newFile.pushToServer = true;
-               }
                this.push(newFile);
             }
          } catch (error) {
