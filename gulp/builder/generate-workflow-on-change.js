@@ -181,7 +181,7 @@ function generateTaskForBuildFile(taskParameters, filePath) {
          )
          .pipe(gulpChmod({ read: true, write: true }))
          .pipe(mapStream((file, callback) => {
-            if (file.pushToServer) {
+            if (!['.ts', '.less'].includes(file.extname)) {
                const outputFilePath = path.join(
                   currentModuleInfo.runtimeModuleName,
                   file.relative
