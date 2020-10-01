@@ -506,9 +506,9 @@ class Cache {
             }
             let isChanged = false;
             const currentPath = path.join(root, currentRelativePath);
-            if (await fs.pathExists(prettyFullPath)) {
+            if (await fs.pathExists(currentPath)) {
                if (hashByContent) {
-                  const fileContents = await fs.readFile(prettyFullPath);
+                  const fileContents = await fs.readFile(currentPath);
                   const hash = crypto
                      .createHash('sha1')
                      .update(fileContents)
