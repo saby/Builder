@@ -37,14 +37,15 @@ const {
    generateTaskForTerminatePool
 } = require('../common/helpers');
 
-function getFilesToBuild(projectRoot, filePath, dependencies) {
+function getFilesToBuild(prettyRoot, filePath, dependencies) {
    const filesToBuild = [filePath];
+   const prettyFilePath = helpers.unixifyPath(filePath);
    const relativeFilePath = helpers.removeLeadingSlashes(
-      filePath.replace(projectRoot, '')
+      prettyFilePath.replace(prettyRoot, '')
    );
    Object.keys(dependencies).forEach((currentFile) => {
       if (dependencies[currentFile].includes(relativeFilePath)) {
-         filesToBuild.push(path.join(projectRoot, currentFile));
+         filesToBuild.push(path.join(prettyRoot, currentFile));
       }
    });
    return filesToBuild;
@@ -150,9 +151,11 @@ function generateTaskForBuildFile(taskParameters, filePath) {
       currentModuleInfo.runtimeModuleName
    );
    const buildModule = function buildModule() {
-      const projectRoot = path.dirname(currentModuleInfo.path);
+      const prettyRoot = helpers.unixifyPath(
+         path.dirname(currentModuleInfo.path)
+      );
       const filesToBuild = getFilesToBuild(
-         projectRoot,
+         prettyRoot,
          filePathInProject,
          taskParameters.cache.getLastStoreDependencies()
       );
