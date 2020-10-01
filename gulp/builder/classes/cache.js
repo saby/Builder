@@ -265,7 +265,13 @@ class Cache {
       );
 
       const hash = getFileHash(fileContents, hashByContent, fileTimeStamp);
-      const isChanged = await this._isFileChanged(hashByContent, prettyRelativePath, prettyPath, hash);
+      const isChanged = await this._isFileChanged(
+         hashByContent,
+         path.dirname(moduleInfo.path),
+         prettyRelativePath,
+         prettyPath,
+         hash
+      );
 
       const relativePath = path.relative(moduleInfo.path, filePath);
       const outputFullPath = path.join(moduleInfo.output, transliterate(relativePath));
@@ -311,7 +317,7 @@ class Cache {
       return isChanged;
    }
 
-   async _isFileChanged(hashByContent, prettyRelativePath, prettyPath, hash) {
+   async _isFileChanged(hashByContent, prettyRoot, prettyRelativePath, prettyPath, hash) {
       // кеша не было, значит все файлы новые
       if (!this.lastStore.startBuildTime) {
          return true;
@@ -361,7 +367,11 @@ class Cache {
       }
 
       if (prettyPath.endsWith('.less') || prettyPath.endsWith('.js') || prettyPath.endsWith('.es') || prettyPath.endsWith('.ts')) {
-         const isChanged = await this._isDependenciesChanged(hashByContent, prettyRelativePath);
+         const isChanged = await this._isDependenciesChanged(
+            hashByContent,
+            prettyRoot,
+            prettyRelativePath
+         );
          this.cacheChanges[prettyPath] = isChanged;
          return isChanged;
       }
@@ -489,40 +499,41 @@ class Cache {
     * @param {string} filePath путь до файла
     * @returns {Promise<boolean>}
     */
-   async _isDependenciesChanged(hashByContent, filePath) {
-      const dependencies = this.getAllDependencies(filePath);
+   async _isDependenciesChanged(hashByContent, prettyRoot, prettyRelativePath) {
+      const dependencies = this.getAllDependencies(prettyRelativePath);
       if (dependencies.length === 0) {
          return false;
       }
       const listChangedDeps = await pMap(
          dependencies,
-         async(currentPath) => {
-            if (this.cacheChanges.hasOwnProperty(currentPath)) {
-               return this.cacheChanges[currentPath];
+         async(currentRelativePath) => {
+            if (this.cacheChanges.hasOwnProperty(currentRelativePath)) {
+               return this.cacheChanges[currentRelativePath];
             }
+            const prettyFullPath = `${prettyRoot}/${prettyRelativePath}`;
             if (
-               !this.lastStore.inputPaths.hasOwnProperty(currentPath) ||
-               !this.lastStore.inputPaths[currentPath].hash
+               !this.lastStore.inputPaths.hasOwnProperty(prettyFullPath) ||
+               !this.lastStore.inputPaths[prettyFullPath].hash
             ) {
                return true;
             }
             let isChanged = false;
-            if (await fs.pathExists(currentPath)) {
+            if (await fs.pathExists(prettyFullPath)) {
                if (hashByContent) {
-                  const fileContents = await fs.readFile(currentPath);
+                  const fileContents = await fs.readFile(prettyFullPath);
                   const hash = crypto
                      .createHash('sha1')
                      .update(fileContents)
                      .digest('base64');
-                  isChanged = this.lastStore.inputPaths[currentPath].hash !== hash;
+                  isChanged = this.lastStore.inputPaths[prettyFullPath].hash !== hash;
                } else {
-                  const fileStats = await fs.stat(currentPath);
-                  isChanged = this.lastStore.inputPaths[currentPath].hash !== fileStats.mtime.toString();
+                  const fileStats = await fs.stat(prettyFullPath);
+                  isChanged = this.lastStore.inputPaths[prettyFullPath].hash !== fileStats.mtime.toString();
                }
             } else {
                isChanged = true;
             }
-            this.cacheChanges[currentPath] = isChanged;
+            this.cacheChanges[prettyRelativePath] = isChanged;
             return isChanged;
          },
          {
