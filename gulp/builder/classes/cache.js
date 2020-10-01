@@ -357,7 +357,11 @@ class Cache {
       }
 
       if (prettyRelativePath.endsWith('.less') || prettyRelativePath.endsWith('.js') || prettyRelativePath.endsWith('.es') || prettyRelativePath.endsWith('.ts')) {
-         const isChanged = await this._isDependenciesChanged(hashByContent, prettyRelativePath, root);
+         const isChanged = await this._isDependenciesChanged(
+            hashByContent,
+            prettyRoot,
+            prettyRelativePath
+         , root);
          this.cacheChanges[prettyRelativePath] = isChanged;
          return isChanged;
       }
@@ -502,9 +506,9 @@ class Cache {
             }
             let isChanged = false;
             const currentPath = path.join(root, currentRelativePath);
-            if (await fs.pathExists(currentPath)) {
+            if (await fs.pathExists(prettyFullPath)) {
                if (hashByContent) {
-                  const fileContents = await fs.readFile(currentPath);
+                  const fileContents = await fs.readFile(prettyFullPath);
                   const hash = crypto
                      .createHash('sha1')
                      .update(fileContents)
