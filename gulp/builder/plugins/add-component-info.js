@@ -60,7 +60,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             // from inputPaths to repeat this error further in next build.
             taskParameters.cache.deleteFailedFromCacheInputs(file.history[0]);
          }
-         moduleInfo.cache.storeComponentInfo(file.history[0], componentInfo);
+         const normalizedFilePath = file.compiled ? file.history[0].replace('.js', '.ts') : file.history[0];
+         moduleInfo.cache.storeComponentInfo(normalizedFilePath, componentInfo);
          callback(null, file);
       },
       function onFlush(callback) {

@@ -507,10 +507,10 @@ class Cache {
       const listChangedDeps = await pMap(
          dependencies,
          async(currentRelativePath) => {
-            if (this.cacheChanges.hasOwnProperty(currentRelativePath)) {
-               return this.cacheChanges[currentRelativePath];
+            const prettyFullPath = `${prettyRoot}/${currentRelativePath}`;
+            if (this.cacheChanges.hasOwnProperty(prettyFullPath)) {
+               return this.cacheChanges[prettyFullPath];
             }
-            const prettyFullPath = `${prettyRoot}/${prettyRelativePath}`;
             if (
                !this.lastStore.inputPaths.hasOwnProperty(prettyFullPath) ||
                !this.lastStore.inputPaths[prettyFullPath].hash
@@ -533,7 +533,7 @@ class Cache {
             } else {
                isChanged = true;
             }
-            this.cacheChanges[prettyRelativePath] = isChanged;
+            this.cacheChanges[prettyFullPath] = isChanged;
             return isChanged;
          },
          {
