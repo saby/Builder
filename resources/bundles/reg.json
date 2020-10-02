@@ -401,7 +401,6 @@
   "resources/View/builder.package.min",
   "resources/View/runner.package.min",
   "resources/WS.Core/core-compatible.package.min",
-  "resources/WS.Core/core-core.package.min",
   "resources/WS.Core/core-helpers-common.package.min",
   "resources/WS.Core/core-helpers-hcontrol.package.min",
   "resources/WS.Core/core-loading-indicator.package.min",
