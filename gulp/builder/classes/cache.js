@@ -357,11 +357,7 @@ class Cache {
       }
 
       if (prettyRelativePath.endsWith('.less') || prettyRelativePath.endsWith('.js') || prettyRelativePath.endsWith('.es') || prettyRelativePath.endsWith('.ts')) {
-         const isChanged = await this._isDependenciesChanged(
-            hashByContent,
-            prettyRoot,
-            prettyRelativePath
-         , root);
+         const isChanged = await this._isDependenciesChanged(hashByContent, prettyRelativePath, root);
          this.cacheChanges[prettyRelativePath] = isChanged;
          return isChanged;
       }
