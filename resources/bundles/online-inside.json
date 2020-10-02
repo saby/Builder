@@ -826,6 +826,8 @@
   "resources/WNC/packages/WNCCardControls.package.min",
   "resources/WNC/packages/WNCExtNomCard.package.min",
   "resources/WNC/packages/WNCNomCard.package.min",
+  "resources/WS.Core/core-core-min.package.min",
+  "resources/WS.Core/core-core-ext.package.min",
   "resources/WS.Core/core-compatible.package.min",
   "resources/WS.Core/core-helpers-common.package.min",
   "resources/WS.Core/core-helpers-hcontrol.package.min",
