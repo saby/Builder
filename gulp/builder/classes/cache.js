@@ -137,8 +137,13 @@ class Cache {
       }
 
       // check hash of builder code for changes. If changed, rebuild the whole project.
+      // In new version builder code can be changed too often, ergo causes cache removal in all
+      // of branch tests(controls, engine, ui, etc.) that sometimes is needless due to kind of
+      // changes in builder and nonetheless causes build time decrease as often as we aren't expected.
+      // Thus, for now don't use this feature in branch tests until there is a better solution to choose
+      // whether or not builder cache should be removed due to builder code base changes.
       const isNewBuilder = this.lastStore.hashOfBuilder !== this.currentStore.hashOfBuilder;
-      if (isNewBuilder) {
+      if (isNewBuilder && !this.config.branchTests) {
          logger.info(`Hash of builder isn't corresponding to saved in cache. ${finishText}`);
          return true;
       }
