@@ -487,6 +487,7 @@
   "resources/Person/packages/experience.package.min",
   "resources/Person/packages/language.package.min",
   "resources/Person/packages/personphoto.package.min",
+  "resources/PersonCard/packages/personBaseCard.package.min",
   "resources/PersonCore/EventRibbon/EventRibbonPackage.min",
   "resources/PersonCore/Utils/ExtUtils.package.min",
   "resources/PersonCore/Vdom/PersonAddTemplates.package.min",
