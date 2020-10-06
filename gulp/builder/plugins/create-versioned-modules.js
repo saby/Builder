@@ -59,6 +59,9 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
             if (taskParameters.config.contents) {
                versionedModulesPaths.push(`${currentModuleName}/contents.json`);
+               if (taskParameters.config.minimize) {
+                  versionedModulesPaths.push(`${currentModuleName}/contents.min.json`);
+               }
             }
 
             const file = new Vinyl({
