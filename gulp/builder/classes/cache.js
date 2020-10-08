@@ -133,6 +133,7 @@ class Cache {
          assert.deepStrictEqual(lastModulesList, currentModulesList);
       } catch (error) {
          logger.info(`Параметры запуска builder'а поменялись. Изменился список модулей на сборку ${finishText}`);
+         logger.info(error);
          return true;
       }
 
