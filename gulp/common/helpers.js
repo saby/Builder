@@ -81,6 +81,9 @@ function generateTaskForLoadCache(taskParameters) {
    return async function loadCache() {
       const startTime = Date.now();
       const { modulesForPatch } = taskParameters.config;
+      if (taskParameters.config.compiled) {
+         await taskParameters.cache.loadCompiled();
+      }
       await taskParameters.cache.load(modulesForPatch && modulesForPatch.length > 0);
       taskParameters.storeTaskTime('loadCache', startTime);
    };

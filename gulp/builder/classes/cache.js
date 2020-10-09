@@ -16,6 +16,18 @@ const helpers = require('../../../lib/helpers'),
    logger = require('../../../lib/logger').logger();
 
 /**
+ * Creates a hash by content for current file
+ * @param fileContents
+ * @returns {string}
+ */
+function generateHash(fileContents) {
+   return crypto
+      .createHash('sha1')
+      .update(fileContents)
+      .digest('base64');
+}
+
+/**
  * Gets file hash
  * @param fileContent
  * @param hashByContent
@@ -60,6 +72,11 @@ class Cache {
          packedLibraries: {},
          lessDependencies: {}
       };
+
+      // store of compiled resources. It is the storage to be used
+      // if there are compiled sources selected to be used in current
+      // build.
+      this.compiledStore = {};
    }
 
    // setting default store values for current interface module
@@ -68,6 +85,18 @@ class Cache {
          hash: '',
          output: []
       };
+   }
+
+   // loads essential cache of compiled sources
+   async loadCompiled() {
+      const compiledStoreRoot = path.dirname(this.config.compiled);
+      this.compiledStore.dependencies = await fs.readJson(path.join(compiledStoreRoot, 'dependencies.json'));
+      this.compiledStore.inputPaths = await fs.readJson(path.join(compiledStoreRoot, 'input-paths.json'));
+   }
+
+   // checks whether first or not is current build
+   isFirstBuild() {
+      return this.lastStore.startBuildTime === 0;
    }
 
    async load(patchBuild) {
@@ -391,10 +420,17 @@ class Cache {
     * @param fileContents
     */
    createContentHash(filePath, fileContents) {
-      this.currentStore.cachedMinified[filePath] = crypto
-         .createHash('sha1')
-         .update(fileContents)
-         .digest('base64');
+      this.currentStore.cachedMinified[filePath] = generateHash(fileContents);
+   }
+
+   /**
+    * Returns a hash by content for a given relative file path
+    * @param relativePath
+    * @returns {*}
+    */
+   getHash(relativePath) {
+      const prettyRelativePath = helpers.unixifyPath(relativePath);
+      return this.currentStore.inputPaths[prettyRelativePath].hash;
    }
 
    /**
@@ -472,6 +508,19 @@ class Cache {
    getDependencies(relativePath) {
       const prettyRelativePath = helpers.unixifyPath(relativePath);
       return this.currentStore.dependencies[prettyRelativePath] || [];
+   }
+
+   getCompiledDependencies(relativePath) {
+      const prettyRelativePath = helpers.unixifyPath(relativePath);
+      return this.compiledStore.dependencies[prettyRelativePath];
+   }
+
+   getCompiledHash(relativePath) {
+      const prettyRelativePath = helpers.unixifyPath(relativePath);
+      if (this.compiledStore.inputPaths[prettyRelativePath]) {
+         return this.compiledStore.inputPaths[prettyRelativePath].hash;
+      }
+      return '';
    }
 
    getLastStoreDependencies() {

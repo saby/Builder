@@ -12,8 +12,6 @@ const through = require('through2'),
    logger = require('../../../lib/logger').logger(),
    { compileEsAndTs } = require('../../../lib/compile-es-and-ts');
 
-const esExt = /\.(es|ts)$/;
-
 /**
  * Объявление плагина
  * @param {TaskParameters} taskParameters параметры для задач
@@ -52,7 +50,35 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
             relativeFilePath = path.join(moduleInfo.name, relativeFilePath);
 
-            const jsInSources = file.history[0].replace(esExt, '.js');
+            if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
+               const compiledBase = path.join(
+                  taskParameters.config.compiled,
+                  path.basename(moduleInfo.output)
+               );
+               const compiledSourcePath = path.join(
+                  compiledBase,
+                  file.relative
+               );
+               const compiledPath = path.join(compiledSourcePath.replace('.ts', '.js'));
+               const compiledSourceHash = taskParameters.cache.getCompiledHash(relativeFilePath);
+               const currentHash = taskParameters.cache.getHash(relativeFilePath);
+               let result = '';
+               if (compiledSourceHash === currentHash) {
+                  result = await fs.readFile(compiledPath, 'utf8');
+               }
+
+               if (result) {
+                  const newFile = file.clone();
+                  newFile.contents = Buffer.from(result);
+                  newFile.path = file.path.replace('.ts', '.js');
+                  this.push(newFile);
+                  callback(null, file);
+                  return;
+               }
+               logger.debug(`There is no corresponding compiled file for source file: ${file.history[0]}. It has to be compiled, then.`);
+            }
+
+            const jsInSources = file.history[0].replace('.ts', '.js');
             if (await fs.pathExists(jsInSources)) {
                const message =
                   `Существующий JS-файл мешает записи результата компиляции '${file.path}'.`;
@@ -71,7 +97,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             const result = await compileEsAndTs(relativeFilePath, file.contents.toString(), moduleInfo.name);
             const newFile = file.clone();
             newFile.contents = Buffer.from(result.text);
-            newFile.path = file.path.replace(/\.(es|ts)$/, '.js');
+            newFile.path = file.path.replace('.ts', '.js');
             this.push(newFile);
          } catch (error) {
             logger.error({

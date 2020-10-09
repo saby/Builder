@@ -52,6 +52,49 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
             relativeFilePath = path.join(path.basename(moduleInfo.path), relativeFilePath);
 
+            if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
+               const compiledBase = path.join(
+                  taskParameters.config.compiled,
+                  path.basename(moduleInfo.output)
+               );
+               const compiledSourcePath = path.join(
+                  compiledBase,
+                  file.relative
+               );
+               const compiledPath = path.join(compiledSourcePath.replace(file.extname, '.min.xhtml'));
+               const [, result] = await execInPool(
+                  taskParameters.pool,
+                  'readCompiledFile',
+                  [
+                     compiledPath,
+                     taskParameters.cache.getCompiledHash(relativeFilePath),
+                     taskParameters.cache.getHash(relativeFilePath)
+                  ],
+                  file.history[0],
+                  moduleInfo
+               );
+
+               if (result) {
+                  moduleInfo.cache.storeBuildedMarkup(file.history[0], {
+                     nodeName: `html!${relativeFilePath.replace('.xhtml', '').replace(/\\/g, '/')}`,
+                     text: result
+                  });
+                  const newFile = file.clone();
+                  newFile.contents = Buffer.from(result);
+                  newFile.path = outputMinFile;
+                  newFile.base = moduleInfo.output;
+                  this.push(newFile);
+                  if (file.versioned) {
+                     moduleInfo.cache.storeVersionedModule(file.history[0], outputMinFile);
+                     file.versioned = false;
+                  }
+                  taskParameters.cache.addOutputFile(file.history[0], outputMinFile, moduleInfo);
+                  callback(null, file);
+                  return;
+               }
+               logger.debug(`There is no corresponding compiled file for source file: ${file.history[0]}. It has to be compiled, then.`);
+            }
+
             const [errorBuild, resultBuild] = await execInPool(
                taskParameters.pool,
                'buildXhtml',
