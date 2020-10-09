@@ -127,8 +127,8 @@ class Cache {
       }
       const lastRunningParameters = { ...this.lastStore.runningParameters };
       const currentRunningParameters = { ...this.currentStore.runningParameters };
-      const lastModulesList = lastRunningParameters.modules.map(currentModule => currentModule.name);
-      const currentModulesList = currentRunningParameters.modules.map(currentModule => currentModule.name);
+      const lastModulesList = lastRunningParameters.modules.map(currentModule => currentModule.name).sort();
+      const currentModulesList = currentRunningParameters.modules.map(currentModule => currentModule.name).sort();
       try {
          assert.deepStrictEqual(lastModulesList, currentModulesList);
       } catch (error) {
