@@ -127,6 +127,51 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                return;
             }
 
+            let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
+            relativeFilePath = path.join(
+               path.basename(moduleInfo.output),
+               relativeFilePath
+            );
+            if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
+               const compiledBase = path.join(
+                  taskParameters.config.compiled,
+                  path.basename(moduleInfo.output)
+               );
+               const compiledSourcePath = path.join(
+                  compiledBase,
+                  file.relative
+               );
+               const compiledPath = path.join(compiledSourcePath.replace('.less', '.css'));
+               const [, result] = await execInPool(
+                  taskParameters.pool,
+                  'readCompiledFile',
+                  [
+                     compiledPath,
+                     taskParameters.cache.getCompiledHash(relativeFilePath),
+                     taskParameters.cache.getHash(relativeFilePath)
+                  ],
+                  file.history[0],
+                  moduleInfo
+               );
+
+               if (result) {
+                  const newFile = file.clone();
+                  const outputPath = getOutput(file, '.css');
+                  newFile.contents = Buffer.from(result);
+                  newFile.path = outputPath;
+                  newFile.base = moduleInfo.output;
+                  this.push(newFile);
+                  taskParameters.cache.addOutputFile(file.history[0], outputPath, moduleInfo);
+                  taskParameters.cache.addDependencies(
+                     moduleInfo.appRoot,
+                     file.history[0],
+                     taskParameters.cache.getCompiledDependencies(relativeFilePath),
+                  );
+                  callback(null, file);
+                  return;
+               }
+               logger.debug(`There is no corresponding compiled file for source file: ${file.history[0]}. It has to be compiled, then.`);
+            }
             const [error, result] = await execInPool(
                taskParameters.pool,
                'buildLess',

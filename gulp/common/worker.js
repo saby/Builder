@@ -224,12 +224,21 @@ try {
       };
    }
 
+   // Read compiled file if we already have a hash for source file in compiled directory
+   function readCompiledFile(filePath, compiledHashFromCache, hash) {
+      if (compiledHashFromCache && hash === compiledHashFromCache) {
+         return fs.readFile(filePath, 'utf8');
+      }
+      return '';
+   }
+
    workerPool.worker({
       parseJsComponent: wrapWorkerFunction(parseJsComponent),
       parseRoutes: wrapWorkerFunction(processingRoutes.parseRoutes),
       buildLess: wrapWorkerFunction(buildLess),
       compileEsAndTs: wrapWorkerFunction(compileEsAndTs),
       buildTmpl: wrapWorkerFunction(buildTmpl),
+      readCompiledFile: wrapWorkerFunction(readCompiledFile),
       buildHtmlTmpl: wrapWorkerFunction(buildHtmlTmpl),
       prepareXHTML: wrapWorkerFunction(prepareXHTML),
       buildXhtml: wrapWorkerFunction(buildXhtml),

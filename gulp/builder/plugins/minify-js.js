@@ -24,6 +24,7 @@ const through = require('through2'),
    transliterate = require('../../../lib/transliterate'),
    execInPool = require('../../common/exec-in-pool'),
    fs = require('fs-extra'),
+   helpers = require('../../../lib/helpers'),
    esExt = /\.(es|ts)$/;
 
 const excludeRegexes = [
@@ -118,6 +119,75 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                taskParameters.cache.addOutputFile(file.history[0], outputMinOriginalJsFile, moduleInfo);
                callback(null, file);
                return;
+            }
+
+            if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
+               const relativeFilePath = helpers.getRelativePath(
+                  helpers.unixifyPath(moduleInfo.appRoot),
+                  file.history[0]
+               );
+               const compiledBase = path.join(
+                  taskParameters.config.compiled,
+                  path.basename(moduleInfo.output)
+               );
+               const compiledSourcePath = path.join(
+                  compiledBase,
+                  file.relative
+               );
+               const compiledPath = path.join(compiledSourcePath.replace(/(\.ts|\.js)/, '.min.js'));
+               const compiledHash = taskParameters.cache.getCompiledHash(relativeFilePath);
+               const currentHash = taskParameters.cache.getHash(relativeFilePath);
+               const [, result] = await execInPool(
+                  taskParameters.pool,
+                  'readCompiledFile',
+                  [
+                     compiledPath,
+                     compiledHash,
+                     currentHash
+                  ],
+                  file.history[0],
+                  moduleInfo
+               );
+
+               if (result) {
+                  const newFile = file.clone();
+
+                  newFile.contents = Buffer.from(result);
+                  newFile.base = moduleInfo.output;
+                  newFile.path = outputMinJsFile;
+                  if (file.modulepack) {
+                     if (file.versioned) {
+                        moduleInfo.cache.storeVersionedModule(file.history[0], outputMinJsFile);
+                     }
+                     if (!file.library) {
+                        const compiledOriginalPath = compiledPath.replace('.js', '.original.js');
+                        const [, resultOriginal] = await execInPool(
+                           taskParameters.pool,
+                           'readCompiledFile',
+                           [
+                              compiledOriginalPath,
+                              compiledHash,
+                              currentHash
+                           ],
+                           file.history[0],
+                           moduleInfo
+                        );
+                        if (resultOriginal) {
+                           const newOriginalFile = file.clone();
+
+                           newOriginalFile.contents = Buffer.from(resultOriginal);
+                           newOriginalFile.base = moduleInfo.output;
+                           taskParameters.cache.addOutputFile(file.history[0], outputMinOriginalJsFile, moduleInfo);
+                           this.push(newOriginalFile);
+                        }
+                     }
+                  }
+                  this.push(newFile);
+                  taskParameters.cache.addOutputFile(file.history[0], outputMinJsFile, moduleInfo);
+                  callback(null, file);
+                  return;
+               }
+               logger.debug(`There is no corresponding minified compiled file for source file: ${file.history[0]}. It has to be compiled, then.`);
             }
 
             if (!file.modulepack) {
