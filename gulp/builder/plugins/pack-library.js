@@ -52,8 +52,13 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                helpers.removeLeadingSlashes(file.history[0].replace(moduleInfo.appRoot, ''))
             )
          ) {
-            libraries.push(file);
-            callback();
+            if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
+               file.library = true;
+               callback(null, file);
+            } else {
+               libraries.push(file);
+               callback();
+            }
          } else {
             callback(null, file);
          }

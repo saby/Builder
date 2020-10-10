@@ -81,7 +81,61 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             }
 
             let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
-            relativeFilePath = path.join(moduleInfo.name, relativeFilePath);
+            relativeFilePath = path.join(
+               path.basename(moduleInfo.output),
+               relativeFilePath
+            );
+            if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
+               const compiledBase = path.join(
+                  taskParameters.config.compiled,
+                  path.basename(moduleInfo.output)
+               );
+               const compiledSourcePath = path.join(
+                  compiledBase,
+                  file.relative
+               );
+               const compiledPath = path.join(compiledSourcePath.replace(/\.ts/, '.js'));
+               const [, result] = await execInPool(
+                  taskParameters.pool,
+                  'readCompiledFile',
+                  [
+                     compiledPath,
+                     taskParameters.cache.getCompiledHash(relativeFilePath),
+                     taskParameters.cache.getHash(relativeFilePath)
+                  ],
+                  file.history[0],
+                  moduleInfo
+               );
+
+               if (result) {
+                  /**
+                   * ts compiled cache is required only in libraries packer, that can be enabled with
+                   * builder flag "minimize"
+                   */
+                  if (taskParameters.config.minimize) {
+                     const resultForCache = {
+                        text: result,
+                        moduleName: relativeFilePath.replace(/\\/g, '/').replace('.ts', '')
+                     };
+
+                     // алиас для совместимости с кэшем шаблонов при паковке библиотек.
+                     resultForCache.nodeName = resultForCache.moduleName;
+                     moduleInfo.cache.storeCompiledES(
+                        file.history[0],
+                        resultForCache
+                     );
+                  }
+                  const newFile = file.clone();
+                  newFile.contents = Buffer.from(result);
+                  newFile.path = outputPath;
+                  newFile.base = moduleInfo.output;
+                  this.push(newFile);
+                  taskParameters.cache.addOutputFile(file.history[0], outputPath, moduleInfo);
+                  callback(null, file);
+                  return;
+               }
+               logger.debug(`There is no corresponding compiled file for source file: ${file.history[0]}. It has to be compiled, then.`);
+            }
 
             const [error, result] = await execInPool(
                taskParameters.pool,

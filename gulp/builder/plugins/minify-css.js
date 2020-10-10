@@ -9,7 +9,8 @@ const through = require('through2'),
    path = require('path'),
    logger = require('../../../lib/logger').logger(),
    transliterate = require('../../../lib/transliterate'),
-   execInPool = require('../../common/exec-in-pool');
+   execInPool = require('../../common/exec-in-pool'),
+   helpers = require('../../../lib/helpers');
 
 const { stylesToExcludeFromMinify } = require('../../../lib/builder-constants');
 
@@ -67,6 +68,48 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             if (file.extname !== '.css') {
                callback(null, file);
                return;
+            }
+
+            if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
+               const relativeFilePath = helpers.getRelativePath(
+                  helpers.unixifyPath(moduleInfo.appRoot),
+                  file.history[0]
+               );
+               const compiledBase = path.join(
+                  taskParameters.config.compiled,
+                  path.basename(moduleInfo.output)
+               );
+               const compiledSourcePath = path.join(
+                  compiledBase,
+                  file.relative
+               );
+               const compiledPath = path.join(compiledSourcePath.replace('.css', '.min.css'));
+               const compiledHash = taskParameters.cache.getCompiledHash(relativeFilePath);
+               const currentHash = taskParameters.cache.getHash(relativeFilePath);
+               const [, result] = await execInPool(
+                  taskParameters.pool,
+                  'readCompiledFile',
+                  [
+                     compiledPath,
+                     compiledHash,
+                     currentHash
+                  ],
+                  file.history[0],
+                  moduleInfo
+               );
+
+               if (result) {
+                  const newFile = file.clone();
+
+                  newFile.contents = Buffer.from(result);
+                  newFile.base = moduleInfo.output;
+                  newFile.path = outputMinFile;
+                  this.push(newFile);
+                  taskParameters.cache.addOutputFile(file.history[0], outputMinFile, moduleInfo);
+                  callback(null, file);
+                  return;
+               }
+               logger.debug(`There is no corresponding minified compiled file for source file: ${file.history[0]}. It has to be compiled, then.`);
             }
 
             // если файл не возможно минифицировать, то запишем оригинал
