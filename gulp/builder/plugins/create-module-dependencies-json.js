@@ -126,7 +126,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
       /* @this Stream */
       function onFlush(callback) {
          const startTime = Date.now();
-         const addAdditionalMeta = taskParameters.config.branchTests || taskParameters.config.builderTests;
+         const addAdditionalMeta = taskParameters.config.branchTests;
          try {
             const { resourcesUrl } = taskParameters.config;
             const packedPrivateModules = {};
