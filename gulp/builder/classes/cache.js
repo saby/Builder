@@ -541,6 +541,14 @@ class Cache {
       return '';
    }
 
+   compareWithCompiled(relativePath) {
+      const compiledHash = this.getCompiledHash(relativePath);
+      if (compiledHash && this.getHash(relativePath) === compiledHash) {
+         return true;
+      }
+      return false;
+   }
+
    getLastStoreDependencies() {
       return this.lastStore.dependencies;
    }

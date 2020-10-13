@@ -62,14 +62,12 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                const compiledPath = path.join(compiledSourcePath.replace('.ts', '.js'));
                const compiledSourceHash = taskParameters.cache.getCompiledHash(relativeFilePath);
                const currentHash = taskParameters.cache.getHash(relativeFilePath);
-               let result = '';
-               if (compiledSourceHash === currentHash) {
-                  result = await fs.readFile(compiledPath, 'utf8');
-               }
 
-               if (result) {
+               if (compiledSourceHash === currentHash) {
+                  file.useSymlink = true;
                   const newFile = file.clone();
-                  newFile.contents = Buffer.from(result);
+                  newFile.origin = compiledPath;
+                  newFile.compiledBase = compiledBase;
                   newFile.path = file.path.replace('.ts', '.js');
                   this.push(newFile);
                   callback(null, file);

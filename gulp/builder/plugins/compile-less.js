@@ -142,22 +142,12 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                   file.relative
                );
                const compiledPath = path.join(compiledSourcePath.replace('.less', '.css'));
-               const [, result] = await execInPool(
-                  taskParameters.pool,
-                  'readCompiledFile',
-                  [
-                     compiledPath,
-                     taskParameters.cache.getCompiledHash(relativeFilePath),
-                     taskParameters.cache.getHash(relativeFilePath)
-                  ],
-                  file.history[0],
-                  moduleInfo
-               );
 
-               if (result) {
+               // for less there is only symlink is needed to be created, so we can get a faster result
+               // due to avoid read of compiled css file
+               if (taskParameters.cache.compareWithCompiled(relativeFilePath)) {
                   const newFile = file.clone();
                   const outputPath = getOutput(file, '.css');
-                  newFile.contents = Buffer.from(result);
                   newFile.path = outputPath;
                   newFile.base = moduleInfo.output;
                   if (!file.isLangCss) {
