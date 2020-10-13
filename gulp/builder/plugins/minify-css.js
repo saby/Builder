@@ -104,6 +104,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   newFile.contents = Buffer.from(result);
                   newFile.base = moduleInfo.output;
                   newFile.path = outputMinFile;
+                  newFile.origin = compiledPath;
+                  newFile.compiledBase = compiledBase;
                   this.push(newFile);
                   taskParameters.cache.addOutputFile(file.history[0], outputMinFile, moduleInfo);
                   callback(null, file);

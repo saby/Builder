@@ -43,9 +43,35 @@ function checkSourceNecessityByConfig(config, extension) {
  * @param {ModuleInfo} moduleInfo информация о модуле
  * @returns {Function} возвращаем функцию для gulp-if
  */
-function needSymlink(config, moduleInfo) {
+function needSymlink(config, moduleInfo, isFirstBuild) {
    const hasLocalization = config.localizations.length > 0;
    return (file) => {
+      if (file.useSymlink) {
+         // if it's a file from compiled sources to be symlink to, rebase it to
+         // compiled sources directory, otherwise symlink it "as is"
+         if (file.origin) {
+            file.history = [file.origin];
+            file.base = file.compiledBase;
+         }
+         return true;
+      }
+
+      /**
+       * After first build every next build should
+       * check firstly if there is a corresponding file
+       * in output directory. If it's a symlink, overwriting
+       * it will overwrite origin file and save this symlink, so that
+       * could cause some unwanted consequences. Thus, we should
+       * remove output file before writing/(creating a symlink) for a
+       * new one
+       */
+      if (config.compiled && !isFirstBuild) {
+         const outputPath = path.join(moduleInfo.output, file.relative);
+         if (fs.pathExistsSync(outputPath)) {
+            fs.unlinkSync(outputPath);
+         }
+      }
+
       // don't use symlinks if it's release mode or symlinks is disabled manually
       if (config.isReleaseMode || !config.symlinks) {
          return false;

@@ -129,7 +129,7 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
 
             let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
             relativeFilePath = path.join(
-               path.basename(moduleInfo.output),
+               path.basename(moduleInfo.path),
                relativeFilePath
             );
             if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
@@ -160,6 +160,12 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                   newFile.contents = Buffer.from(result);
                   newFile.path = outputPath;
                   newFile.base = moduleInfo.output;
+                  if (!file.isLangCss) {
+                     newFile.useSymlink = true;
+                     newFile.origin = compiledPath;
+                     newFile.compiledBase = compiledBase;
+                  }
+                  file.useSymlink = true;
                   this.push(newFile);
                   taskParameters.cache.addOutputFile(file.history[0], outputPath, moduleInfo);
                   taskParameters.cache.addDependencies(
