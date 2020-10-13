@@ -204,7 +204,11 @@ function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap
 
             // createStaticTemplatesJson зависит от buildStaticHtml и gulpBuildHtmlTmpl
             .pipe(gulpIf(config.presentationServiceMeta, createStaticTemplatesJson(taskParameters, moduleInfo)))
-            .pipe(gulpIf(needModuleDependencies, createModuleDependenciesJson(taskParameters, moduleInfo)))
+
+            // For the record, gulp-if has a strange logic:
+            // if it gets undefined as a condition, plugin executes in any case.
+            // So convert condition to logic constant to avoid that behavior
+            .pipe(gulpIf(!!needModuleDependencies, createModuleDependenciesJson(taskParameters, moduleInfo)))
             .pipe(filterCached(taskParameters, moduleInfo))
             .pipe(pushToServer(taskParameters, moduleInfo))
             .pipe(gulpIf(config.isSourcesOutput, filterSources()))
@@ -212,7 +216,7 @@ function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap
             .pipe(gulpChmod({ read: true, write: true }))
             .pipe(
                gulpIf(
-                  needSymlink(config, moduleInfo),
+                  needSymlink(config, moduleInfo, taskParameters.cache.isFirstBuild()),
                   gulp.symlink(moduleInfo.output),
                   gulp.dest(moduleInfo.output)
                )

@@ -128,6 +128,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          less: true,
          typescript: true,
          dependenciesGraph: true,
+         builderTests: true,
          modules: [
             {
                name: 'SBIS3.CONTROLS',
@@ -301,6 +302,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          less: true,
          typescript: true,
          dependenciesGraph: true,
+         builderTests: true,
          modules: [
             {
                name: 'SBIS3.CONTROLS',
@@ -810,6 +812,7 @@ describe('gulp/builder/generate-workflow.js', () => {
       };
 
       const config = {
+         wsCoreMap: true,
          cache: cacheFolder,
          output: outputFolder,
          dependenciesGraph: true,
@@ -2204,6 +2207,7 @@ describe('gulp/builder/generate-workflow.js', () => {
             builderTests: true,
             minimize: true,
             debugCustomPack: true,
+            dependenciesGraph: true,
             distributive: false,
             joinedMeta: true,
             modules: [

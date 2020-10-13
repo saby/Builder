@@ -436,7 +436,19 @@ class Cache {
     */
    getHash(relativePath) {
       const prettyRelativePath = helpers.unixifyPath(relativePath);
-      return this.currentStore.inputPaths[prettyRelativePath].hash;
+      const currentFileCache = this.currentStore.inputPaths[prettyRelativePath];
+
+      /**
+       * if there is no saved cache for current file
+       * it could mean that this file was generated in some
+       * builder plugin without origin source(f.e. joined css
+       * localization, created by plugin with using of current
+       * interface module localization styles)
+       */
+      if (!currentFileCache) {
+         return '';
+      }
+      return currentFileCache.hash;
    }
 
    /**
