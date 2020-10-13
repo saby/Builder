@@ -143,7 +143,7 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                );
                const compiledPath = path.join(compiledSourcePath.replace('.less', '.css'));
 
-               // for less there is only symlink is needed to be created, so we can get a faster result
+               // for less there is only a symlink needed to be created, so we can get a result faster
                // due to avoid read of compiled css file
                if (taskParameters.cache.compareWithCompiled(relativeFilePath)) {
                   const newFile = file.clone();

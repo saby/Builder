@@ -86,7 +86,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                );
                const compiledPath = path.join(compiledSourcePath.replace('.css', '.min.css'));
 
-               // for css there is only symlink is needed to be created, so we can get a faster result
+               // for css there is only a symlink needed to be created, so we can get a result faster
                // due to avoid read of compiled and minified css file
                if (taskParameters.cache.compareWithCompiled(relativeFilePath)) {
                   const newFile = file.clone();
