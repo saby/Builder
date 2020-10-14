@@ -125,14 +125,13 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                         resultForCache
                      );
                   }
+                  file.useSymlink = true;
                   const newFile = file.clone();
                   newFile.contents = Buffer.from(result);
                   newFile.path = outputPath;
                   newFile.base = moduleInfo.output;
-                  newFile.useSymlink = true;
                   newFile.origin = compiledPath;
                   newFile.compiledBase = compiledBase;
-                  file.useSymlink = true;
                   this.push(newFile);
                   taskParameters.cache.addOutputFile(file.history[0], outputPath, moduleInfo);
                   callback(null, file);

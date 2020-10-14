@@ -72,8 +72,9 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
             if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
                const relativeFilePath = helpers.getRelativePath(
-                  helpers.unixifyPath(moduleInfo.appRoot),
-                  file.history[0]
+                  moduleInfo.appRoot,
+                  file.history[0],
+                  moduleInfo.outputRoot
                );
                const compiledBase = path.join(
                   taskParameters.config.compiled,
@@ -84,28 +85,20 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   file.relative
                );
                const compiledPath = path.join(compiledSourcePath.replace('.css', '.min.css'));
-               const compiledHash = taskParameters.cache.getCompiledHash(relativeFilePath);
-               const currentHash = taskParameters.cache.getHash(relativeFilePath);
-               const [, result] = await execInPool(
-                  taskParameters.pool,
-                  'readCompiledFile',
-                  [
-                     compiledPath,
-                     compiledHash,
-                     currentHash
-                  ],
-                  file.history[0],
-                  moduleInfo
-               );
 
-               if (result) {
+               // for css there is only a symlink needed to be created, so we can get a result faster
+               // due to avoid read of compiled and minified css file
+               if (taskParameters.cache.compareWithCompiled(relativeFilePath)) {
                   const newFile = file.clone();
 
-                  newFile.contents = Buffer.from(result);
                   newFile.base = moduleInfo.output;
                   newFile.path = outputMinFile;
                   newFile.origin = compiledPath;
                   newFile.compiledBase = compiledBase;
+                  newFile.useSymlink = true;
+                  if (!file.unitedDict && file.history[0].endsWith('.css')) {
+                     file.useSymlink = true;
+                  }
                   this.push(newFile);
                   taskParameters.cache.addOutputFile(file.history[0], outputMinFile, moduleInfo);
                   callback(null, file);

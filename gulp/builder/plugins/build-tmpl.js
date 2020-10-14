@@ -110,6 +110,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             );
 
             if (result) {
+               file.useSymlink = true;
                moduleInfo.cache.storeBuildedMarkup(file.history[0], {
                   nodeName: `${extension}!${relativeFilePath.replace(file.extname, '').replace(/\\/g, '/')}`,
                   text: result
@@ -118,6 +119,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                newFile.contents = Buffer.from(result);
                newFile.path = outputMinFile;
                newFile.base = moduleInfo.output;
+               newFile.origin = compiledPath;
+               newFile.compiledBase = compiledBase;
                this.push(newFile);
                if (file.versioned) {
                   moduleInfo.cache.storeVersionedModule(file.history[0], outputMinFile);
