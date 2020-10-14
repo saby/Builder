@@ -20,6 +20,21 @@ const path = require('path'),
    logger = require('../../../lib/logger').logger(),
    { generateDownloadModuleCache } = require('../../builder/classes/modules-cache');
 
+function needSymlink() {
+   return (file) => {
+      if (file.useSymlink) {
+         // if it's a file from compiled sources to be symlink to, rebase it to
+         // compiled sources directory, otherwise symlink it "as is"
+         if (file.origin) {
+            file.history = [file.origin];
+            file.base = file.compiledBase;
+         }
+         return true;
+      }
+      return false;
+   };
+}
+
 /**
  * Генерация задачи инкрементальной сборки модулей.
  * @param {TaskParameters} taskParameters параметры задачи
@@ -81,7 +96,7 @@ function generateTaskForPrepareWSModule(localTaskParameters, moduleInfo) {
          .pipe(pluginCompileEsAndTs(localTaskParameters, moduleInfo))
          .pipe(filterCached(localTaskParameters, moduleInfo))
          .pipe(gulpChmod({ read: true, write: true }))
-         .pipe(gulp.dest(moduleOutput));
+         .pipe(gulpIf(needSymlink(), gulp.symlink(moduleOutput), gulp.dest(moduleOutput)));
    }
 
    return gulp.series(

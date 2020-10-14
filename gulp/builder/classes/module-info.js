@@ -15,6 +15,7 @@ class ModuleInfo extends BaseModuleInfo {
    constructor(baseModuleInfo, commonOutputPath, staticServer) {
       super(baseModuleInfo);
       this.output = path.join(commonOutputPath, transliterate(path.basename(baseModuleInfo.path)));
+      this.outputRoot = path.dirname(this.output).replace(/\\/g, '/');
 
       // объект для записи contents.json
       // availableLanguage, defaultLanguage добавляются только при локализации

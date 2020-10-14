@@ -123,8 +123,9 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
             if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
                const relativeFilePath = helpers.getRelativePath(
-                  helpers.unixifyPath(moduleInfo.appRoot),
-                  file.history[0]
+                  moduleInfo.appRoot,
+                  file.history[0],
+                  moduleInfo.outputRoot
                );
                const compiledBase = path.join(
                   taskParameters.config.compiled,
@@ -135,24 +136,13 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   file.relative
                );
                const compiledPath = path.join(compiledSourcePath.replace(/(\.ts|\.js)/, '.min.js'));
-               const compiledHash = taskParameters.cache.getCompiledHash(relativeFilePath);
-               const currentHash = taskParameters.cache.getHash(relativeFilePath);
-               const [, result] = await execInPool(
-                  taskParameters.pool,
-                  'readCompiledFile',
-                  [
-                     compiledPath,
-                     compiledHash,
-                     currentHash
-                  ],
-                  file.history[0],
-                  moduleInfo
-               );
 
-               if (result) {
+               // for js there is only a symlink needed to be created, so we can get a result faster
+               // due to avoid read of minified compiled js file
+               const hashesAreEqual = taskParameters.cache.compareWithCompiled(relativeFilePath);
+               if (hashesAreEqual) {
+                  file.useSymlink = true;
                   const newFile = file.clone();
-
-                  newFile.contents = Buffer.from(result);
                   newFile.base = moduleInfo.output;
                   newFile.path = outputMinJsFile;
                   newFile.origin = compiledPath;
@@ -163,25 +153,13 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                      }
                      if (!file.library) {
                         const compiledOriginalPath = compiledPath.replace('.js', '.original.js');
-                        const [, resultOriginal] = await execInPool(
-                           taskParameters.pool,
-                           'readCompiledFile',
-                           [
-                              compiledOriginalPath,
-                              compiledHash,
-                              currentHash
-                           ],
-                           file.history[0],
-                           moduleInfo
-                        );
-                        if (resultOriginal) {
-                           const newOriginalFile = file.clone();
-
-                           newOriginalFile.contents = Buffer.from(resultOriginal);
-                           newOriginalFile.base = moduleInfo.output;
-                           taskParameters.cache.addOutputFile(file.history[0], outputMinOriginalJsFile, moduleInfo);
-                           this.push(newOriginalFile);
-                        }
+                        const newOriginalFile = file.clone();
+                        newOriginalFile.base = moduleInfo.output;
+                        newOriginalFile.path = outputMinOriginalJsFile;
+                        newOriginalFile.origin = compiledOriginalPath;
+                        newOriginalFile.compiledBase = compiledBase;
+                        taskParameters.cache.addOutputFile(file.history[0], outputMinOriginalJsFile, moduleInfo);
+                        this.push(newOriginalFile);
                      }
                   }
                   this.push(newFile);
