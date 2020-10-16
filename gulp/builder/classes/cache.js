@@ -348,7 +348,21 @@ class Cache {
          return true;
       }
 
-      if (this.dropCacheForMarkup && (prettyPath.endsWith('.xhtml') || prettyPath.endsWith('.tmpl') || prettyPath.endsWith('.wml'))) {
+      /**
+       * if templates cache was dropped off, we need also to rebuild ts files because of pack own dependencies task
+       * needs a compiled js file(from ts source) to pack actual compiled template into it. That behaviour could be
+       * established only with force cache reset for ts files. For js files cache checker will detect a change of
+       * dependent wml files, so there is no need of force reset of cache for those.
+       */
+      if (
+         this.dropCacheForMarkup &&
+         (
+            prettyPath.endsWith('.xhtml') ||
+            prettyPath.endsWith('.tmpl') ||
+            prettyPath.endsWith('.wml') ||
+            prettyPath.endsWith('.ts')
+         )
+      ) {
          return true;
       }
 
