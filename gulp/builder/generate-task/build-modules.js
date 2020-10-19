@@ -147,7 +147,12 @@ function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap
             .pipe(gulpIf(config.deprecatedWebPageTemplates, buildStaticHtml(taskParameters, moduleInfo, modulesMap)))
 
             // versionizeToStub зависит от compileLess, buildStaticHtml и gulpBuildHtmlTmpl
-            .pipe(gulpIf(!!config.version && !taskParameters.config.localStand, versionizeToStub(taskParameters, moduleInfo)))
+            .pipe(
+               gulpIf(
+                  !!config.version && !taskParameters.config.localStand,
+                  versionizeToStub(taskParameters, moduleInfo)
+               )
+            )
             .pipe(gulpIf(hasLocalization, indexDictionary(taskParameters, moduleInfo)))
             .pipe(
                gulpIf(
@@ -187,8 +192,18 @@ function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap
             .pipe(gulpIf(config.minimize && !moduleInfo.isUnitTestModule, minifyOther(taskParameters, moduleInfo)))
 
             // createVersionedModules и createCdnModules зависит от versionizeToStub
-            .pipe(gulpIf(!!config.version && !taskParameters.config.localStand, createVersionedModules(taskParameters, moduleInfo)))
-            .pipe(gulpIf(!!config.version && !taskParameters.config.localStand, createCdnModules(taskParameters, moduleInfo)))
+            .pipe(
+               gulpIf(
+                  !!config.version && !taskParameters.config.localStand,
+                  createVersionedModules(taskParameters, moduleInfo)
+               )
+            )
+            .pipe(
+               gulpIf(
+                  !!config.version && !taskParameters.config.localStand,
+                  createCdnModules(taskParameters, moduleInfo)
+               )
+            )
             .pipe(
                gulpRename((file) => {
                   file.dirname = transliterate(file.dirname);
