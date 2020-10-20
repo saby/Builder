@@ -16,6 +16,18 @@ const helpers = require('../../../lib/helpers'),
    logger = require('../../../lib/logger').logger();
 
 /**
+ * Regex that checks if a file depends on a markup generator changes
+ * @type {RegExp}
+ */
+const MARKUP_DEPEND_FILES_REGEX = /(\.xhtml)|(\.wml)|(\.tmpl)|(\.ts)|(\.js)$/;
+
+/**
+ * Regex that checks if a file saves into builder's cache
+ * @type {RegExp}
+ */
+const CACHED_FILES_EXTENSIONS = /(\.less)|(\.js)|(\.es)|(\.ts)$/;
+
+/**
  * Creates a hash by content for current file
  * @param fileContents
  * @returns {string}
@@ -354,15 +366,7 @@ class Cache {
        * established only with force cache reset for ts files. For js files cache checker will detect a change of
        * dependent wml files, so there is no need of force reset of cache for those.
        */
-      if (
-         this.dropCacheForMarkup &&
-         (
-            prettyPath.endsWith('.xhtml') ||
-            prettyPath.endsWith('.tmpl') ||
-            prettyPath.endsWith('.wml') ||
-            prettyPath.endsWith('.ts')
-         )
-      ) {
+      if (this.dropCacheForMarkup && MARKUP_DEPEND_FILES_REGEX.test(prettyPath)) {
          return true;
       }
 
@@ -387,11 +391,11 @@ class Cache {
           * with current templates processor changes. Also check UI components for changing between
           * 2 builds, it's using by static VDOM pages compiler.
           */
-         if (prettyPath.includes('temp-modules/View/Builder/') || prettyPath.includes('temp-modules/UI/')) {
+         if (prettyPath.includes('temp-modules/UI/')) {
             logger.info(`Templates compiling components was changed. All templates will be rebuilt for current project. Changed component: ${prettyPath}`);
             this.dropCacheForMarkup = true;
          }
-         if (prettyPath.endsWith('.less') || prettyPath.endsWith('.js') || prettyPath.endsWith('.es') || prettyPath.endsWith('.ts') || prettyPath.endsWith('.ts')) {
+         if (CACHED_FILES_EXTENSIONS.test(prettyPath)) {
             this.cacheChanges[prettyPath] = true;
          }
          return true;
@@ -405,7 +409,7 @@ class Cache {
          return true;
       }
 
-      if (prettyRelativePath.endsWith('.less') || prettyRelativePath.endsWith('.js') || prettyRelativePath.endsWith('.es') || prettyRelativePath.endsWith('.ts')) {
+      if (CACHED_FILES_EXTENSIONS.test(prettyRelativePath)) {
          const isChanged = await this._isDependenciesChanged(hashByContent, prettyRelativePath, root);
          this.cacheChanges[prettyRelativePath] = isChanged;
          return isChanged;
