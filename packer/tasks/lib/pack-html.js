@@ -132,20 +132,7 @@ async function getJsAndCssPackage(
    relativePackagePath
 ) {
    const isOfflineClient = await checkItIsOfflineClient(applicationRoot);
-   const jsForPack = orderQueue.js.filter((node) => {
-      const fullPath = node.moduleYes ? node.moduleYes.fullPath : node.fullPath;
-
-      /**
-       * Исключаем все модули локализации из старой статической паковки. Они уже присутствуют в составе
-       * основного пакета ядра core-core.package.min.js. Наличие данных модулей дополнительно ещё и в составе
-       * статического старого пакета вызывает сбои в работе локализации, пример
-       * https://online.sbis.ru/opendoc.html?guid=918ba0c0-be68-4643-a06d-0204cbf4d298
-       */
-      if (fullPath.includes('Core/i18n') || fullPath.endsWith('i18n.min.js')) {
-         return false;
-      }
-      return node.amd;
-   });
+   const jsForPack = orderQueue.js.filter((node) => !!node.amd);
    const cssForPack = orderQueue.css
       .filter(function removeControls(module) {
          // TODO: Написать доку по тому как должны выглядеть и распространяться темы оформления. Это трэщ
