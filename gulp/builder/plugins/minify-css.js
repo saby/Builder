@@ -10,9 +10,11 @@ const through = require('through2'),
    logger = require('../../../lib/logger').logger(),
    transliterate = require('../../../lib/transliterate'),
    execInPool = require('../../common/exec-in-pool'),
-   helpers = require('../../../lib/helpers');
+   helpers = require('../../../lib/helpers'),
+   fs = require('fs-extra');
 
 const { stylesToExcludeFromMinify } = require('../../../lib/builder-constants');
+const thirdPartyModule = /.*[/\\]third-party[/\\].*/;
 
 /**
  * Объявление плагина
@@ -38,6 +40,20 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   callback(null, file);
                   return;
                }
+            }
+
+            // dont minify source third-party library if it was already minified
+            if (thirdPartyModule.test(file.path) && await fs.pathExists(file.path.replace(/\.css/, '.min.css'))) {
+               if (file.cached) {
+                  taskParameters.cache.addOutputFile(
+                     file.history[0],
+                     path.join(moduleInfo.output, file.relative.replace(/\.css$/, '.min.css')),
+                     moduleInfo,
+                     true
+                  );
+               }
+               callback(null, file);
+               return;
             }
 
             let outputMinFile;
