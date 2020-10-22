@@ -132,7 +132,7 @@ async function getJsAndCssPackage(
    relativePackagePath
 ) {
    const isOfflineClient = await checkItIsOfflineClient(applicationRoot);
-   const jsForPack = orderQueue.js.filter((node) => !!node.amd);
+   const jsForPack = orderQueue.js.filter(node => !!node.amd);
    const cssForPack = orderQueue.css
       .filter(function removeControls(module) {
          // TODO: Написать доку по тому как должны выглядеть и распространяться темы оформления. Это трэщ
