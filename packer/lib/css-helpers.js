@@ -7,7 +7,6 @@ const safe = require('postcss-safe-parser');
 const logger = require('../../lib/logger').logger();
 const helpers = require('../../lib/helpers');
 const invalidUrl = /^(\/|#|data:|[a-z]+:\/\/)(?=.*)/i;
-const importCss = /@import[^;]+;/gi;
 
 function rebaseUrlsToAbsolutePath(cssConfig) {
    const {
@@ -62,27 +61,6 @@ function rebaseUrlsToAbsolutePath(cssConfig) {
    return result;
 }
 
-/**
- * Собирает все @import из склееных css, и перемещает их вверх,
- * т.к. все @import должны быть вверху css
- * @param {String} packedCss - пакованная css
- * @return {String}
- */
-function bumpImportsUp(packedCss) {
-   let result = packedCss;
-   const imports = result.match(importCss);
-   if (imports) {
-      imports.forEach((anImport) => {
-         result = result.replace(anImport, '');
-      });
-      result = imports.join('\n') + result;
-   }
-
-   return result;
-}
-
-// removed splitIntoBatches function. Its old function for supporting old IE6-8.
 module.exports = {
-   rebaseUrls: rebaseUrlsToAbsolutePath,
-   bumpImportsUp
+   rebaseUrls: rebaseUrlsToAbsolutePath
 };
