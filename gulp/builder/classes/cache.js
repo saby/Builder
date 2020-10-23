@@ -221,6 +221,13 @@ class Cache {
          lastRunningParameters.version = '';
          currentRunningParameters.version = '';
       }
+
+      // list of modules shouldn't affect builder cache anyhow. Builder will either build new interface module that
+      // wasn't in a project before or delete all information about the one(cache, artifacts of this module in output).
+      // That should give us an opportunity to get build faster with incremental build of non-changing modules and new
+      // build of new ones.
+      delete lastRunningParameters.modules;
+      delete currentRunningParameters.modules;
       try {
          assert.deepStrictEqual(lastRunningParameters, currentRunningParameters);
       } catch (error) {
