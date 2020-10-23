@@ -86,7 +86,7 @@ async function packCSS(files, root, relativePackagePath) {
    Object.keys(filesContent).sort().forEach((currentKey) => {
       results.push(filesContent[currentKey]);
    });
-   const cssPackage = cssHelpers.bumpImportsUp(results.join('\n'));
+   const cssPackage = results.join('\n');
    return [cssPackage];
 }
 
