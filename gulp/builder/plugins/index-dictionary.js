@@ -114,31 +114,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                            unitedDict: true
                         })
                      );
-                     const loaderCodeWithRegion = indexer.extractLoaderCode(moduleInfo.output, locale, currentRegion);
-                     if (loaderCodeWithRegion) {
-                        const loaderPath = path.join(moduleInfo.output, 'lang', locale, `${locale}-${currentRegion}.js`);
-                        this.push(
-                           new Vinyl({
-                              base: moduleInfo.output,
-                              path: loaderPath,
-                              contents: Buffer.from(loaderCodeWithRegion),
-                              unitedDict: true
-                           })
-                        );
-                     }
                   });
-               }
-               const loaderCode = indexer.extractLoaderCode(moduleInfo.output, locale);
-               if (loaderCode) {
-                  const loaderPath = path.join(moduleInfo.output, 'lang', locale, `${locale}.js`);
-                  this.push(
-                     new Vinyl({
-                        base: moduleInfo.output,
-                        path: loaderPath,
-                        contents: Buffer.from(loaderCode),
-                        unitedDict: true
-                     })
-                  );
                }
             }
             const dictList = indexer.getDictionaryForContents();
