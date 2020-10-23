@@ -15,8 +15,28 @@ async function recursiveGetAllBuilderFiles(dir) {
    return files.flat();
 }
 
+/**
+ * List of files of builder code that should cause full builder cache reset due to theirs
+ * code updates
+ * @type {string[]}
+ */
+const FILES_FOR_BUILDER_HASH = ['/less/', '/templates/', 'compile-less.js', 'build-tmpl.js', 'build-xhtml.js'];
+
 async function getBuilderCodeHash(filesList) {
-   const filesContent = await Promise.all(filesList.map(currentFile => fs.readFile(currentFile, 'utf8')));
+   const filesContent = await Promise.all(
+      filesList
+         .filter((currentFile) => {
+            const prettyPath = currentFile.replace(/\\/g, '/');
+            let isNeeded = false;
+            FILES_FOR_BUILDER_HASH.forEach((mask) => {
+               if (prettyPath.includes(mask)) {
+                  isNeeded = true;
+               }
+            });
+            return isNeeded;
+         })
+         .map(currentFile => fs.readFile(currentFile, 'utf8'))
+   );
    return crypto
       .createHash('sha1')
       .update(filesContent.join('\n'))
