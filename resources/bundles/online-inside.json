@@ -6,6 +6,7 @@
   "resources/entity-superbundle.package.min",
   "resources/page-superbundle.package.min",
   "resources/controls-superbundle.package.min",
+  "resources/saby-page-superbundle.package.min",
   "resources/TestPacker/core.package.min",
   "resources/TestPacker/test.package.min",
   "resources/ACS/AcsPass.package.min",
