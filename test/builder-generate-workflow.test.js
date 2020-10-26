@@ -222,13 +222,10 @@ describe('gulp/builder/generate-workflow.js', () => {
          contents.should.deep.equal(correctContents);
          const listOfDictionaries = await fs.readdir(path.join(moduleOutputFolder, 'lang/en'));
          listOfDictionaries.should.have.members([
-            'en-GB.js',
             'en-GB.json',
             'en-GB.json.js',
-            'en-US.js',
             'en-US.json',
             'en-US.json.js',
-            'en.js',
             'en.json',
             'en.json.js',
             'en.less',
@@ -249,18 +246,6 @@ describe('gulp/builder/generate-workflow.js', () => {
             'Это словарь!': 'This is dictionary! God, save the queen!',
             'Ключ для Британии': 'GB key'
          });
-         (await fs.readFile(path.join(currentDictDirectory, 'en-US.js'), 'utf8')).includes(
-            'global.requirejs(["Core/i18n","Modul/lang/en/en-US.json"],function(i18n,dict){i18n.setDict(dict, "Modul/lang/en/en-US.json", "en");' +
-                  'if(i18n.getLang()=="en"){global.requirejs(["native-css!Modul/lang/en/en-US"]);}});'
-         ).should.equal(true);
-         (await fs.readFile(path.join(currentDictDirectory, 'en-GB.js'), 'utf8')).includes(
-            'global.requirejs(["Core/i18n","Modul/lang/en/en-GB.json"],function(i18n,dict){i18n.setDict(dict, "Modul/lang/en/en-GB.json", "en");' +
-            'if(i18n.getLang()=="en"){global.requirejs(["native-css!Modul/lang/en/en-GB"]);}});'
-         ).should.equal(true);
-         (await fs.readFile(path.join(currentDictDirectory, 'en.js'), 'utf8')).includes(
-            'global.requirejs(["Core/i18n","Modul/lang/en/en.json"],function(i18n,dict){i18n.setDict(dict, "Modul/lang/en/en.json", "en");' +
-            'if(i18n.getLang()=="en"){global.requirejs(["native-css!Modul/lang/en/en"]);}});'
-         ).should.equal(true);
          (await fs.readFile(path.join(currentDictDirectory, 'en.css'), 'utf8')).should.equal(
             '.en .test {\n' +
             '  width: 686px;\n' +
@@ -1312,11 +1297,7 @@ describe('gulp/builder/generate-workflow.js', () => {
       const check = async() => {
          // запустим таску
          await runWorkflowWithTimeout();
-
          (await isRegularFile(moduleOutputFolder, 'lang/en-US/en-US.css')).should.equal(true);
-         (await isRegularFile(moduleOutputFolder, 'lang/en-US/en-US.js')).should.equal(true);
-         (await isRegularFile(moduleOutputFolder, 'lang/ru-RU/ru-RU.js')).should.equal(true);
-
          (await isSymlink(moduleOutputFolder, 'lang/ru-RU/ru-RU.json')).should.equal(true);
       };
 
