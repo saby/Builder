@@ -231,7 +231,9 @@ class BuildConfiguration {
       // in cache path.
       // TODO use a special flag instead of this code below after task completion
       // https://online.sbis.ru/opendoc.html?guid=ae4cbd50-74bd-49ba-bffa-e49f15a954e8
-      this.localStand = this.cachePath.includes('.genie') || !this.distributive;
+      // Also we can't use lite build mode in case where source files should be removed from output directory
+      // because there are configs of custom packages to be used in further rebuilds.
+      this.localStand = (this.cachePath.includes('.genie') || !this.distributive) && this.sources;
 
       if (!this.isReleaseMode || this.localStand) {
          this.outputPath = this.rawConfig.output.replace(/\\/g, '/');
