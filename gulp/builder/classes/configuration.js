@@ -328,6 +328,7 @@ class BuildConfiguration {
          this.uiServicePath = this.rawConfig['ui-service-path'];
       }
 
+      // application name to be used in css links rebase
       this.applicationForRebase = this.uiServicePath || '/';
 
       if (this.rawConfig['url-default-service-path']) {
@@ -335,6 +336,10 @@ class BuildConfiguration {
       } else {
          this.urlDefaultServicePath = this.urlServicePath;
       }
+
+      // application name to be used in templates processor
+      const isUiService = !this.urlServicePath.includes('/service/');
+      this.applicationForLayout = isUiService ? this.urlServicePath || '/' : this.applicationForRebase;
 
       // set tsconfig name from saby-typescript/configs to use while do tsc compilation
       if (this.rawConfig.hasOwnProperty('tsconfig')) {
