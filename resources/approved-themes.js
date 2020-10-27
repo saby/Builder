@@ -17,5 +17,6 @@ module.exports = new Set([
    'wasabydev',
    'sbisru',
    'videoPlayer',
-   'consultant'
+   'consultant',
+   'plugin'
 ]);
