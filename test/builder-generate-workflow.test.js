@@ -2730,7 +2730,7 @@ describe('gulp/builder/generate-workflow.js', () => {
                path: path.join(sourceFolder, 'UI')
             },
             {
-               name: 'Modul',
+               name: 'Some fake name',
                path: path.join(sourceFolder, 'Modul')
             },
             {
