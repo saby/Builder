@@ -22,18 +22,7 @@ const logger = require('../../../lib/logger').logger();
 async function prepareJsonGeneratorCache(root, currentCachePath, additionalCachePath) {
    const generatorCachePath = path.join(currentCachePath, 'json-generator-cache.json');
    if (!(await fs.pathExists(generatorCachePath))) {
-      const jsonGeneratorCache = await fs.readJson(path.join(additionalCachePath, 'json-generator-cache.json'));
-      const formattedJsonGenerator = {};
-
-      // normalize path according to a local root path. TODO remove it after json-generator-cache has relative paths
-      // https://online.sbis.ru/opendoc.html?guid=46a18202-2dc4-47fe-97f7-a1949cf49ffe
-      Object.keys(jsonGeneratorCache).forEach((currentPath) => {
-         const relativePath = currentPath.replace(/.+?temp-modules(\/|\\)/, '');
-         const normalizedPath = path.join(root, relativePath);
-         formattedJsonGenerator[normalizedPath] = jsonGeneratorCache[currentPath];
-         delete jsonGeneratorCache[currentPath];
-      });
-      await fs.outputJson(generatorCachePath, formattedJsonGenerator);
+      await fs.copy(path.join(additionalCachePath, 'json-generator-cache.json'), generatorCachePath);
    }
 }
 
