@@ -506,6 +506,8 @@
   "resources/PowerOfAttorney/packages/poa_list.package.min",
   "resources/Presto/Restaurants/OrdersExtended/OrdersExtended.min",
   "resources/Presto/Restaurants/Room/Room.min",
+  "resources/Presto/Restaurants/BookCard/BookCard.package.min",
+  "resources/Presto/Restaurants/BookOrders/BookOrders.package.min",
   "resources/PriceFormationCommon/packages/CoreTwoColBrowser.package.min",
   "resources/PriceFormationCommon/packages/DiscountCardCardDialog.package.min",
   "resources/PriceFormationCommon/packages/DiscountCardRegistry.package.min",
