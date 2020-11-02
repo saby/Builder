@@ -13,6 +13,7 @@ define('Modul/testNativeNamesImports', [
             enumerable: true
         });
     }
+    Object.defineProperty(exports, '__esModule', { value: true });
         exports['Modul/_es6/fetch'] = true;
         var Modul__es6_fetch;
     var Modul__es6_fetch_func = function () {
@@ -45,7 +46,6 @@ define('Modul/testNativeNamesImports', [
         }
         return Modul__es6_fetch;
     };
-    Object.defineProperty(exports, '__esModule', { value: true });
     lazyDefineProperty(exports, 'fetch', 'Modul/testNativeNamesImports:fetch', function () {
         return Modul__es6_fetch_func();
     });

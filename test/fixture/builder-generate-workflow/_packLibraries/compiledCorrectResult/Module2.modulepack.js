@@ -14,6 +14,7 @@ define('Modul2/Module2', [
             enumerable: true
         });
     }
+    Object.defineProperty(exports, '__esModule', { value: true });
         exports['Modul2/_private/Module1'] = true;
         var Modul2__private_Module1;
     var Modul2__private_Module1_func = function () {
@@ -87,7 +88,6 @@ define('Modul2/Module2', [
         }
         return Modul2__private_withNotAmdImport;
     };
-    Object.defineProperty(exports, '__esModule', { value: true });
     lazyDefineProperty(exports, 'default', 'Modul2/Module2:default', function () {
         return Modul2__private_withNotAmdImport_func();
     });

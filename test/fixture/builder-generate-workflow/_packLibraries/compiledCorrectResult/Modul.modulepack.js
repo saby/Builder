@@ -18,6 +18,7 @@ define('Modul/Modul', [
             enumerable: true
         });
     }
+    Object.defineProperty(exports, '__esModule', { value: true });
         exports['wml!Modul/_es6/test'] = true;
         var wml_Modul__es6_test;
     var wml_Modul__es6_test_func = function () {
@@ -186,7 +187,6 @@ define('Modul/Modul', [
         }
         return Modul__es6_Modul;
     };
-    Object.defineProperty(exports, '__esModule', { value: true });
     lazyDefineProperty(exports, 'default', 'Modul/Modul:default', function () {
         return Modul__es6_Modul_func().default;
     });
