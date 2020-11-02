@@ -7,6 +7,17 @@ define('Modul/Modul', [
     'exports',
     'css!theme?Modul/_es6/test'
 ], function (tslib_1, rk_1, rk, Executor, require, exports) {
+        function lazyDefineProperty(scope, name, moduleName, factory) {
+        Object.defineProperty(scope, name, {
+            get: function () {
+                var e = factory();
+                if ('function' === typeof e && e.prototype && !e.prototype.hasOwnProperty('_moduleName'))
+                    e.prototype._moduleName = moduleName;
+                return e;
+            },
+            enumerable: true
+        });
+    }
     Object.defineProperty(exports, '__esModule', { value: true });
         exports['wml!Modul/_es6/test'] = true;
         var wml_Modul__es6_test;
@@ -176,15 +187,8 @@ define('Modul/Modul', [
         }
         return Modul__es6_Modul;
     };
-    Object.defineProperty(exports, 'default', {
-        get: function () {
-            var result = Modul__es6_Modul_func().default;
-            if (typeof result === 'function' && result.prototype && !result.prototype.hasOwnProperty('_moduleName')) {
-                result.prototype._moduleName = 'Modul/Modul:default';
-            }
-            return result;
-        },
-        enumerable: true
+    lazyDefineProperty(exports, 'default', 'Modul/Modul:default', function () {
+        return Modul__es6_Modul_func().default;
     });
     exports._packedLibrary = true;
     return exports;

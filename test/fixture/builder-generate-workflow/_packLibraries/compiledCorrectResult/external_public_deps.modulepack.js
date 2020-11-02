@@ -5,6 +5,17 @@ define('Modul/external_public_deps', [
     'Modul/Modul',
     'Modul/publicFunction1'
 ], function (removeArrayDuplicates, require, exports, Module_1, testFunction_1) {
+        function lazyDefineProperty(scope, name, moduleName, factory) {
+        Object.defineProperty(scope, name, {
+            get: function () {
+                var e = factory();
+                if ('function' === typeof e && e.prototype && !e.prototype.hasOwnProperty('_moduleName'))
+                    e.prototype._moduleName = moduleName;
+                return e;
+            },
+            enumerable: true
+        });
+    }
         exports['Modul/_es6/testPublicModule'] = true;
         var Modul__es6_testPublicModule;
     var Modul__es6_testPublicModule_func = function () {
