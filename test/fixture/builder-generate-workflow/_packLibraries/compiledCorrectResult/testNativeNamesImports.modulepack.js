@@ -2,7 +2,17 @@ define('Modul/testNativeNamesImports', [
     'require',
     'exports'
 ], function (require, exports) {
-    Object.defineProperty(exports, '__esModule', { value: true });
+        function lazyDefineProperty(scope, name, moduleName, factory) {
+        Object.defineProperty(scope, name, {
+            get: function () {
+                var e = factory();
+                if ('function' === typeof e && e.prototype && !e.prototype.hasOwnProperty('_moduleName'))
+                    e.prototype._moduleName = moduleName;
+                return e;
+            },
+            enumerable: true
+        });
+    }
         exports['Modul/_es6/fetch'] = true;
         var Modul__es6_fetch;
     var Modul__es6_fetch_func = function () {
@@ -35,15 +45,9 @@ define('Modul/testNativeNamesImports', [
         }
         return Modul__es6_fetch;
     };
-    Object.defineProperty(exports, 'fetch', {
-        get: function () {
-            var result = Modul__es6_fetch_func();
-            if (typeof result === 'function' && result.prototype && !result.prototype.hasOwnProperty('_moduleName')) {
-                result.prototype._moduleName = 'Modul/testNativeNamesImports:fetch';
-            }
-            return result;
-        },
-        enumerable: true
+    Object.defineProperty(exports, '__esModule', { value: true });
+    lazyDefineProperty(exports, 'fetch', 'Modul/testNativeNamesImports:fetch', function () {
+        return Modul__es6_fetch_func();
     });
     exports._packedLibrary = true;
     return exports;

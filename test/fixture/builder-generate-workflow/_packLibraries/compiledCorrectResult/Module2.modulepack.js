@@ -3,7 +3,17 @@ define('Modul2/Module2', [
     'exports',
     'Modul2/_private/notAmd'
 ], function (require, exports) {
-    Object.defineProperty(exports, '__esModule', { value: true });
+        function lazyDefineProperty(scope, name, moduleName, factory) {
+        Object.defineProperty(scope, name, {
+            get: function () {
+                var e = factory();
+                if ('function' === typeof e && e.prototype && !e.prototype.hasOwnProperty('_moduleName'))
+                    e.prototype._moduleName = moduleName;
+                return e;
+            },
+            enumerable: true
+        });
+    }
         exports['Modul2/_private/Module1'] = true;
         var Modul2__private_Module1;
     var Modul2__private_Module1_func = function () {
@@ -77,15 +87,9 @@ define('Modul2/Module2', [
         }
         return Modul2__private_withNotAmdImport;
     };
-    Object.defineProperty(exports, 'default', {
-        get: function () {
-            var result = Modul2__private_withNotAmdImport_func();
-            if (typeof result === 'function' && result.prototype && !result.prototype.hasOwnProperty('_moduleName')) {
-                result.prototype._moduleName = 'Modul2/Module2:default';
-            }
-            return result;
-        },
-        enumerable: true
+    Object.defineProperty(exports, '__esModule', { value: true });
+    lazyDefineProperty(exports, 'default', 'Modul2/Module2:default', function () {
+        return Modul2__private_withNotAmdImport_func();
     });
     exports._packedLibrary = true;
     return exports;

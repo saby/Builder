@@ -32,6 +32,17 @@ define('Modul/external_public_deps', [
         }
         return Modul__es6_testPublicModule;
     };
+        function lazyDefineProperty(scope, name, moduleName, factory) {
+        Object.defineProperty(scope, name, {
+            get: function () {
+                var e = factory();
+                if ('function' === typeof e && e.prototype && !e.prototype.hasOwnProperty('_moduleName'))
+                    e.prototype._moduleName = moduleName;
+                return e;
+            },
+            enumerable: true
+        });
+    }
         var exports = {
         default: Module_1,
         simpleArrayFunction: testFunction_1,
