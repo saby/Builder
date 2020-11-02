@@ -35,10 +35,11 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
       /* @this Stream */
       function onFlush(callback) {
          const startTime = Date.now();
+         const moduleName = path.basename(moduleInfo.output);
          try {
             // подготовим contents.json и contents.js
             if (taskParameters.config.version) {
-               moduleInfo.contents.buildnumber = `%{MODULE_VERSION_STUB=${path.basename(moduleInfo.output)}}`;
+               moduleInfo.contents.buildnumber = `%{MODULE_VERSION_STUB=${moduleName}}`;
             }
 
             // save modular contents.js into joined if needed.
@@ -60,7 +61,14 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                moduleInfo,
                compiled: true
             });
+            const contentsJsonJsFile = new Vinyl({
+               path: 'contents.json.js',
+               contents: Buffer.from(`define('${moduleName}/contents.json',[],function(){return ${sortedContents};});`),
+               moduleInfo,
+               compiled: true
+            });
             this.push(contentsJsFile);
+            this.push(contentsJsonJsFile);
             this.push(contentsJsonFile);
             if (taskParameters.config.isReleaseMode) {
                const contentsMinJsonFile = new Vinyl({
@@ -70,6 +78,13 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   compiled: true
                });
                this.push(contentsMinJsonFile);
+               const contentsJsonMinJsFile = new Vinyl({
+                  path: 'contents.json.min.js',
+                  contents: Buffer.from(`define('${moduleName}/contents.json',[],function(){return ${sortedContents};});`),
+                  moduleInfo,
+                  compiled: true
+               });
+               this.push(contentsJsonMinJsFile);
             }
          } catch (error) {
             logger.error({
