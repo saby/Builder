@@ -881,6 +881,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          'Stable.html',
          'contents.js',
          'contents.json',
+         'contents.json.js',
          'navigation-modules.json',
          'routes-info.json',
          'static_templates.json'
@@ -1016,6 +1017,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          'Stable.html',
          'contents.js',
          'contents.json',
+         'contents.json.js',
          'navigation-modules.json',
          'routes-info.json',
          'static_templates.json'
@@ -1723,6 +1725,10 @@ describe('gulp/builder/generate-workflow.js', () => {
             'Page.xhtml',
             'contents.js',
             'contents.json',
+            'contents.json.js',
+            'contents.json.min.js',
+            'contents.json.min.js.br',
+            'contents.json.min.js.gz',
             'contents.min.json',
             'contents.min.json.br',
             'contents.min.json.gz',
@@ -2015,6 +2021,8 @@ describe('gulp/builder/generate-workflow.js', () => {
             'moduleStyle.min.css',
             'contents.js',
             'contents.json',
+            'contents.json.js',
+            'contents.json.min.js',
             'contents.min.json',
             'packages'
          ]);
