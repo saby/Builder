@@ -247,4 +247,4 @@ module.exports = {
       }
    ],
    sourceType: 'script'
-}
+};
