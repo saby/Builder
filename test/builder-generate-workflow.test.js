@@ -2760,22 +2760,22 @@ describe('gulp/builder/generate-workflow.js', () => {
       (await isRegularFile(modulCachePath, 'StableTS.ts')).should.be.equal(true);
       (await isRegularFile(path.join(outputFolder, 'Modul'), 'StableTS.ts')).should.be.equal(true);
 
-      await fs.rename(path.join(sourceFolder, 'Модуль/StableTS.ts'), path.join(sourceFolder, 'Модуль/stableTS.ts'));
+      await fs.rename(path.join(sourceFolder, 'Модуль/StableTS.ts'), path.join(sourceFolder, 'Модуль/StableTS-new.ts'));
 
       // запустим таску
       await runWorkflowWithTimeout();
 
       (await isRegularFile(modulCachePath, 'StableTS.ts')).should.be.equal(false);
       (await isRegularFile(path.join(outputFolder, 'Modul'), 'StableTS.ts')).should.be.equal(false);
-      (await isRegularFile(modulCachePath, 'stableTS.ts')).should.be.equal(true);
-      (await isRegularFile(path.join(outputFolder, 'Modul'), 'stableTS.ts')).should.be.equal(true);
+      (await isRegularFile(modulCachePath, 'StableTS-new.ts')).should.be.equal(true);
+      (await isRegularFile(path.join(outputFolder, 'Modul'), 'StableTS-new.ts')).should.be.equal(true);
 
-      await fs.remove(path.join(sourceFolder, 'Модуль/stableTS.ts'));
+      await fs.remove(path.join(sourceFolder, 'Модуль/StableTS-new.ts'));
 
       await runWorkflowWithTimeout();
 
-      (await isRegularFile(modulCachePath, 'stableTS.ts')).should.be.equal(false);
-      (await isRegularFile(path.join(outputFolder, 'Modul'), 'stableTS.ts')).should.be.equal(false);
+      (await isRegularFile(modulCachePath, 'StableTS-new.ts')).should.be.equal(false);
+      (await isRegularFile(path.join(outputFolder, 'Modul'), 'StableTS-new.ts')).should.be.equal(false);
 
       await clearWorkspace();
    });
