@@ -716,7 +716,7 @@ class Cache {
        * We need to remove it from these directories
        */
       if (outputPath !== cachePath) {
-         removeFiles = [...removeFiles, removeFiles.map(currentFile => currentFile.replace(cachePath, outputPath))];
+         removeFiles = [...removeFiles, ...removeFiles.map(currentFile => currentFile.replace(cachePath, outputPath))];
       }
       const results = await pMap(
          removeFiles,
