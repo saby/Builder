@@ -2713,54 +2713,6 @@ describe('gulp/builder/generate-workflow.js', () => {
       await clearWorkspace();
    });
 
-   it('check removal of outdated files', async() => {
-      const fixtureFolder = path.join(__dirname, 'fixture/builder-generate-workflow/esAndTs');
-      await prepareTest(fixtureFolder);
-
-      const config = {
-         cache: cacheFolder,
-         output: outputFolder,
-         typescript: true,
-         minimize: true,
-         modules: [
-            {
-               name: 'Модуль',
-               path: path.join(sourceFolder, 'Модуль')
-            }
-         ]
-      };
-
-      await fs.writeJSON(configPath, config);
-
-      await linkPlatform(sourceFolder);
-      const modulCachePath = path.join(cacheFolder, 'incremental_build/Modul');
-
-      // запустим таску
-      await runWorkflowWithTimeout();
-
-      (await isRegularFile(modulCachePath, 'StableTS.ts')).should.be.equal(true);
-      (await isRegularFile(path.join(outputFolder, 'Modul'), 'StableTS.ts')).should.be.equal(true);
-
-      await fs.rename(path.join(sourceFolder, 'Модуль/StableTS.ts'), path.join(sourceFolder, 'Модуль/StableTS-new.ts'));
-
-      // запустим таску
-      await runWorkflowWithTimeout();
-
-      (await isRegularFile(modulCachePath, 'StableTS.ts')).should.be.equal(false);
-      (await isRegularFile(path.join(outputFolder, 'Modul'), 'StableTS.ts')).should.be.equal(false);
-      (await isRegularFile(modulCachePath, 'StableTS-new.ts')).should.be.equal(true);
-      (await isRegularFile(path.join(outputFolder, 'Modul'), 'StableTS-new.ts')).should.be.equal(true);
-
-      await fs.remove(path.join(sourceFolder, 'Модуль/StableTS-new.ts'));
-
-      await runWorkflowWithTimeout();
-
-      (await isRegularFile(modulCachePath, 'StableTS-new.ts')).should.be.equal(false);
-      (await isRegularFile(path.join(outputFolder, 'Modul'), 'StableTS-new.ts')).should.be.equal(false);
-
-      await clearWorkspace();
-   });
-
    describe('pack-library', () => {
       const fixtureFolder = path.join(__dirname, 'fixture/builder-generate-workflow/_packLibraries');
       const config = {
