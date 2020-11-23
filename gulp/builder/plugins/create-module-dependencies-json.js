@@ -282,7 +282,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                    * For now, log interceptions with information level. First of all,
                    * we should assess the scale of a problem in common projects.
                    */
-                  logger.info(
+                  logger.warning(
                      message,
                      moduleInfo
                   );
