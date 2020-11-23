@@ -153,6 +153,10 @@ class Cache {
     * @returns {Promise<boolean>}
     */
    async cacheHasIncompatibleChanges() {
+      // do no check of gulp_config if it's disabled manually
+      if (!this.config.checkConfig) {
+         return false;
+      }
       const finishText = 'Кеш и результат предыдущей сборки будут удалены, если существуют.';
       if (this.previousRunFailed) {
          logger.info(`В директории кэша с предыдущей сборки остался файл builder.lockfile. ${finishText}`);

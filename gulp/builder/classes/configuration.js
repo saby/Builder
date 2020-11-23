@@ -161,6 +161,9 @@ class BuildConfiguration {
        * unacceptable 5-25 minutes(common issue on Windows OS due to its file system)
        */
       this.distributive = true;
+
+      // a sign whether or not gulp_config should be checked. Check it by default.
+      this.checkConfig = true;
    }
 
    /**
