@@ -11,6 +11,7 @@ const through = require('through2'),
    logger = require('../../../lib/logger').logger(),
    helpers = require('../../../lib/helpers'),
    transliterate = require('../../../lib/transliterate'),
+   fs = require('fs-extra'),
    modulePathToRequire = require('../../../lib/modulepath-to-require');
 
 // плагины, которые должны попасть в links
@@ -124,7 +125,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
       },
 
       /* @this Stream */
-      function onFlush(callback) {
+      async function onFlush(callback) {
          const startTime = Date.now();
          const addAdditionalMeta = taskParameters.config.branchTests;
          try {
@@ -136,8 +137,12 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                packedLibraries: {}
             };
             if (addAdditionalMeta) {
-               json.lessDependencies = {};
-               json.requireJsSubstitutions = {};
+               if (!json.lessDependencies) {
+                  json.lessDependencies = {};
+               }
+               if (!json.requireJsSubstitutions) {
+                  json.requireJsSubstitutions = {};
+               }
             }
             const storeNode = (mDeps, nodeName, objectToStore, relativePath) => {
                const ext = path.extname(relativePath);
@@ -250,6 +255,25 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                const prettyPath = modulePathToRequire.getPrettyPath(transliterate(relativePath));
                const nodeName = `text!${prettyPath}`;
                storeNode(json, nodeName, {}, relativePath);
+            }
+
+            // Add missing module-dependencies meta for files when meta of those
+            // can be received only if this file was compiled.
+            if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
+               const currentMDepsPath = path.join(taskParameters.config.compiled, path.basename(moduleInfo.output), 'module-dependencies.json');
+               if (await fs.pathExists(currentMDepsPath)) {
+                  const compiledMDeps = await fs.readJson(currentMDepsPath);
+                  Object.keys(compiledMDeps.links).forEach((currentNode) => {
+                     if (!json.links.hasOwnProperty(currentNode) || json.links[currentNode].length === 0) {
+                        json.links[currentNode] = compiledMDeps.links[currentNode];
+                     }
+                  });
+                  Object.keys(compiledMDeps.links).forEach((currentNode) => {
+                     if (!json.nodes.hasOwnProperty(currentNode)) {
+                        json.nodes[currentNode] = compiledMDeps.nodes[currentNode];
+                     }
+                  });
+               }
             }
 
             /**
