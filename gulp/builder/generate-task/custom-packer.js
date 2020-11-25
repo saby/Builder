@@ -57,7 +57,7 @@ function generateCollectPackagesTasks(configs, taskParameters, root, bundlesList
                   }
                })
             )
-            .pipe(collectCustomPacks(moduleInfo, root, configs, bundlesList, taskParameters.config.rawConfig.cld_name));
+            .pipe(collectCustomPacks(moduleInfo, root, configs, bundlesList));
       };
    });
    return gulp.series(
