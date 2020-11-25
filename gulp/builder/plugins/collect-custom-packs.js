@@ -13,18 +13,13 @@ const
    helpers = require('../../../lib/helpers'),
    logger = require('../../../lib/logger').logger();
 
-const RESTRICTED_SUPERBUNDLE_PROJECTS = [
-   'new.sbis.ru',
-   'tensor.ru'
-];
-
 /**
  * Объявление плагина
  * @param {Object} configs все конфигурации для кастомной паковки
  * @param {string} root корень развернутого приложения
  * @returns {stream}
  */
-module.exports = function collectPackageJson(moduleInfo, applicationRoot, configs, bundlesList, cloudName) {
+module.exports = function collectPackageJson(moduleInfo, applicationRoot, configs, bundlesList) {
    const { commonBundles, superBundles } = configs;
    return through.obj(
       function onTransform(file, encoding, callback) {
@@ -42,7 +37,7 @@ module.exports = function collectPackageJson(moduleInfo, applicationRoot, config
                configPath,
                currentPackageJson,
                moduleInfo
-            ).filter(currentConfig => !RESTRICTED_SUPERBUNDLE_PROJECTS.includes(cloudName) || currentConfig.output);
+            );
 
             configsArray.forEach((currentConfig) => {
                const isPrivatePackage = currentConfig.includeCore && !currentConfig.platformPackage;
