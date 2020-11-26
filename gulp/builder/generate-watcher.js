@@ -10,6 +10,7 @@ const path = require('path');
 const ConfigurationReader = require('../common/configuration-reader');
 const processParameters = ConfigurationReader.getProcessParameters(process.argv);
 const fs = require('fs-extra');
+const crypto = require('crypto');
 
 /**
  * get processed and parsed gulp config to get proper
@@ -215,6 +216,7 @@ class ChildProcess {
  */
 class WatcherTask {
    constructor() {
+      this.filesHash = {};
       this.filesToBuild = {
          awaits: {},
          ready: {},
@@ -265,14 +267,22 @@ class WatcherTask {
                   } else {
                      changedFiles.forEach((filePath) => {
                         logger.info(`watcher: start file ${filePath} build!`);
-                        const currentExecutor = exec(
-                           `node "${gulpBinPath}" buildOnChange --config="${processParameters.config}" --nativeWatcher=true --filePath="${filePath}"`,
-                           processOptions
-                        );
-                        const fileExecutor = new ChildProcess(currentExecutor);
-                        fileExecutor.processOutputEmit();
-                        fileExecutor.processErrorEmit();
-                        fileExecutor.processSingleFileResult(this, filePath);
+                        const fileContent = fs.readFileSync(filePath, 'utf8');
+                        const hash = crypto.createHash('sha1').update(fileContent).digest('base64');
+                        if (this.filesHash[filePath] === hash) {
+                           logger.info(`File ${filePath} has already been built. False watcher trigger.`);
+                        } else {
+                           // add current compiled file hash into current watcher hash list
+                           this.filesHash[filePath] = hash;
+                           const currentExecutor = exec(
+                              `node "${gulpBinPath}" buildOnChange --config="${processParameters.config}" --nativeWatcher=true --filePath="${filePath}"`,
+                              processOptions
+                           );
+                           const fileExecutor = new ChildProcess(currentExecutor);
+                           fileExecutor.processOutputEmit();
+                           fileExecutor.processErrorEmit();
+                           fileExecutor.processSingleFileResult(this, filePath, hash);
+                        }
                      });
                   }
                } else {
