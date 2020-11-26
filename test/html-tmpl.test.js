@@ -26,10 +26,6 @@ describe('convert html.tmpl', () => {
 
       // check if there is a correct base component for current html page
       result.includes('application="UI/_base/HTML"').should.equal(true);
-
-      // check if there is localization decorator in current html page
-      result.includes('require([ \'i18n!UI_Module\' ]').should.equal(true);
-      result.includes('.requirejs("i18n!UI_Module")').should.equal(true);
    });
 
    describe('templates config - check wsconfig setup', () => {

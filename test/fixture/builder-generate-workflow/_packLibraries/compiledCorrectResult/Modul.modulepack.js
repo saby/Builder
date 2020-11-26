@@ -47,6 +47,8 @@ define('Modul/Modul', [
                             forceCompatible = false;
                         }
                         var markupGenerator = thelpers.createGenerator(isVdom, forceCompatible, generatorConfig);
+                        var filename = 'Modul/_es6/test';
+                        var rk = thelpers.getRk(filename);
                         try {
                             var out = markupGenerator.joinElements([markupGenerator.createTag('div', {
                                     'attributes': { 'class': 'test' },
@@ -58,7 +60,7 @@ define('Modul/Modul', [
                                 defCollection = undefined;
                             }
                         } catch (e) {
-                            thelpers.templateError('Modul/_es6/test', e, data);
+                            thelpers.templateError(filename, e, data);
                         }
                         return out || markupGenerator.createText('');
                     };

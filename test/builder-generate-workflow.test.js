@@ -1392,46 +1392,6 @@ describe('gulp/builder/generate-workflow.js', () => {
       await clearWorkspace();
    });
 
-   describe('localization', () => {
-      const fixtureFolder = path.join(__dirname, 'fixture/builder-generate-workflow/localization');
-      before(async() => {
-         await prepareTest(fixtureFolder);
-         await linkPlatform(sourceFolder);
-         const config = {
-            cache: cacheFolder,
-            output: outputFolder,
-            minimize: true,
-            wml: true,
-            modules: [
-               {
-                  name: 'Module with space',
-                  path: path.join(sourceFolder, 'Module with space')
-               },
-               {
-                  name: 'View',
-                  path: path.join(sourceFolder, 'View')
-               },
-               {
-                  name: 'UI',
-                  path: path.join(sourceFolder, 'UI')
-               }
-            ]
-         };
-         await fs.writeJSON(configPath, config);
-
-         await runWorkflowWithTimeout();
-      });
-
-      it('requirejs must have been included with a valid i18n module dependency', async() => {
-         const resultedContent = await fs.readFile(path.join(outputFolder, 'Module_with_space/Component.min.tmpl'), 'utf8');
-         resultedContent.includes('requirejs("i18n!Module_with_space"').should.equal(true);
-      });
-
-      after(async() => {
-         await clearWorkspace();
-      });
-   });
-
    it('minimize third-party libraries', async() => {
       const fixtureFolder = path.join(__dirname, 'fixture/builder-generate-workflow/minimize');
       const testResults = async() => {
