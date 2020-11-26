@@ -57,6 +57,7 @@ function getPlatformModules() {
    return [
       new ModuleInfo(getModuleInfo('WS.Core', 'sbis3-ws/WS.Core')),
       new ModuleInfo(getModuleInfo('RequireJsLoader', 'wasaby-requirejs-loader/RequireJsLoader')),
+      new ModuleInfo(getModuleInfo('WasabyLoader', 'wasaby-requirejs-loader/WasabyLoader')),
       new ModuleInfo(getModuleInfo('Application', 'wasaby-app/src/Application')),
       new ModuleInfo(getModuleInfo('View', 'sbis3-ws/View')),
       new ModuleInfo(getModuleInfo('Vdom', 'sbis3-ws/Vdom')),
