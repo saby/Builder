@@ -304,8 +304,8 @@ class BuildConfiguration {
 
       this.needTemplates = this.rawConfig.wml || this.rawConfig.htmlWml || this.rawConfig.deprecatedXhtml;
 
-      this.branchTests = this.rawConfig.cld_name === 'InTest' || this.rawConfig.lessCoverage ||
-         this.rawConfig.wsCoreMap;
+      this.branchTests = this.rawConfig.branchTests || this.rawConfig.cld_name === 'InTest' ||
+         this.rawConfig.lessCoverage || this.rawConfig.wsCoreMap;
 
       if (this.rawConfig.hasOwnProperty('logs')) {
          this.logFolder = this.rawConfig.logs;
@@ -384,7 +384,11 @@ class BuildConfiguration {
             (
                module.name.endsWith('Test') ||
                module.name.endsWith('Unit') ||
-               module.name.endsWith('Tests')
+               module.name.endsWith('Tests') ||
+
+               // cdn module is a bunch of third-party libraries, so it can't be parsed
+               // and should be only transmitted to output directory.
+               module.name === 'cdn'
             );
 
          if (moduleInfo.rebuild) {
