@@ -16,7 +16,17 @@ const path = require('path'),
    plumber = require('gulp-plumber'),
    helpers = require('../../lib/helpers'),
    startTask = require('../../gulp/common/start-task-with-timer'),
-   mapStream = require('map-stream');
+   mapStream = require('map-stream'),
+   addComponentInfo = require('./plugins/add-component-info'),
+   minifyCss = require('./plugins/minify-css'),
+   minifyJs = require('./plugins/minify-js'),
+
+   packLibrary = require('./plugins/pack-library'),
+   minifyOther = require('./plugins/minify-other'),
+   buildXhtml = require('./plugins/build-xhtml'),
+   buildTmpl = require('./plugins/build-tmpl'),
+   gulpBuildHtmlTmpl = require('./plugins/build-html-tmpl'),
+   generateTaskForPrepareWS = require('../common/generate-task/prepare-ws');
 
 const Cache = require('./classes/cache'),
    Configuration = require('./classes/configuration.js'),
@@ -73,30 +83,6 @@ function generateBuildWorkflowOnChange(processArgv) {
       taskParameters.config.less = false;
    }
 
-   // guardSingleProcess пришлось убрать из-за того что WebStorm может вызвать несколько процессов параллельно
-   return gulp.series(
-      generateTaskForLoadCache(taskParameters),
-      generateTaskForCheckVersion(taskParameters),
-      generateTaskForInitWorkerPool(taskParameters),
-      generateTaskForMarkThemeModules(taskParameters, config),
-      generateTaskForBuildFile(taskParameters, filePath),
-      generateTaskForPushOfChanges(taskParameters),
-      generateTaskForTerminatePool(taskParameters)
-   );
-}
-
-function generateTaskForPushOfChanges(taskParameters) {
-   if (!taskParameters.config.staticServer) {
-      return function skipPushOfChangedFiles(done) {
-         done();
-      };
-   }
-   return function pushOfChangedFiles() {
-      return pushChanges(taskParameters);
-   };
-}
-
-function generateTaskForBuildFile(taskParameters, filePath) {
    let currentModuleInfo;
    const pathsForImportSet = new Set();
    let filePathInProject = helpers.unixifyPath(filePath);
@@ -140,12 +126,45 @@ function generateTaskForBuildFile(taskParameters, filePath) {
       pathsForImport: [...pathsForImportSet],
       gulpModulesPaths
    };
+
    if (!currentModuleInfo) {
       logger.info(`Файл ${filePathInProject} вне проекта`);
-      return function buildModule(done) {
+      return function skipWatcher(done) {
          done();
       };
    }
+
+   // guardSingleProcess пришлось убрать из-за того что WebStorm может вызвать несколько процессов параллельно
+   return gulp.series(
+      generateTaskForLoadCache(taskParameters),
+      generateTaskForCheckVersion(taskParameters),
+      generateTaskForPrepareWS(
+         taskParameters,
+         currentModuleInfo,
+
+         // prepareWS for current interface module needed only if there is a .ts or .js file for rebuild.
+         filePath.endsWith('.ts') || filePath.endsWith('.js')
+      ),
+      generateTaskForInitWorkerPool(taskParameters),
+      generateTaskForMarkThemeModules(taskParameters, config),
+      generateTaskForBuildFile(taskParameters, currentModuleInfo, gulpModulesInfo, filePathInProject),
+      generateTaskForPushOfChanges(taskParameters),
+      generateTaskForTerminatePool(taskParameters)
+   );
+}
+
+function generateTaskForPushOfChanges(taskParameters) {
+   if (!taskParameters.config.staticServer) {
+      return function skipPushOfChangedFiles(done) {
+         done();
+      };
+   }
+   return function pushOfChangedFiles() {
+      return pushChanges(taskParameters);
+   };
+}
+
+function generateTaskForBuildFile(taskParameters, currentModuleInfo, gulpModulesInfo, filePathInProject) {
    const currentModuleOutput = path.join(
       taskParameters.config.rawConfig.output,
       currentModuleInfo.runtimeModuleName
@@ -175,13 +194,34 @@ function generateTaskForBuildFile(taskParameters, filePath) {
             })
          )
          .pipe(compileEsAndTs(taskParameters, currentModuleInfo))
+         .pipe(addComponentInfo(taskParameters, currentModuleInfo))
          .pipe(compileLess(taskParameters, currentModuleInfo, gulpModulesInfo))
+         .pipe(gulpIf(taskParameters.config.htmlWml, gulpBuildHtmlTmpl(taskParameters, currentModuleInfo)))
+         .pipe(
+            gulpIf(
+               (taskParameters.config.wml && taskParameters.config.isReleaseMode),
+               buildTmpl(taskParameters, currentModuleInfo)
+            )
+         )
+         .pipe(
+            gulpIf(
+               (taskParameters.config.deprecatedXhtml && taskParameters.config.isReleaseMode),
+               buildXhtml(taskParameters, currentModuleInfo)
+            )
+         )
          .pipe(
             gulpRename((file) => {
                file.dirname = transliterate(file.dirname);
                file.basename = transliterate(file.basename);
             })
          )
+         .pipe(gulpIf(taskParameters.config.minimize, packLibrary(taskParameters, currentModuleInfo)))
+         .pipe(gulpIf(taskParameters.config.minimize, minifyCss(taskParameters, currentModuleInfo)))
+
+         // minifyJs зависит от packOwnDeps
+         .pipe(gulpIf(taskParameters.config.minimize, minifyJs(taskParameters, currentModuleInfo)))
+
+         .pipe(gulpIf(taskParameters.config.minimize, minifyOther(taskParameters, currentModuleInfo)))
          .pipe(gulpChmod({ read: true, write: true }))
          .pipe(mapStream((file, callback) => {
             if (!['.ts', '.less'].includes(file.extname)) {
@@ -210,7 +250,10 @@ function generateTaskForBuildFile(taskParameters, filePath) {
    const buildFile = startTask('buildModule', taskParameters);
    return gulp.series(
       buildFile.start,
-      generateDownloadModuleCache(taskParameters, currentModuleInfo),
+
+      // set a sign of patch build to get a whole module cache
+      // for instance, es compile cache and markup cache, for proper library packing
+      generateDownloadModuleCache(taskParameters, currentModuleInfo, true),
       buildModule,
       generateSaveModuleCache(currentModuleInfo),
       buildFile.finish
