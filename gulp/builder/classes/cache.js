@@ -711,7 +711,7 @@ class Cache {
       );
       let removeFiles = Array.from(lastOutputSet)
          .filter(relativeFilePath => !currentOutputSet.has(relativeFilePath))
-         .map(relativeFilePath => path.join(cachePath, relativeFilePath));
+         .map(relativeFilePath => helpers.unixifyPath(path.join(cachePath, relativeFilePath)));
 
       /**
        * in case of release mode there are 2 folder to remove outdated files therefrom:
