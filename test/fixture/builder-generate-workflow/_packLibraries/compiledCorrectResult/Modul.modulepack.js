@@ -49,6 +49,7 @@ define('Modul/Modul', [
                         var markupGenerator = thelpers.createGenerator(isVdom, forceCompatible, generatorConfig);
                         var filename = 'Modul/_es6/test';
                         var rk = thelpers.getRk(filename);
+                        var funcContext = this;
                         try {
                             var out = markupGenerator.joinElements([markupGenerator.createTag('div', {
                                     'attributes': { 'class': 'test' },
