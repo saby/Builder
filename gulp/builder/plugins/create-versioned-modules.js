@@ -59,12 +59,12 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
             if (taskParameters.config.contents) {
                versionedModulesPaths.push(`${currentModuleName}/contents.json`);
-               versionedModulesPaths.push(`${currentModuleName}/contents.json.js`);
 
                // in desktop apps there will not be any contents.js files(debug files
                // removes from output in desktop apps). Write it in versioned_modules
                // for online projects only
                if (taskParameters.config.sources) {
+                  versionedModulesPaths.push(`${currentModuleName}/contents.json.js`);
                   versionedModulesPaths.push(`${currentModuleName}/contents.js`);
                }
                if (taskParameters.config.minimize) {
