@@ -59,8 +59,11 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
             if (taskParameters.config.contents) {
                versionedModulesPaths.push(`${currentModuleName}/contents.json`);
+               versionedModulesPaths.push(`${currentModuleName}/contents.json.js`);
+               versionedModulesPaths.push(`${currentModuleName}/contents.js`);
                if (taskParameters.config.minimize) {
                   versionedModulesPaths.push(`${currentModuleName}/contents.min.json`);
+                  versionedModulesPaths.push(`${currentModuleName}/contents.json.min.js`);
                }
             }
 
