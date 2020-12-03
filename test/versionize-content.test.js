@@ -451,7 +451,7 @@ describe('versionize-content', () => {
          templateSourceContent.includes('bundles.js"') &&
          templateSourceContent.includes('src="{{item.get(image) ? item.get(image) : \'/resources/SBIS3.CONTROLS/themes/online/img/defaultFolder.png\'}}" />');
       templateSourceNotChanged.should.equal(true);
-      const templateCompiledChanged = templateCompiledContent.includes('contents.min.js?x_module=%{BUILDER_VERSION_STUB}&amp;x_app=%{PRODUCT_NAME}') &&
+      const templateCompiledChanged = templateCompiledContent.includes('contents.min.js?x_module=%{BUILDER_VERSION_STUB}&x_app=%{PRODUCT_NAME}') &&
          templateCompiledContent.includes('config.min.js?x_module=%{MODULE_VERSION_STUB=WS.Core}"') &&
          templateCompiledContent.includes('"/cdn/requirejs/2.3.5-p3/require-min.js"');
       templateCompiledChanged.should.equal(true);
