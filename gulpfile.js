@@ -55,27 +55,19 @@ try {
       const generateBuildWorkflowOnChange = require('./gulp/builder/generate-workflow-on-change.js');
       gulp.task('buildOnChange', generateBuildWorkflowOnChange(process.argv));
    } else if (process.argv.includes('buildOnChangeWatcher')) {
-      const generateBuildWorkflow = require('./gulp/builder/generate-workflow.js');
       gulp.task('buildOnChangeWatcher', () => {
          const { WatcherTask, SOURCE_ROOT } = require('./gulp/builder/generate-watcher');
+         const gulpWatcher = gulp.watch(SOURCE_ROOT);
+         const addSubscriptions = (events) => {
+            const watcher = new WatcherTask();
+            watcher.debounce();
+            events.forEach(currentEvent => gulpWatcher.on(
+               currentEvent, watcher.updateChangedFiles.bind(watcher)
+            ));
+         };
 
-         // run common build to catch all of changes that was happened while watcher wasn't working
-         generateBuildWorkflow(process.argv)();
-
-         // run watcher only after common build was completed
-         process.on('beforeExit', () => {
-            const gulpWatcher = gulp.watch(SOURCE_ROOT);
-            const addSubscriptions = (events) => {
-               const watcher = new WatcherTask();
-               watcher.debounce();
-               events.forEach(currentEvent => gulpWatcher.on(
-                  currentEvent, watcher.updateChangedFiles.bind(watcher)
-               ));
-            };
-
-            // we have to add eventListeners manually, otherwise we cant get a path of a file to build
-            addSubscriptions(['change', 'addDir', 'add', 'unlink', 'unlinkDir']);
-         });
+         // we have to add eventListeners manually, otherwise we cant get a path of a file to build
+         addSubscriptions(['change', 'addDir', 'add', 'unlink', 'unlinkDir']);
       });
    } else if (process.argv.includes('runTypescript')) {
       const generateWorkflowTypescript = require('./gulp/builder/generate-workflow-typescript');
