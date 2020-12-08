@@ -264,12 +264,14 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                if (await fs.pathExists(currentMDepsPath)) {
                   const compiledMDeps = await fs.readJson(currentMDepsPath);
                   Object.keys(compiledMDeps.links).forEach((currentNode) => {
-                     // add info from compiled meta if
-                     // 1) it doesn't exist yet
-                     // 2) it's empty
-                     // 3) current node is a packed library. In case of compiled sources usage
-                     // info about new dependencies list(after it's packed) can be extracted
-                     // from compiled module-dependencies meta only.
+                     /**
+                      * add info from compiled meta if
+                      * 1) it doesn't exist yet
+                      * 2) it's empty
+                      * 3) current node is a packed library. In case of compiled sources usage
+                      * info about new dependencies list(after it's packed) can be extracted
+                      * from compiled module-dependencies meta only.
+                      */
                      if (
                         !json.links.hasOwnProperty(currentNode) ||
                         json.links[currentNode].length === 0 ||
