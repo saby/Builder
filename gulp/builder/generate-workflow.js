@@ -49,6 +49,9 @@ function generateWorkflow(processArgv) {
       config.localizations.length > 0 && config.isReleaseMode
    );
 
+   throw new Error('ПОШЁЛ ТЫ НАХЕР, КОЗЗЁЛ!');
+
+   // eslint-disable-next-line no-unreachable
    return gulp.series(
 
       // generateTaskForLock's first of all
