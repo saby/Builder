@@ -1555,6 +1555,13 @@ describe('gulp/builder/generate-workflow.js', () => {
          (await isRegularFile(outputFolder, 'contents.js')).should.equal(true);
          (await isRegularFile(outputFolder, 'contents.min.js')).should.equal(true);
       });
+      it('joined meta must have correct data', async() => {
+         const routerMeta = await fs.readFile(path.join(outputFolder, 'router.js'), 'utf8');
+         const minRouterMeta = await fs.readFile(path.join(outputFolder, 'router.min.js'), 'utf8');
+         const correctRouterMeta = 'define(\'router\', [], function(){ return {"/":"Modul/Index"}; })';
+         routerMeta.should.equal(correctRouterMeta);
+         minRouterMeta.should.equal(correctRouterMeta);
+      });
       it('packed as javascript content styles in usual package should have correct related urls', async() => {
          const resultExtendBundlesMeta = await fs.readFile(
             path.join(outputFolder, 'InterfaceModule1/interfacemodule1-styles-in-js.package.min.js'),
@@ -1717,6 +1724,14 @@ describe('gulp/builder/generate-workflow.js', () => {
             'private.min.js.br',
             'private.min.original.js',
             'private.package.json',
+            'router.json',
+            'router.json.js',
+            'router.json.min.js',
+            'router.json.min.js.br',
+            'router.json.min.js.gz',
+            'router.min.json',
+            'router.min.json.br',
+            'router.min.json.gz'
          ];
 
          // output directory must have brotli(except windows os) and gzip files, only for minified files and packages.
