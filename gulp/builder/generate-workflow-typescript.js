@@ -30,9 +30,7 @@ function generateBuildWorkflowTypescript(processArgv) {
       console.log('output directory wasn\'t added. Using default directory instead');
    }
 
-   const tscFlags = '--incremental --tsBuildInfoFile "../front-end"';
-
-   return generateTaskForTypescriptCompile(taskParameters, output, tscFlags);
+   return generateTaskForTypescriptCompile(taskParameters, output);
 }
 
 function generateTaskForTypescriptCompile(taskParameters, output, tscFlags) {
