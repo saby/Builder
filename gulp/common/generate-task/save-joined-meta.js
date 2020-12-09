@@ -13,6 +13,39 @@
 
 const fs = require('fs-extra');
 const path = require('path');
+const logger = require('../../../lib/logger').logger();
+const pMap = require('p-map');
+
+/**
+ * Reads all of "router.json" meta from interface modules
+ * and saves them into joined meta in application root
+ * @param modules - list of modules to be processed
+ * @returns {Promise<{}>}
+ */
+async function readJoinAndSaveRouterJson(modules) {
+   const routerMeta = {};
+   await pMap(
+      modules,
+      async(moduleInfo) => {
+         const currentRouterPath = path.join(moduleInfo.output, 'router.json');
+         try {
+            if (await fs.pathExists(currentRouterPath)) {
+               const currentRouterMeta = await fs.readJson(currentRouterPath);
+               Object.keys(currentRouterMeta).forEach((currentRouterKey) => {
+                  routerMeta[currentRouterKey] = currentRouterMeta[currentRouterKey];
+               });
+            }
+         } catch (error) {
+            logger.error({
+               message: 'Error occurred while reading "router.json" meta for current interface module',
+               error,
+               moduleInfo
+            });
+         }
+      }
+   );
+   return routerMeta;
+}
 
 /**
  * Генерация задачи сохранения в корень каталога основных мета-файлов сборщика
@@ -64,7 +97,8 @@ module.exports = function generateTaskForSaveJoinedMeta(taskParameters) {
          }
       }
 
-      const routerContent = 'define(\'router\', [], function(){ return {}; })';
+      const routerMeta = await readJoinAndSaveRouterJson(taskParameters.config.modules);
+      const routerContent = `define('router', [], function(){ return ${JSON.stringify(routerMeta)}; })`;
       await fs.writeFile(path.join(root, 'router.js'), routerContent);
       if (taskParameters.config.isReleaseMode) {
          await fs.writeFile(path.join(root, 'router.min.js'), routerContent);
