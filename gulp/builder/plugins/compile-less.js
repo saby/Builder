@@ -161,7 +161,7 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                   taskParameters.cache.addDependencies(
                      moduleInfo.appRoot,
                      file.history[0],
-                     taskParameters.cache.getCompiledDependencies(relativeFilePath) || [],
+                     taskParameters.cache.getCompiledDependencies(relativeFilePath) || []
                   );
                   callback(null, file);
                   return;
