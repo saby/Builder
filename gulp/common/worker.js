@@ -35,6 +35,11 @@ try {
 
    // логгер - прежде всего
    require('../../lib/logger').setWorkerLogger(process.env.logs);
+   const logger = require('../../lib/logger').logger();
+
+   // set information about current cloud to get correct messages (with info about cloud and responsible)
+   // from worker to be added in a final builder_report
+   logger.setBaseInfo(process.env.cloud, process.env.responsibleOfCloud);
 
    function initializeWSForWorker() {
       // ws должен быть вызван раньше чем первый global.requirejs
