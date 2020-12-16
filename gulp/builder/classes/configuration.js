@@ -302,10 +302,13 @@ class BuildConfiguration {
          this.isSourcesOutput = isSourcesOutput;
       }
 
-      this.needTemplates = this.rawConfig.wml || this.rawConfig.htmlWml || this.rawConfig.deprecatedXhtml;
+      this.cloud = this.cld_name;
+      this.responsibleOfCloud = this.cld_responsible;
 
-      this.branchTests = this.rawConfig.branchTests || this.rawConfig.cld_name === 'InTest' ||
-         this.rawConfig.lessCoverage || this.rawConfig.wsCoreMap;
+      this.needTemplates = this.wml || this.htmlWml || this.deprecatedXhtml;
+
+      this.branchTests = this.branchTests || this.cloud === 'InTest' ||
+         this.lessCoverage || this.wsCoreMap;
 
       if (this.rawConfig.hasOwnProperty('logs')) {
          this.logFolder = this.rawConfig.logs;

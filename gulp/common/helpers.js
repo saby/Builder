@@ -151,6 +151,8 @@ function generateTaskForInitWorkerPool(taskParameters) {
          .filter(currentModule => currentModule.required)
          .map(currentModule => currentModule.name);
       process.env.logs = getLogLevel(process.argv);
+      process.env.cloud = taskParameters.config.cloud;
+      process.env.responsibleOfCloud = taskParameters.config.responsibleOfCloud;
       process.env['require-loader-path'] = RequireJsLoaderPath;
       process.env['main-process-cwd'] = process.cwd();
       process.env['required-modules'] = JSON.stringify(requiredModules);
