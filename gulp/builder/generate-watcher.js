@@ -11,6 +11,7 @@ const ConfigurationReader = require('../common/configuration-reader');
 const processParameters = ConfigurationReader.getProcessParameters(process.argv);
 const fs = require('fs-extra');
 const crypto = require('crypto');
+const debugMode = process.argv.includes('--debug');
 
 /**
  * get processed and parsed gulp config to get proper
@@ -267,11 +268,24 @@ class WatcherTask {
                   } else {
                      changedFiles.forEach((filePath) => {
                         logger.info(`watcher: start file ${filePath} build!`);
-                        const fileContent = fs.readFileSync(filePath, 'utf8');
-                        const hash = crypto.createHash('sha1').update(fileContent).digest('base64');
-                        if (this.filesHash[filePath] === hash) {
-                           logger.info(`File ${filePath} has already been built. False watcher trigger.`);
-                        } else {
+                        let fileContent;
+
+                        /**
+                         * deleting of a file causes a critical error and watcher exits with exit
+                         * code 1. This can cause a confusion - programmer deleted a file, nothing
+                         * happened on Genie side, but at the same time watcher process died with critical
+                         * error and no one knows about it, because Genie has functionality when builder
+                         * watcher logs emits in Genie interface not in real time but with chunks
+                         * of certain size, so this needs a bit of luck to catch this kind of an exception
+                         * in Gulp's logs of Genie interface.
+                         */
+                        try {
+                           fileContent = fs.readFileSync(filePath, 'utf8');
+                        } catch (err) {
+                           logger.info(`watcher: file ${filePath} was removed!`);
+                        }
+                        const hash = fileContent ? crypto.createHash('sha1').update(fileContent).digest('base64') : '';
+                        if (this.filesHash[filePath] !== hash) {
                            // add current compiled file hash into current watcher hash list
                            this.filesHash[filePath] = hash;
                            const currentExecutor = exec(
@@ -282,6 +296,8 @@ class WatcherTask {
                            fileExecutor.processOutputEmit();
                            fileExecutor.processErrorEmit();
                            fileExecutor.processSingleFileResult(this, filePath, hash);
+                        } else if (debugMode) {
+                           logger.info(`File ${filePath} has already been built. False watcher trigger.`);
                         }
                      });
                   }
