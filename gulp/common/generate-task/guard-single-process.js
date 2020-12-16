@@ -33,7 +33,7 @@ function generateTaskForLock(taskParameters) {
          }
 
          // задаём в логгере информацию о приложении и ответственном
-         logger.setBaseInfo(taskParameters.config.rawConfig.cld_name, taskParameters.config.rawConfig.cld_responsible);
+         logger.setBaseInfo(taskParameters.config.cloud, taskParameters.config.responsibleOfCloud);
          resolve();
       });
    };
