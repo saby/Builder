@@ -71,6 +71,7 @@ function generateTaskForMarkThemeModules(taskParameters) {
    );
    const tasks = modulesWithThemes.map((moduleInfo) => {
       const input = path.join(moduleInfo.path, '/**/_theme.less');
+      moduleInfo.modifiers = [];
       return function markThemeModules() {
          return gulp
             .src(input, { dot: false, nodir: true })
@@ -111,7 +112,18 @@ function generateTaskForMarkThemeModules(taskParameters) {
                         });
                         unapprovedThemes.add(themeName);
                      }
-                     moduleInfo.newThemesModule = true;
+                     if (!(taskParameters.config.themes instanceof Array &&
+                           !taskParameters.config.themes.hasOwnProperty(themeName)
+                     )) {
+                        const relativeThemeParts = file.relative.split(path.sep);
+                        if (relativeThemeParts.length > 1) {
+                           moduleInfo.modifiers.push(relativeThemeParts[0]);
+                        } else {
+                           moduleInfo.modifiers.push('');
+                        }
+                        moduleInfo.newThemesModule = true;
+                        moduleInfo.themeName = themeName;
+                     }
                   }
                }
                done();
