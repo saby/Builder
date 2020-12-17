@@ -1,6 +1,15 @@
-{
-  "includeCore": true,
-  "modules": ["InterfaceModule1/*","InterfaceModule2/*"],
-  "include": ["InterfaceModule1/*","InterfaceModule2/*"],
-  "output": "Modul/private"
-}
+[
+  {
+    "includeCore": true,
+    "modules": ["InterfaceModule1/*","InterfaceModule2/*"],
+    "include": ["InterfaceModule1/*","InterfaceModule2/*"],
+    "output": "Modul/private"
+  },
+  {
+    "includeCore": true,
+    "optimized": true,
+    "modules": ["InterfaceModule1/*","InterfaceModule2/*"],
+    "include": ["InterfaceModule1/*","InterfaceModule2/*"],
+    "output": "lazy-private.package.js"
+  }
+]

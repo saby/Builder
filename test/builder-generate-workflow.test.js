@@ -1579,6 +1579,17 @@ describe('gulp/builder/generate-workflow.js', () => {
          );
          resultPackage.should.equal(correctResultPackage);
       });
+      it('custom package with lazy modules initialization should be generated correctly', async() => {
+         const privateLazyPackage = await fs.readFile(
+            path.join(outputFolder, 'Modul/lazy-private.package.min.js'),
+            'utf8'
+         );
+         const correctPrivateLazyPackage = await fs.readFile(
+            path.join(sourceFolder, 'correctResult/lazyPrivatePackage.js'),
+            'utf8'
+         );
+         removeRSymbol(privateLazyPackage).should.equal(removeRSymbol(correctPrivateLazyPackage));
+      });
       it('exclude new unknown for builder packages', async() => {
          (await isRegularFile(moduleOutputFolder, 'test.package.min.js')).should.equal(false);
          (await isRegularFile(moduleOutputFolder, 'test.package.min.css')).should.equal(false);
@@ -1731,7 +1742,13 @@ describe('gulp/builder/generate-workflow.js', () => {
             'router.json.min.js.gz',
             'router.min.json',
             'router.min.json.br',
-            'router.min.json.gz'
+            'router.min.json.gz',
+            'lazy-private.package.min.css',
+            'lazy-private.package.min.css.br',
+            'lazy-private.package.min.css.gz',
+            'lazy-private.package.min.js',
+            'lazy-private.package.min.js.br',
+            'lazy-private.package.min.js.gz'
          ];
 
          // output directory must have brotli(except windows os) and gzip files, only for minified files and packages.
@@ -1764,6 +1781,8 @@ describe('gulp/builder/generate-workflow.js', () => {
             'Modul/contents.json.min.js',
             'Modul/private.min.css',
             'Modul/private.min.js',
+            'Modul/lazy-private.package.min.css',
+            'Modul/lazy-private.package.min.js',
             'Modul/test-brotli.package.min.css',
             'Modul/test-brotli.package.min.js'
          ]);
@@ -1781,6 +1800,8 @@ describe('gulp/builder/generate-workflow.js', () => {
             'Modul/TestBSort/test-superbundle.package.min.js',
             'Modul/private.min.css',
             'Modul/private.min.js',
+            'Modul/lazy-private.package.min.css',
+            'Modul/lazy-private.package.min.js',
             'Modul/test-brotli.package.min.css',
             'Modul/test-brotli.package.min.js'
          ]);
@@ -1819,6 +1840,8 @@ describe('gulp/builder/generate-workflow.js', () => {
             'Modul/contents.json.min.js',
             'Modul/private.min.css',
             'Modul/private.min.js',
+            'Modul/lazy-private.package.min.css',
+            'Modul/lazy-private.package.min.js',
             'Modul/test-brotli.package.min.css',
             'Modul/test-brotli.package.min.js'
          ]);
@@ -1836,6 +1859,8 @@ describe('gulp/builder/generate-workflow.js', () => {
             'Modul/TestBSort/test-superbundle.package.min.js',
             'Modul/private.min.css',
             'Modul/private.min.js',
+            'Modul/lazy-private.package.min.css',
+            'Modul/lazy-private.package.min.js',
             'Modul/test-brotli.package.min.css',
             'Modul/test-brotli.package.min.js'
          ]);

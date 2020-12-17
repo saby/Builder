@@ -1,0 +1,23 @@
+(function () {var bundleExports = {};
+require(["require"],function(require) {
+var css_InterfaceModule2_moduleStyle;
+Object.defineProperty(bundleExports, 'css!InterfaceModule2/moduleStyle', {get: function() {if (!css_InterfaceModule2_moduleStyle) {css_InterfaceModule2_moduleStyle = {};var result = undefined();if (result) {css_InterfaceModule2_moduleStyle = result;}}return css_InterfaceModule2_moduleStyle;},enumerable: true});
+var InterfaceModule2_amdModule;
+Object.defineProperty(bundleExports, 'InterfaceModule2/amdModule', {get: function() {if (!InterfaceModule2_amdModule) {InterfaceModule2_amdModule = {};var result = function(){return{_moduleName:'InterfaceModule1/amdModule'};}();if (result) {InterfaceModule2_amdModule = result;}}return InterfaceModule2_amdModule;},enumerable: true});
+var InterfaceModule1_library;
+Object.defineProperty(bundleExports, 'InterfaceModule1/library', {get: function() {if (!InterfaceModule1_library) {InterfaceModule1_library = {};var result = function(n,e){Object.defineProperty(e,'__esModule',{value:true}),e['InterfaceModule1/_private/module1']=true;var t,r=function(){'use strict';var e={},t=function(e,t){Object.defineProperty(t,'__esModule',{value:true});var r=function(){function e(e){this.variables=e;}return e;}();t.default=r;}(n,e);if(t instanceof Function)return t;else if(t&&Object.getPrototypeOf(t)!==Object.prototype)return t;else for(var r in t)if(t.hasOwnProperty(r))e[r]=t[r];return e;}();e['InterfaceModule1/_private/module2']=true;var u,o=function(){'use strict';var e={},t=function(e,t){Object.defineProperty(t,'__esModule',{value:true});var r=function(){function e(e){this.variables=e;}return e;}();t.default=r;}(n,e);if(t instanceof Function)return t;else if(t&&Object.getPrototypeOf(t)!==Object.prototype)return t;else for(var r in t)if(t.hasOwnProperty(r))e[r]=t[r];return e;}();function i(){return'test';}return e.Module1=r.default,e.Module2=o.default,e.test=i,e;}(require,InterfaceModule1_library);if (result) {InterfaceModule1_library = result;}}return InterfaceModule1_library;},enumerable: true});
+var InterfaceModule1_amdModule;
+Object.defineProperty(bundleExports, 'InterfaceModule1/amdModule', {get: function() {if (!InterfaceModule1_amdModule) {InterfaceModule1_amdModule = {};var result = function(){return{_moduleName:'InterfaceModule1/amdModule'};}();if (result) {InterfaceModule1_amdModule = result;}}return InterfaceModule1_amdModule;},enumerable: true});
+var InterfaceModule1__private_module2;
+Object.defineProperty(bundleExports, 'InterfaceModule1/_private/module2', {get: function() {if (!InterfaceModule1__private_module2) {InterfaceModule1__private_module2 = {};var result = function(e,t){'use strict';Object.defineProperty(t,'__esModule',{value:true});var r=function(){function e(e){this.variables=e;}return e;}();t.default=r;}(require,InterfaceModule1__private_module2);if (result) {InterfaceModule1__private_module2 = result;}}return InterfaceModule1__private_module2;},enumerable: true});
+var InterfaceModule1__private_module1;
+Object.defineProperty(bundleExports, 'InterfaceModule1/_private/module1', {get: function() {if (!InterfaceModule1__private_module1) {InterfaceModule1__private_module1 = {};var result = function(e,t){'use strict';Object.defineProperty(t,'__esModule',{value:true});var r=function(){function e(e){this.variables=e;}return e;}();t.default=r;}(require,InterfaceModule1__private_module1);if (result) {InterfaceModule1__private_module1 = result;}}return InterfaceModule1__private_module1;},enumerable: true});
+(function(){define('css!InterfaceModule2/moduleStyle',['css!Modul/lazy-private.package'],'');define('css!InterfaceModule1/moduleStyle',['css!Modul/lazy-private.package'],'');define('css!InterfaceModule1/amdModule',['css!Modul/lazy-private.package'],'');})();
+define('css!InterfaceModule2/moduleStyle', function() {return bundleExports['css!InterfaceModule2/moduleStyle'];});
+define('InterfaceModule2/amdModule', function() {return bundleExports['InterfaceModule2/amdModule'];});
+define('InterfaceModule1/library', function() {return bundleExports['InterfaceModule1/library'];});
+define('InterfaceModule1/amdModule', function() {return bundleExports['InterfaceModule1/amdModule'];});
+define('InterfaceModule1/_private/module2', function() {return bundleExports['InterfaceModule1/_private/module2'];});
+define('InterfaceModule1/_private/module1', function() {return bundleExports['InterfaceModule1/_private/module1'];});
+});
+})();
