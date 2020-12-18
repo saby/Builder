@@ -15,6 +15,53 @@ const through = require('through2'),
    cssExt = /\.css$/;
 
 /**
+ * Checks whether file should be built or skipped.
+ * @param{String} relativePath - relative path from interface module root
+ * @param{ModuleInfo} moduleInfo - info about current less interface module
+ * @param{Object|boolean} themes - current project themes list. If true, all themes are enabled
+ * in current project
+ * @returns {boolean}
+ */
+function lessCanBeBuilt(relativePath, moduleInfo, themes) {
+   // if themes checked as "true", build all of incoming less files
+   if (themes && typeof themes === 'boolean') {
+      return true;
+   }
+
+   // a regular less always can be built
+   if (!moduleInfo.newThemesModule) {
+      return true;
+   }
+
+   // dont build any less of current interface module if
+   // there is no a corresponding theme in a current project
+   if (!themes.hasOwnProperty(moduleInfo.themeName)) {
+      return false;
+   }
+
+   // for non-array values of current theme(can be only "true" value) always build any less
+   //  of current interface module
+   if (themes[moduleInfo.themeName] && !themes[moduleInfo.themeName].length) {
+      return true;
+   }
+
+   const relativePathParts = relativePath.split(path.sep);
+   const firstName = relativePathParts[0];
+
+   // build less if it's a root less and there is an
+   // empty modifier of a current theme in a current project
+   if (firstName.endsWith('.less') && themes[moduleInfo.themeName].includes('')) {
+      return true;
+   }
+
+   if (themes[moduleInfo.themeName].includes(firstName) || !moduleInfo.modifiers.includes(firstName)) {
+      return true;
+   }
+
+   return false;
+}
+
+/**
  * Plugin declaration
  * @param {TaskParameters} taskParameters a whole parameters list for execution of build of current project
  * @param {ModuleInfo} moduleInfo all needed information about current interface module
@@ -77,6 +124,11 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
              * ignore them and return as common file into gulp stream
              */
             if (file.basename.startsWith('_')) {
+               callback(null, file);
+               return;
+            }
+
+            if (!lessCanBeBuilt(file.relative, moduleInfo, taskParameters.config.themes)) {
                callback(null, file);
                return;
             }

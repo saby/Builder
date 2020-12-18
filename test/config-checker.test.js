@@ -14,7 +14,7 @@ const processArgs = [`--config="${configPath}"`];
 const clearWorkspace = function() {
    return fs.remove(workspaceFolder);
 };
-
+const { parseThemesFlag } = require('../lib/config-helpers');
 const prepareTest = async function(fixtureFolder) {
    await clearWorkspace();
    await fs.ensureDir(sourceFolder);
@@ -114,6 +114,30 @@ describe('configuration checker', () => {
             ]
          };
          await runTest(gulpConfig, false);
+      });
+   });
+
+   describe('themes flag', () => {
+      // return theme as true(build all of we would find) if
+      // there is a single theme without any modifiers
+      it('regular theme', () => {
+         const result = parseThemesFlag(['default']);
+         result.should.deep.equal({ default: true });
+      });
+
+      // if there are themes with modifier and a regular one, we should
+      // get "true" as a value of "default" theme
+      it('regular theme and themes with modifiers', () => {
+         const result = parseThemesFlag(['default', 'default__dark', 'default__cola']);
+         result.should.deep.equal({ default: true });
+      });
+
+      // empty modifier should be parsed correctly and be a member of an array as an empty string
+      it('theme with empty modifier and ones with regular modifiers', () => {
+         const result = parseThemesFlag(['default__', 'default__cola', 'default__dark']);
+         result.should.deep.equal({
+            default: ['', 'cola', 'dark']
+         });
       });
    });
 });

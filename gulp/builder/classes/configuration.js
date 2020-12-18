@@ -10,7 +10,12 @@ const path = require('path');
 const fs = require('fs-extra');
 const ConfigurationReader = require('../../common/configuration-reader');
 const ModuleInfo = require('./module-info');
-const { getLanguageByLocale, clearSourcesSymlinks, checkForSourcesOutput } = require('../../../lib/config-helpers');
+const {
+   getLanguageByLocale,
+   clearSourcesSymlinks,
+   checkForSourcesOutput,
+   parseThemesFlag
+} = require('../../../lib/config-helpers');
 const availableLanguage = require('../../../resources/availableLanguage.json');
 
 /**
@@ -164,6 +169,14 @@ class BuildConfiguration {
 
       // a sign whether or not gulp_config should be checked. Check it by default.
       this.checkConfig = true;
+
+      /**
+       * If themes flag is true, all of themes interface modules will be built.
+       * If themes flag is an array of several themes with/without modificator, build only those.
+       * Default value is true
+       * @type {boolean}
+       */
+      this.themes = true;
    }
 
    /**
@@ -195,6 +208,11 @@ class BuildConfiguration {
             default:
                break;
          }
+      }
+
+      // parse themes from config and use it to build theme interface modules
+      if (this.rawConfig.hasOwnProperty('themes') && this.rawConfig.themes instanceof Array) {
+         this.themes = parseThemesFlag(this.rawConfig.themes);
       }
    }
 
