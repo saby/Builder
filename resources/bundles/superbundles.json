@@ -41,6 +41,6 @@
 
   "resources/SabyPage/saby-page-superbundle.package.min",
   "resources/OnlineSbisRu/saby-page-superbundle.package.min",
-  "resources/controls-superbundle.package.min"
+  "resources/Controls/controls-superbundle.package.min"
 
 ]
