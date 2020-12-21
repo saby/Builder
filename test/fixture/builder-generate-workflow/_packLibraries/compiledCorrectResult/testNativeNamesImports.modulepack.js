@@ -10,6 +10,7 @@ define('Modul/testNativeNamesImports', [
         var result = function (require, exports) {
             'use strict';
             Object.defineProperty(exports, '__esModule', { value: true });
+            exports.someTest = void 0;
             function someTest() {
                 var test1 = 'Тестовое сообщение';
                 return test1;
@@ -29,6 +30,7 @@ define('Modul/testNativeNamesImports', [
         }
         return exports;
     }();
+    exports.fetch = void 0;
     exports.fetch = Modul__es6_fetch;
     
     return exports;
