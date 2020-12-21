@@ -1,0 +1,46 @@
+[
+  "resources/Application/online-superbundle.package.min",
+  "resources/Browser/online-superbundle.package.min",
+  "resources/Env/online-superbundle.package.min",
+  "resources/EnvConfig/online-superbundle.package.min",
+  "resources/ParametersWebAPI/online-superbundle.package.min",
+  "resources/SbisEnvUI/online-superbundle.package.min",
+  "resources/Inferno/online-superbundle.package.min",
+  "resources/RequireJsLoader/online-superbundle.package.min",
+  "resources/WasabyLoader/online-superbundle.package.min",
+  "resources/View/online-superbundle.package.min",
+  "resources/WS.Core/online-superbundle.package.min",
+  "resources/Types/online-superbundle.package.min",
+  "resources/UI/online-superbundle.package.min",
+
+  "resources/EngineLink/page-superbundle.package.min",
+  "resources/EngineUser/page-superbundle.package.min",
+  "resources/Hint/page-superbundle.package.min",
+  "resources/LongOperations/page-superbundle.package.min",
+  "resources/Page/page-superbundle.package.min",
+  "resources/PopupNotifications/page-superbundle.package.min",
+  "resources/ServiceUpdateNotifier/page-superbundle.package.min",
+  "resources/Configuration/page-superbundle.package.min",
+  "resources/EntityCommon/page-superbundle.package.min",
+  "resources/OnlineSbisRu/page-superbundle.package.min",
+  "resources/OnlineSidebar/page-superbundle.package.min",
+  "resources/Notes/page-superbundle.package.min",
+  "resources/NoticeCenterRoute/page-superbundle.package.min",
+
+  "resources/OnlinePage/online-page-superbundle.package.min",
+  "resources/OnlineSbisRu/online-page-superbundle.package.min",
+
+  "resources/OnlinePage/entity-superbundle.package.min",
+  "resources/OnlineSbisRu/entity-superbundle.package.min"
+,
+  "resources/EngineUser/base-superbundle.package.min",
+  "resources/OnlineSidebar/base-superbundle.package.min",
+  "resources/NavigationPanels/base-superbundle.package.min",
+  "resources/Informers/base-superbundle.package.min",
+  "resources/Docflow/base-superbundle.package.min",
+
+  "resources/SabyPage/saby-page-superbundle.package.min",
+  "resources/OnlineSbisRu/saby-page-superbundle.package.min",
+  "resources/controls-superbundle.package.min"
+
+]
