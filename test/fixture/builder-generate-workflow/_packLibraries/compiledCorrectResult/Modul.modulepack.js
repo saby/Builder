@@ -135,6 +135,7 @@ define('Modul/Modul', [
         var result = function (require, exports, rk, Module_js_1) {
             'use strict';
             Object.defineProperty(exports, '__esModule', { value: true });
+            exports.someTest = void 0;
             exports.default = Module_js_1.default;
             function someTest() {
                 var test1 = rk('Тестовое сообщение');

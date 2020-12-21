@@ -23,7 +23,7 @@ define('Modul2/Module2', [
                     set: function (value) {
                         this.test2 = value;
                     },
-                    enumerable: true,
+                    enumerable: false,
                     configurable: true
                 });
                 return MyClass;
