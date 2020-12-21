@@ -40,6 +40,7 @@
   "resources/Docflow/base-superbundle.package.min",
 
   "resources/SabyPage/saby-page-superbundle.package.min",
-  "resources/OnlineSbisRu/saby-page-superbundle.package.min"
+  "resources/OnlineSbisRu/saby-page-superbundle.package.min",
+  "resources/controls-superbundle.package.min"
 
 ]
