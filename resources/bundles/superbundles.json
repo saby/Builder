@@ -12,6 +12,7 @@
   "resources/WS.Core/online-superbundle.package.min",
   "resources/Types/online-superbundle.package.min",
   "resources/UI/online-superbundle.package.min",
+  "resources/Superbundles/online-superbundle.package.min",
 
   "resources/EngineLink/page-superbundle.package.min",
   "resources/EngineUser/page-superbundle.package.min",
@@ -26,21 +27,26 @@
   "resources/OnlineSidebar/page-superbundle.package.min",
   "resources/Notes/page-superbundle.package.min",
   "resources/NoticeCenterRoute/page-superbundle.package.min",
+  "resources/Superbundles/page-superbundle.package.min",
 
   "resources/OnlinePage/online-page-superbundle.package.min",
   "resources/OnlineSbisRu/online-page-superbundle.package.min",
 
   "resources/OnlinePage/entity-superbundle.package.min",
-  "resources/OnlineSbisRu/entity-superbundle.package.min"
-,
+  "resources/OnlineSbisRu/entity-superbundle.package.min",
+  "resources/Superbundles/entity-superbundle.package.min",
+
   "resources/EngineUser/base-superbundle.package.min",
   "resources/OnlineSidebar/base-superbundle.package.min",
   "resources/NavigationPanels/base-superbundle.package.min",
   "resources/Informers/base-superbundle.package.min",
   "resources/Docflow/base-superbundle.package.min",
+  "resources/Superbundles/base-superbundle.package.min",
 
   "resources/SabyPage/saby-page-superbundle.package.min",
   "resources/OnlineSbisRu/saby-page-superbundle.package.min",
-  "resources/controls-superbundle.package.min"
+  "resources/Superbundles/saby-page-superbundle.package.min",
 
+  "resources/controls-superbundle.package.min",
+  "resources/Controls/controls-superbundle.package.min"
 ]
