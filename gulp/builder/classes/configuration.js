@@ -266,7 +266,7 @@ class BuildConfiguration {
          this.outputPath = path.join(this.cachePath, 'incremental_build').replace(/\\/g, '/');
 
          // always enable tsc compiler in release mode
-         this.tsc = true;
+         this.tsc = false;
       }
 
       // localization может быть списком или false

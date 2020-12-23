@@ -8,8 +8,8 @@
   {
     "includeCore": true,
     "optimized": true,
-    "modules": ["InterfaceModule1/*","InterfaceModule2/*"],
-    "include": ["InterfaceModule1/*","InterfaceModule2/*"],
+    "modules": ["InterfaceModule1/*","InterfaceModule2/*", "Modul/private"],
+    "include": ["InterfaceModule1/*","InterfaceModule2/*", "Modul/private"],
     "output": "lazy-private.package.js"
   }
 ]
