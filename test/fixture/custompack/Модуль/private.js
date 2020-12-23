@@ -1,1 +1,1 @@
-define('Modul/private', [], function(){return {_moduleName: 'Modul/private'};});
+define('Modul/private', ['optional!InterfaceModule1/amdModule', 'optional!InterfaceModule2/amdModule'], function(module1, module2){return {_moduleName: 'Modul/private', externalDeps: { module1: module1, module2: module2 }};});
