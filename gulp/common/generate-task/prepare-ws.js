@@ -40,8 +40,8 @@ function needSymlink() {
  * @param {TaskParameters} taskParameters параметры задачи
  * @returns {Undertaker.TaskFunction}
  */
-function generateTaskForPrepareWS(taskParameters) {
-   if (!taskParameters.config.initCore) {
+function generateTaskForPrepareWS(taskParameters, currentModuleInfo, needToBePrepared) {
+   if (!taskParameters.config.initCore || (currentModuleInfo && !needToBePrepared)) {
       return function skipPrepareWS(done) {
          done();
       };
@@ -49,7 +49,8 @@ function generateTaskForPrepareWS(taskParameters) {
 
    const localTaskParameters = new TaskParameters(taskParameters.config, taskParameters.cache, false);
    localTaskParameters.tasksTimer = taskParameters.tasksTimer;
-   const requiredModules = taskParameters.config.modules.filter(moduleInfo => moduleInfo.required);
+   let requiredModules = currentModuleInfo ? [currentModuleInfo] : taskParameters.config.modules;
+   requiredModules = requiredModules.filter(moduleInfo => moduleInfo.required);
    const buildWSModule = startTask('buildWSModule', localTaskParameters);
    if (requiredModules.length) {
       const tasks = [];

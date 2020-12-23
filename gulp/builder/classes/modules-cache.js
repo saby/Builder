@@ -242,9 +242,13 @@ async function getLastModuleCache(moduleCachePath) {
  * @param moduleInfo - main info about current module
  * @returns {downloadModuleCache}
  */
-function generateDownloadModuleCache(taskParameters, moduleInfo) {
+function generateDownloadModuleCache(taskParameters, moduleInfo, singleFileBuild) {
    moduleInfo.cachePath = path.join(taskParameters.config.cachePath, 'modules-cache', `${moduleInfo.name}.json`);
-   const patchBuild = taskParameters.config.modulesForPatch && taskParameters.config.modulesForPatch.length > 0;
+
+   // If it's a single file build(simple watcher) or patch build
+   // a whole module cache should be loaded instantaneously
+   const patchBuild = singleFileBuild ||
+      (taskParameters.config.modulesForPatch && taskParameters.config.modulesForPatch.length > 0);
    return async function downloadModuleCache() {
       const lastCache = await getLastModuleCache(moduleInfo.cachePath);
       moduleInfo.cache = new ModuleCache(lastCache);
