@@ -54,7 +54,7 @@
       "strip-bom": "3.0.0",
       "tensor-xmldom": "0.2.0-b9",
       "through2": "2.0.3",
-      "saby-typescript": "git+https://platform-git.sbis.ru/saby/TypeScript.git#rc-21.1000",
+      "saby-typescript": "git+https://platform-git.sbis.ru/saby/TypeScript.git#21.1000/feature/react-dom-types",
       "saby-units": "git+https://platform-git.sbis.ru/saby/Units.git#rc-21.1000",
       "uglify-js": "3.3.23",
       "vinyl": "2.2.0",
