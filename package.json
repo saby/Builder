@@ -59,7 +59,8 @@
       "uglify-js": "3.3.23",
       "vinyl": "2.2.0",
       "workerpool": "6.0.0",
-      "semver": "6.3.0"
+      "semver": "6.3.0",
+      "react": "17.0.1"
    },
    "devDependencies": {
       "@tensor-corp/eslint-config": "2.0.3",
