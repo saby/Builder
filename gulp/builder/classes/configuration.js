@@ -22,7 +22,7 @@ const availableLanguage = require('../../../resources/availableLanguage.json');
  * Class with data about configuration of the build.
  */
 class BuildConfiguration {
-   constructor(nativeWatcher) {
+   constructor() {
       // path to the configuration file
       this.configFile = '';
 
@@ -143,10 +143,6 @@ class BuildConfiguration {
 
       // use hash by content instead of file timestamp.
       this.hashByContent = true;
-
-      // native watcher executing state. If true,
-      // source modules symlinks can't be recreated, because watcher watches theirs directories
-      this.nativeWatcher = !!nativeWatcher;
 
       // address of static server that is listening for changes from builder
       // side to update those on a server side.
@@ -388,10 +384,14 @@ class BuildConfiguration {
     * @param {string[]} argv utility running cli arguments
     */
    loadSync(argv) {
-      this.configFile = ConfigurationReader.getProcessParameters(argv).config;
+      const { config, nativeWatcher } = ConfigurationReader.getProcessParameters(argv);
+      this.configFile = config;
       this.rawConfig = ConfigurationReader.readConfigFileSync(this.configFile, process.cwd());
       this.configMainBuildInfo();
-      if (!this.nativeWatcher) {
+
+      // native watcher executing state. If true,
+      // source modules symlinks can't be recreated, because watcher watches theirs directories
+      if (!nativeWatcher) {
          clearSourcesSymlinks(this.cachePath);
       }
       const mainModulesForTemplates = {
