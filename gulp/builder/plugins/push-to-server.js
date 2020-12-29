@@ -20,7 +20,6 @@ const GRANTED_EXTENSIONS = [
 ];
 
 const NON_CACHED_META = [
-   'contents.js',
    'contents.json',
    'ru.js',
    'en.js'

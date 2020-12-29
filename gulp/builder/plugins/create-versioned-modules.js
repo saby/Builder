@@ -65,7 +65,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                // for online projects only
                if (taskParameters.config.sources) {
                   versionedModulesPaths.push(`${currentModuleName}/contents.json.js`);
-                  versionedModulesPaths.push(`${currentModuleName}/contents.js`);
                }
                if (taskParameters.config.minimize) {
                   versionedModulesPaths.push(`${currentModuleName}/contents.min.json`);

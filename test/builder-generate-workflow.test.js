@@ -879,7 +879,6 @@ describe('gulp/builder/generate-workflow.js', () => {
          'TestASort',
          'Stable.js',
          'Stable.html',
-         'contents.js',
          'contents.json',
          'contents.json.js',
          'navigation-modules.json',
@@ -1015,7 +1014,6 @@ describe('gulp/builder/generate-workflow.js', () => {
          'TestASort',
          'Stable.js',
          'Stable.html',
-         'contents.js',
          'contents.json',
          'contents.json.js',
          'navigation-modules.json',
@@ -1176,7 +1174,6 @@ describe('gulp/builder/generate-workflow.js', () => {
          (await isRegularFile(moduleOutputFolder, 'StaticHtml.html')).should.equal(true);
 
          // генерируемые файлы на модуль
-         (await isRegularFile(moduleOutputFolder, 'contents.js')).should.equal(true);
          (await isRegularFile(moduleOutputFolder, 'contents.json')).should.equal(true);
          (await isRegularFile(moduleOutputFolder, 'navigation-modules.json')).should.equal(true);
          (await isRegularFile(moduleOutputFolder, 'static_templates.json')).should.equal(true);
@@ -1552,8 +1549,6 @@ describe('gulp/builder/generate-workflow.js', () => {
          (await isRegularFile(outputFolder, 'router.js')).should.equal(true);
          (await isRegularFile(outputFolder, 'router.min.js')).should.equal(true);
          (await isRegularFile(outputFolder, 'contents.json')).should.equal(true);
-         (await isRegularFile(outputFolder, 'contents.js')).should.equal(true);
-         (await isRegularFile(outputFolder, 'contents.min.js')).should.equal(true);
       });
       it('joined meta must have correct data', async() => {
          const routerMeta = await fs.readFile(path.join(outputFolder, 'router.js'), 'utf8');
@@ -1701,7 +1696,6 @@ describe('gulp/builder/generate-workflow.js', () => {
             'Page.wml',
             'Page.min.xhtml',
             'Page.xhtml',
-            'contents.js',
             'contents.json',
             'contents.json.js',
             'contents.json.min.js',
@@ -1780,7 +1774,6 @@ describe('gulp/builder/generate-workflow.js', () => {
             'Modul/TestBSort/test-superbundle.package.min.js',
             'Modul/contents.json',
             'Modul/contents.min.json',
-            'Modul/contents.js',
             'Modul/contents.json.js',
             'Modul/contents.json.min.js',
             'Modul/private.min.css',
@@ -1839,7 +1832,6 @@ describe('gulp/builder/generate-workflow.js', () => {
             'Modul/TestBSort/test-superbundle.package.min.js',
             'Modul/contents.json',
             'Modul/contents.min.json',
-            'Modul/contents.js',
             'Modul/contents.json.js',
             'Modul/contents.json.min.js',
             'Modul/private.min.css',
@@ -2031,7 +2023,6 @@ describe('gulp/builder/generate-workflow.js', () => {
             'module-dependencies.json',
             'moduleStyle.css',
             'moduleStyle.min.css',
-            'contents.js',
             'contents.json',
             'contents.json.js',
             'contents.json.min.js',
