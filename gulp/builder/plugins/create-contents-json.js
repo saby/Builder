@@ -48,13 +48,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             }
             const sortedContents = JSON.stringify(helpers.sortObject(moduleInfo.contents));
             const contentsBuffer = Buffer.from(sortedContents);
-
-            const contentsJsFile = new Vinyl({
-               path: 'contents.js',
-               contents: Buffer.from(`contents=${sortedContents}`),
-               moduleInfo,
-               compiled: true
-            });
             const contentsJsonFile = new Vinyl({
                path: 'contents.json',
                contents: contentsBuffer,
@@ -67,7 +60,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                moduleInfo,
                compiled: true
             });
-            this.push(contentsJsFile);
             this.push(contentsJsonJsFile);
             this.push(contentsJsonFile);
             if (taskParameters.config.isReleaseMode) {
