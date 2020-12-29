@@ -258,7 +258,7 @@ class WatcherTask {
                      this.commonBuildStarted = true;
                      logger.info(`there are too many files changed. Running common build in this case. Number of changed files ${changedFiles.length}`);
                      const currentExecutor = exec(
-                        `node "${gulpBinPath}" build --config="${processParameters.config}"`,
+                        `node "${gulpBinPath}" build --config="${processParameters.config}" --nativeWatcher=true`,
                         processOptions
                      );
                      const buildExecutor = new ChildProcess(currentExecutor);

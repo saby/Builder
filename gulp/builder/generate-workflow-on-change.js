@@ -67,10 +67,10 @@ function getFilesToBuild(prettyRoot, filePath, dependencies) {
  * @returns {Undertaker.TaskFunction} gulp задача
  */
 function generateBuildWorkflowOnChange(processArgv) {
-   const { filePath, nativeWatcher } = ConfigurationReader.getProcessParameters(processArgv);
+   const { filePath } = ConfigurationReader.getProcessParameters(processArgv);
 
    // загрузка конфигурации должна быть синхронной, иначе не построятся задачи для сборки модулей
-   const config = new Configuration(nativeWatcher);
+   const config = new Configuration();
    config.loadSync(processArgv);
    if (!filePath) {
       throw new Error('Не указан параметр --filePath');
