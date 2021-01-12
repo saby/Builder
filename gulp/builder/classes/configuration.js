@@ -321,8 +321,7 @@ class BuildConfiguration {
 
       this.needTemplates = this.wml || this.htmlWml || this.deprecatedXhtml;
 
-      this.branchTests = this.branchTests || this.cloud === 'InTest' ||
-         this.lessCoverage || this.wsCoreMap;
+      this.branchTests = this.branchTests || this.lessCoverage || this.wsCoreMap;
 
       if (this.rawConfig.hasOwnProperty('logs')) {
          this.logFolder = this.rawConfig.logs;
