@@ -14,6 +14,20 @@ const through = require('through2'),
    fs = require('fs-extra'),
    modulePathToRequire = require('../../../lib/modulepath-to-require');
 
+const INTERCEPT_IGNORE = [
+
+   /**
+    * I18n interceptions cannot be solved, because those are aspects of
+    * each language locale(e.g. en-GB, en-US for english) and they must be
+    * packed with each one language. For this issue possible solutions are:
+    * 1) use aspects as external dependencies - will cause overhead of requests for
+    * each language aspect
+    * 2) create a common library for these aspects - there will be overhead of transferred
+    * data due to useless aspects in library.
+    */
+   'I18n'
+];
+
 // плагины, которые должны попасть в links
 const supportedPluginsForLinks = new Set([
    'is',
@@ -305,27 +319,30 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
             taskParameters.cache.storeLocalModuleDependencies(json);
 
-            /**
-             * Check libraries for interceptions between private modules.
-             * current private module should be packed only in 1 library,
-             * otherwise it should be declared as public dependency and be loaded as single
-             * dependency in all dependent libraries
-             */
-            Object.keys(packedPrivateModules)
-               .filter(currentKey => packedPrivateModules[currentKey].length > 1)
-               .forEach((currentDuplicatedKey) => {
-                  const message = `Module ${currentDuplicatedKey} was packed into several libraries:` +
-                     `"${packedPrivateModules[currentDuplicatedKey].join('","')}"`;
+            // don't check for libraries interceptions in excluded modules
+            if (!INTERCEPT_IGNORE.includes(moduleInfo.name)) {
+               /**
+                * Check libraries for interceptions between private modules.
+                * current private module should be packed only in 1 library,
+                * otherwise it should be declared as public dependency and be loaded as single
+                * dependency in all dependent libraries
+                */
+               Object.keys(packedPrivateModules)
+                  .filter(currentKey => packedPrivateModules[currentKey].length > 1)
+                  .forEach((currentDuplicatedKey) => {
+                     const message = `Module ${currentDuplicatedKey} was packed into several libraries:` +
+                        `"${packedPrivateModules[currentDuplicatedKey].join('","')}"`;
 
-                  /**
-                   * For now, log interceptions with information level. First of all,
-                   * we should assess the scale of a problem in common projects.
-                   */
-                  logger.warning({
-                     message,
-                     moduleInfo
+                     /**
+                      * For now, log interceptions with information level. First of all,
+                      * we should assess the scale of a problem in common projects.
+                      */
+                     logger.warning({
+                        message,
+                        moduleInfo
+                     });
                   });
-               });
+            }
          } catch (error) {
             logger.error({
                message: "Ошибка Builder'а",
