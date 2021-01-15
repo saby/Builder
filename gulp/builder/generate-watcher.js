@@ -298,6 +298,9 @@ class WatcherTask {
                            fileExecutor.processSingleFileResult(this, filePath, hash);
                         } else if (debugMode) {
                            logger.info(`File ${filePath} has already been built. False watcher trigger.`);
+
+                           // remove built file from current building files list.
+                           delete this.filesToBuild.ready[filePath];
                         }
                      });
                   }
