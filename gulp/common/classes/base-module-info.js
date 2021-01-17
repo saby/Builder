@@ -66,8 +66,11 @@ class ModuleInfo {
          try {
             fs.ensureSymlinkSync(this.path, newPath, 'dir');
          } catch (err) {
-            const errorMessage = 'An error occured while creating symlinks to source modules.\n' +
-               'Make sure you\'re running your CLI or IDE with administrator rules(or with sudo rules in linux)';
+            const errorMessage = 'An error occurred while creating symlink:\n' +
+               `from: ${this.path}\n` +
+               `to: ${newPath}\n` +
+               'Make sure you\'re running your CLI or IDE with administrator rules(or with sudo rules in linux)\n' +
+               `Error: ${err.message}`;
             throw new Error(errorMessage);
          }
          this.path = newPath;
