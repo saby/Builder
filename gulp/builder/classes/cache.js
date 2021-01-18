@@ -429,6 +429,32 @@ class Cache {
       return false;
    }
 
+   setBaseThemeInfo(resultThemeName) {
+      const { themes } = this.currentStore;
+      themes[resultThemeName] = {
+         files: []
+      };
+   }
+
+   /**
+    * adds meta info about current theme part into common cache
+    * @param{String} resultThemeName - normalized theme name
+    * (with modifier if exists, e.g. default__dark)
+    * @param{String} relativePath - relative path of theme part
+    * @param{boolean} newFile - whether this theme part is new
+    */
+   addThemePartIntoMeta(resultThemeName, relativePath) {
+      const prettyRelativePath = helpers.unixifyPath(relativePath);
+      const { themes } = this.currentStore;
+      if (!themes[resultThemeName].files.hasOwnProperty(prettyRelativePath)) {
+         themes[resultThemeName].files.push(prettyRelativePath);
+      }
+   }
+
+   getThemesMeta() {
+      return this.currentStore.themes;
+   }
+
    /**
     * Добавляет в кеш информацию о дополнительных генерируемых файлах.
     * Это нужно, чтобы в финале инкрементальной сборки удалить только не актуальные файлы.
