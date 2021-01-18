@@ -2079,7 +2079,8 @@ describe('gulp/builder/generate-workflow.js', () => {
             'module-dependencies.json',
             'module-dependencies.min.json',
             'router.js',
-            'router.min.js'
+            'router.min.js',
+            'themes.json'
          ]);
       });
       it('patch - meta should be updated after sources removal', async() => {
