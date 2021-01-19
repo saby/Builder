@@ -111,11 +111,11 @@ module.exports = function generateTaskForSaveJoinedMeta(taskParameters) {
    if (!taskParameters.config.joinedMeta) {
       return async function saveOnlyThemesMeta() {
          const resultThemesMeta = {};
-         const themesMeta = taskParameters.cache.getThemesMeta();
-         Object.keys(themesMeta).forEach((currentTheme) => {
-            resultThemesMeta[`themes/${currentTheme}.css`] = themesMeta[currentTheme].files.map(file => `${file}.css`);
+         const { themes } = taskParameters.cache.getThemesMeta();
+         Object.keys(themes).forEach((currentTheme) => {
+            resultThemesMeta[`themes/${currentTheme}.css`] = themes[currentTheme].files.map(file => `${file}.css`);
             if (typeof fileSuffix === 'string') {
-               resultThemesMeta[`themes/${currentTheme}${fileSuffix}.css`] = themesMeta[currentTheme].files.map(file => `${file}${fileSuffix}.css`);
+               resultThemesMeta[`themes/${currentTheme}${fileSuffix}.css`] = themes[currentTheme].files.map(file => `${file}${fileSuffix}.css`);
             }
          });
          await fs.outputJson(path.join(root, 'themesMeta.json'), resultThemesMeta);
