@@ -61,6 +61,13 @@ function lessCanBeBuilt(relativePath, moduleInfo, themes) {
    return false;
 }
 
+function getRelativePath(modulePath, filePath) {
+   return path.join(
+      path.basename(modulePath),
+      path.relative(modulePath, filePath)
+   );
+}
+
 /**
  * Plugin declaration
  * @param {TaskParameters} taskParameters a whole parameters list for execution of build of current project
@@ -173,17 +180,27 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                file.isLangCss = isLangCss;
             }
 
+            let relativeFilePath;
+            if (moduleInfo.newThemesModule && file.basename === 'theme.less') {
+               let modifier = '';
+               relativeFilePath = getRelativePath(moduleInfo.path, file.history[0]).replace('.less', '');
+               moduleInfo.modifiers.forEach((currentModifier) => {
+                  if (relativeFilePath.startsWith(path.join(moduleInfo.name, currentModifier, path.sep))) {
+                     modifier = currentModifier;
+                  }
+               });
+               const resultThemeName = `${moduleInfo.themeName}${modifier ? `__${modifier}` : ''}`;
+               taskParameters.cache.addThemePartIntoMeta(resultThemeName, relativeFilePath, !file.cached);
+               file.themeName = resultThemeName;
+            }
+
             if (file.cached) {
                taskParameters.cache.addOutputFile(file.history[0], getOutput(file, '.css'), moduleInfo);
                callback(null, file);
                return;
             }
 
-            let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
-            relativeFilePath = path.join(
-               path.basename(moduleInfo.path),
-               relativeFilePath
-            );
+            relativeFilePath = getRelativePath(moduleInfo.path, file.history[0]);
             if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
                const compiledBase = path.join(
                   taskParameters.config.compiled,

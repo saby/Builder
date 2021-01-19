@@ -40,6 +40,12 @@ class StoreInfo {
       // Чтобы ошибки не терялись при инкрементальной сборке, нужно запоминать файлы с ошибками
       // и подавать их при повторном запуске как изменённые
       this.filesWithErrors = new Set();
+
+      // Object with all meta info about themes:
+      // 1) output theme name(e.g. default, default__cola, default__pink, etc.)
+      // 2) list of parts of the theme with theirs relatives paths
+      // 3) parameter value whether it should be rebuilt
+      this.themes = {};
    }
 
    static getLastRunningParametersPath(cacheDirectory) {
@@ -96,6 +102,15 @@ class StoreInfo {
                error
             });
          }
+
+         try {
+            this.themes = await fs.readJson(path.join(cacheDirectory, 'themes.json'));
+         } catch (error) {
+            logger.info({
+               message: `Cache file "${path.join(cacheDirectory, 'themes.json')}" failed to be read`,
+               error
+            });
+         }
       }
    }
 
@@ -113,6 +128,13 @@ class StoreInfo {
       await fs.outputJson(
          path.join(cacheDirectory, 'input-paths.json'),
          this.inputPaths,
+         {
+            spaces: 1
+         }
+      );
+      await fs.outputJson(
+         path.join(cacheDirectory, 'themes.json'),
+         this.themes,
          {
             spaces: 1
          }
