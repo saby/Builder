@@ -76,21 +76,21 @@ async function getJoinedThemeContent(root, fileSuffix, files) {
  * @param{String} root - current application root
  * @param{String} fileSuffix - suffix for file if needed
  * (for release and debug mode it is '.min' and '' respectively)
- * @param{Object} themesMeta - all meta information about
+ * @param{Object} themes - all meta information about
  * themes in current building project
  * @returns {Promise<void>}
  */
-async function generateJoinedThemes(root, fileSuffix, themesMeta) {
+async function generateJoinedThemes(root, fileSuffix, themes) {
    await pMap(
-      Object.keys(themesMeta),
+      Object.keys(themes),
       async(currentTheme) => {
-         const debugContent = await getJoinedThemeContent(root, '', themesMeta[currentTheme].files);
+         const debugContent = await getJoinedThemeContent(root, '', themes[currentTheme].files);
          await fs.outputFile(
             path.join(root, 'themes', `${currentTheme}.css`),
             debugContent
          );
          if (typeof fileSuffix === 'string') {
-            const releaseContent = await getJoinedThemeContent(root, fileSuffix, themesMeta[currentTheme].files);
+            const releaseContent = await getJoinedThemeContent(root, fileSuffix, themes[currentTheme].files);
             await fs.outputFile(
                path.join(root, 'themes', `${currentTheme}${fileSuffix}.css`),
                releaseContent
@@ -118,7 +118,7 @@ module.exports = function generateTaskForSaveJoinedMeta(taskParameters) {
                resultThemesMeta[`themes/${currentTheme}${fileSuffix}.css`] = themesMeta[currentTheme].files.map(file => `${file}${fileSuffix}.css`);
             }
          });
-         await fs.outputJson(path.join(root, 'themes.json'), resultThemesMeta);
+         await fs.outputJson(path.join(root, 'themesMeta.json'), resultThemesMeta);
       };
    }
    return async function saveJoinedMeta() {
@@ -126,7 +126,7 @@ module.exports = function generateTaskForSaveJoinedMeta(taskParameters) {
 
       // save joined module-dependencies for non-jinnee application
       const themesMeta = taskParameters.cache.getThemesMeta();
-      await generateJoinedThemes(root, fileSuffix, themesMeta);
+      await generateJoinedThemes(root, fileSuffix, themesMeta.themes);
       if (taskParameters.config.dependenciesGraph) {
          const moduleDeps = taskParameters.cache.getModuleDependencies();
          await fs.writeJson(path.join(root, 'module-dependencies.json'), moduleDeps);

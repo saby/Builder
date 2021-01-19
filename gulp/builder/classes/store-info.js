@@ -41,11 +41,22 @@ class StoreInfo {
       // и подавать их при повторном запуске как изменённые
       this.filesWithErrors = new Set();
 
-      // Object with all meta info about themes:
-      // 1) output theme name(e.g. default, default__cola, default__pink, etc.)
-      // 2) list of parts of the theme with theirs relatives paths
-      // 3) parameter value whether it should be rebuilt
-      this.themes = {};
+      this.themesMeta = {
+
+         // object with each css variable default value
+         defaultVariables: {},
+
+         // map with info about from where each css variable is taken
+         defaultVariablesMap: {},
+
+         /**
+          * Object with all meta info about themes:
+          * 1) output theme name(e.g. default, default__cola, default__pink, etc.)
+          * 2) list of parts of the theme with theirs relatives paths
+          * 3) parameter value whether it should be rebuilt
+          */
+         themes: {}
+      };
    }
 
    static getLastRunningParametersPath(cacheDirectory) {
@@ -104,10 +115,10 @@ class StoreInfo {
          }
 
          try {
-            this.themes = await fs.readJson(path.join(cacheDirectory, 'themes.json'));
+            this.themesMeta = await fs.readJson(path.join(cacheDirectory, 'themesMeta.json'));
          } catch (error) {
             logger.info({
-               message: `Cache file "${path.join(cacheDirectory, 'themes.json')}" failed to be read`,
+               message: `Cache file "${path.join(cacheDirectory, 'themesMeta.json')}" failed to be read`,
                error
             });
          }
@@ -133,8 +144,8 @@ class StoreInfo {
          }
       );
       await fs.outputJson(
-         path.join(cacheDirectory, 'themes.json'),
-         this.themes,
+         path.join(cacheDirectory, 'themesMeta.json'),
+         this.themesMeta,
          {
             spaces: 1
          }

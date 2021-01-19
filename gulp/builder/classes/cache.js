@@ -430,7 +430,7 @@ class Cache {
    }
 
    setBaseThemeInfo(resultThemeName) {
-      const { themes } = this.currentStore;
+      const { themes } = this.currentStore.themesMeta;
       themes[resultThemeName] = {
          files: []
       };
@@ -445,14 +445,34 @@ class Cache {
     */
    addThemePartIntoMeta(resultThemeName, relativePath) {
       const prettyRelativePath = helpers.unixifyPath(relativePath);
-      const { themes } = this.currentStore;
+      const { themes } = this.currentStore.themesMeta;
       if (!themes[resultThemeName].files.hasOwnProperty(prettyRelativePath)) {
          themes[resultThemeName].files.push(prettyRelativePath);
       }
    }
 
+   /**
+    * adds default css variables into themes cache to be used
+    * further in less compilation if there are no variables
+    * described in current module context(interface module
+    * fallback.json files with it's owm css variables)
+    * @param{Object} cssVariables - list of css variables
+    * @param{String} variablesSource - name of file with current css variables
+    */
+   addDefaultCssVariables(cssVariables, variablesSource) {
+      const { themesMeta } = this.currentStore;
+      Object.keys(cssVariables).forEach((cssVariable) => {
+         themesMeta.defaultVariables[cssVariable] = cssVariables[cssVariable];
+         themesMeta.defaultVariablesMap[cssVariable] = variablesSource;
+      });
+   }
+
+   getDefaultCssVariables() {
+      return this.currentStore.themesMeta.defaultVariables;
+   }
+
    getThemesMeta() {
-      return this.currentStore.themes;
+      return this.currentStore.themesMeta;
    }
 
    /**

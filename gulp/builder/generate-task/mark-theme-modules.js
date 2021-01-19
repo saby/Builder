@@ -24,25 +24,35 @@ const unapprovedThemes = new Set();
  * module would be named to "Controls-online-theme"
  * Returns themeName - current theme name
  * @param{Set} modulesList - current project list of interface modules
- * @param{Array} currentModuleParts - parts of current interface module name
+ * @param{Array} currentModuleNameParts - parts of current interface module name
  * @returns {{themeName: string, moduleName: *}}
  */
-function parseThemeName(modulesList, currentModuleParts) {
-   const themeNameParts = [];
-   let interfaceModuleParsed = false;
-   while (!interfaceModuleParsed && currentModuleParts.length > 0) {
-      themeNameParts.unshift(currentModuleParts.pop());
-      const presumedModuleName = currentModuleParts.join('-');
-      if (modulesList.has(presumedModuleName)) {
-         interfaceModuleParsed = presumedModuleName;
-      }
-   }
+function parseThemeName(modulesList, currentModuleNameParts) {
+   const currentModuleParts = [...currentModuleNameParts];
 
-   // remove "theme" postfix from array to get exact theme name
-   themeNameParts.pop();
+   // clone moduleName parts to avoid errors in modules
+   // analyzing due to override of current module name parts.
+   if (currentModuleParts.length > 2) {
+      const themeNameParts = [];
+      let interfaceModuleParsed = false;
+      while (!interfaceModuleParsed && currentModuleParts.length > 0) {
+         themeNameParts.unshift(currentModuleParts.pop());
+         const presumedModuleName = currentModuleParts.join('-');
+         if (modulesList.has(presumedModuleName)) {
+            interfaceModuleParsed = presumedModuleName;
+         }
+      }
+
+      // remove "theme" postfix from array to get exact theme name
+      themeNameParts.pop();
+      return {
+         themeName: themeNameParts.join('-'),
+         originModule: interfaceModuleParsed
+      };
+   }
    return {
-      themeName: themeNameParts.join('-'),
-      originModule: interfaceModuleParsed
+      themeName: null,
+      originModule: null
    };
 }
 
@@ -54,27 +64,42 @@ function parseThemeName(modulesList, currentModuleParts) {
  */
 function generateTaskForMarkThemeModules(taskParameters) {
    // analyse only interface modules supposed to have themes
-   const modulesWithThemes = taskParameters.config.modules
-      .filter(currentModule => currentModule.name.endsWith('-theme'));
+   const modulesWithThemes = [];
+   const buildModulesNames = new Set();
+   taskParameters.config.modules.forEach((currentModule) => {
+      if (currentModule.name.endsWith('-theme')) {
+         modulesWithThemes.push(currentModule);
+      }
+      if (!currentModule.name.endsWith('-theme')) {
+         buildModulesNames.add(path.basename(currentModule.output));
+      }
+   });
    if (!taskParameters.config.less || modulesWithThemes.length === 0) {
       return function skipMarkThemeModules(done) {
          done();
       };
    }
-   const buildModulesNames = new Set();
-   taskParameters.config.modules.forEach(
-      (currentModule) => {
-         if (!currentModule.name.endsWith('-theme')) {
-            buildModulesNames.add(path.basename(currentModule.output));
-         }
-      }
-   );
+
    const tasks = modulesWithThemes.map((moduleInfo) => {
-      const input = path.join(moduleInfo.path, '/**/_theme.less');
+      const input = [
+         path.join(moduleInfo.path, '/**/_theme.less'),
+         path.join(moduleInfo.path, '/fallback.json')
+      ];
       moduleInfo.modifiers = [];
+      const currentModuleName = path.basename(moduleInfo.output);
+      const currentModuleNameParts = currentModuleName.split('-');
+
+      /**
+       * Interface module name for new theme should always contains 3 parts:
+       * 1)Interface module name for current theme
+       * 2)Current theme name
+       * 3) "theme" postfix
+       * Other Interface modules will be ignored from new theme's processing
+       */
+      const { themeName, originModule } = parseThemeName(buildModulesNames, currentModuleNameParts);
       return function markThemeModules() {
          return gulp
-            .src(input, { dot: false, nodir: true })
+            .src(input, { dot: false, nodir: true, allowEmpty: true })
             .pipe(
                plumber({
                   errorHandler(err) {
@@ -88,10 +113,8 @@ function generateTaskForMarkThemeModules(taskParameters) {
                })
             )
             .pipe(mapStream((file, done) => {
-               if (path.basename(file.path) === '_theme.less') {
-                  const currentModuleName = path.basename(moduleInfo.output);
-                  const currentModuleNameParts = currentModuleName.split('-');
-
+               const fileName = path.basename(file.path);
+               if (fileName === '_theme.less') {
                   /**
                    * Interface module name for new theme should always contains 3 parts:
                    * 1)Interface module name for current theme
@@ -100,7 +123,6 @@ function generateTaskForMarkThemeModules(taskParameters) {
                    * Other Interface modules will be ignored from new theme's processing
                    */
                   if (currentModuleNameParts.length > 2) {
-                     const { themeName, originModule } = parseThemeName(buildModulesNames, currentModuleNameParts);
                      taskParameters.setThemedModule(path.basename(moduleInfo.output), originModule);
 
                      // if unapproved theme has already been declared in unapproved themes list,
@@ -122,6 +144,19 @@ function generateTaskForMarkThemeModules(taskParameters) {
                         moduleInfo.newThemesModule = true;
                         moduleInfo.themeName = themeName;
                      }
+                  }
+               } else if (fileName === 'fallback.json') {
+                  try {
+                     moduleInfo.themeVariables = JSON.parse(file.contents);
+                     if (themeName === 'default') {
+                        taskParameters.cache.addDefaultCssVariables(moduleInfo.themeVariables, `${moduleInfo.name}/fallback.json`);
+                     }
+                  } catch (error) {
+                     logger.error({
+                        message: 'An error occurred when tried to parse fallback.json',
+                        filePath: file.path,
+                        moduleInfo
+                     });
                   }
                }
                done();
