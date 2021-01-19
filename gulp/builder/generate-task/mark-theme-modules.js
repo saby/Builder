@@ -116,11 +116,9 @@ function generateTaskForMarkThemeModules(taskParameters) {
                            !taskParameters.config.themes.hasOwnProperty(themeName)
                      )) {
                         const relativeThemeParts = file.relative.split(path.sep);
-                        if (relativeThemeParts.length > 1) {
-                           moduleInfo.modifiers.push(relativeThemeParts[0]);
-                        } else {
-                           moduleInfo.modifiers.push('');
-                        }
+                        const currentModifier = relativeThemeParts.length > 1 ? relativeThemeParts[0] : '';
+                        moduleInfo.modifiers.push(currentModifier);
+                        taskParameters.cache.setBaseThemeInfo(`${themeName}${currentModifier ? `__${currentModifier}` : ''}`);
                         moduleInfo.newThemesModule = true;
                         moduleInfo.themeName = themeName;
                      }
