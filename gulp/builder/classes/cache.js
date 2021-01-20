@@ -69,6 +69,7 @@ class Cache {
       this.lastStore = new StoreInfo();
       this.currentStore = new StoreInfo();
       this.dropCacheForMarkup = false;
+      this.dropCacheForStaticMarkup = false;
       this.dropCacheForLess = false;
       this.previousRunFailed = false;
 
@@ -380,6 +381,9 @@ class Cache {
       if (this.dropCacheForMarkup && MARKUP_DEPEND_FILES_REGEX.test(prettyPath)) {
          return true;
       }
+      if (this.dropCacheForStaticMarkup && prettyPath.endsWith('.html.tmpl')) {
+         return true;
+      }
 
       // если список тем поменялся, то нужно все less пересобрать
       if (this.dropCacheForLess && (prettyPath.endsWith('.less'))) {
@@ -403,7 +407,11 @@ class Cache {
           * 2 builds, it's using by static VDOM pages compiler.
           */
          if (prettyPath.includes('temp-modules/UI/')) {
-            logger.info(`Templates compiling components was changed. All templates will be rebuilt for current project. Changed component: ${prettyPath}`);
+            logger.info(`Templates compiling components was changed. All static templates will be rebuilt for current project. Changed component: ${prettyPath}`);
+            this.dropCacheForStaticMarkup = true;
+         }
+         if (prettyPath.includes('temp-modules/Compiler/')) {
+            logger.info(`Templates compiling components was changed. All project templates will be rebuilt for current project. Changed component: ${prettyPath}`);
             this.dropCacheForMarkup = true;
          }
          if (CACHED_FILES_EXTENSIONS.test(prettyPath)) {
