@@ -11,7 +11,6 @@ const ConfigurationReader = require('../common/configuration-reader');
 const processParameters = ConfigurationReader.getProcessParameters(process.argv);
 const fs = require('fs-extra');
 const crypto = require('crypto');
-const debugMode = process.argv.includes('--debug');
 
 /**
  * get processed and parsed gulp config to get proper
@@ -296,7 +295,7 @@ class WatcherTask {
                            fileExecutor.processOutputEmit();
                            fileExecutor.processErrorEmit();
                            fileExecutor.processSingleFileResult(this, filePath, hash);
-                        } else if (debugMode) {
+                        } else {
                            logger.info(`File ${filePath} has already been built. False watcher trigger.`);
 
                            // remove built file from current building files list.
