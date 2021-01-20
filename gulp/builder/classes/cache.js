@@ -430,7 +430,7 @@ class Cache {
    }
 
    setBaseThemeInfo(resultThemeName) {
-      const { themes } = this.currentStore;
+      const { themes } = this.currentStore.themesMeta;
       themes[resultThemeName] = {
          files: []
       };
@@ -445,14 +445,14 @@ class Cache {
     */
    addThemePartIntoMeta(resultThemeName, relativePath) {
       const prettyRelativePath = helpers.unixifyPath(relativePath);
-      const { themes } = this.currentStore;
+      const { themes } = this.currentStore.themesMeta;
       if (!themes[resultThemeName].files.hasOwnProperty(prettyRelativePath)) {
          themes[resultThemeName].files.push(prettyRelativePath);
       }
    }
 
    getThemesMeta() {
-      return this.currentStore.themes;
+      return this.currentStore.themesMeta;
    }
 
    /**
