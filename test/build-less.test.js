@@ -97,7 +97,7 @@ describe('build less', () => {
          filePath,
          defaultModuleThemeObject,
          gulpModulesInfo,
-         defaultAutoprefixerOptions
+         { autoprefixerOptions: defaultAutoprefixerOptions }
       );
       result.imports.length.should.equal(2);
       result.text.should.equal(
