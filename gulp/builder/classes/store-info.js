@@ -43,12 +43,6 @@ class StoreInfo {
 
       this.themesMeta = {
 
-         // object with each css variable default value
-         defaultVariables: {},
-
-         // map with info about from where each css variable is taken
-         defaultVariablesMap: {},
-
          /**
           * Object with all meta info about themes:
           * 1) output theme name(e.g. default, default__cola, default__pink, etc.)

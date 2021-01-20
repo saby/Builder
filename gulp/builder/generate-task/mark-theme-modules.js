@@ -148,9 +148,6 @@ function generateTaskForMarkThemeModules(taskParameters) {
                } else if (fileName === 'fallback.json') {
                   try {
                      moduleInfo.themeVariables = JSON.parse(file.contents);
-                     if (themeName === 'default') {
-                        taskParameters.cache.addDefaultCssVariables(moduleInfo.themeVariables, `${moduleInfo.name}/fallback.json`);
-                     }
                   } catch (error) {
                      logger.error({
                         message: 'An error occurred when tried to parse fallback.json',

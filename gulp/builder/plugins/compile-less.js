@@ -100,16 +100,14 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
          break;
    }
 
-   const cssVariablesOptions = defaultCssVariablesOptions;
-
    /**
     * Use current context css variables if exists.
-    * Otherwise use global default css variables.
+    * Otherwise don't use postcss-css-variables.
     */
+   let cssVariablesOptions = null;
    if (moduleInfo.themeVariables) {
+      cssVariablesOptions = defaultCssVariablesOptions;
       cssVariablesOptions.variables = moduleInfo.themeVariables;
-   } else {
-      cssVariablesOptions.variables = taskParameters.cache.getDefaultCssVariables();
    }
    return through.obj(
 

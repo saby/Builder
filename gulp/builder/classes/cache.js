@@ -451,26 +451,6 @@ class Cache {
       }
    }
 
-   /**
-    * adds default css variables into themes cache to be used
-    * further in less compilation if there are no variables
-    * described in current module context(interface module
-    * fallback.json files with it's owm css variables)
-    * @param{Object} cssVariables - list of css variables
-    * @param{String} variablesSource - name of file with current css variables
-    */
-   addDefaultCssVariables(cssVariables, variablesSource) {
-      const { themesMeta } = this.currentStore;
-      Object.keys(cssVariables).forEach((cssVariable) => {
-         themesMeta.defaultVariables[cssVariable] = cssVariables[cssVariable];
-         themesMeta.defaultVariablesMap[cssVariable] = variablesSource;
-      });
-   }
-
-   getDefaultCssVariables() {
-      return this.currentStore.themesMeta.defaultVariables;
-   }
-
    getThemesMeta() {
       return this.currentStore.themesMeta;
    }
