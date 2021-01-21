@@ -5,7 +5,8 @@
 
 const fs = require('fs-extra'),
    path = require('path'),
-   logger = require('../../../lib/logger').logger();
+   logger = require('../../../lib/logger').logger(),
+   { defaultCssVariablesOptions } = require('../../../lib/builder-constants');
 
 /**
  * Class with current build data. For incremental build processing.
@@ -42,6 +43,10 @@ class StoreInfo {
       this.filesWithErrors = new Set();
 
       this.themesMeta = {
+         cssVariablesOptions: {
+            ...defaultCssVariablesOptions,
+            variables: {}
+         },
 
          /**
           * Object with all meta info about themes:

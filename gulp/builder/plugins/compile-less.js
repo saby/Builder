@@ -11,7 +11,7 @@ const through = require('through2'),
    transliterate = require('../../../lib/transliterate'),
    execInPool = require('../../common/exec-in-pool'),
    fs = require('fs-extra'),
-   { defaultAutoprefixerOptions, defaultCssVariablesOptions } = require('../../../lib/builder-constants'),
+   { defaultAutoprefixerOptions } = require('../../../lib/builder-constants'),
    cssExt = /\.css$/;
 
 /**
@@ -100,15 +100,6 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
          break;
    }
 
-   /**
-    * Use current context css variables if exists.
-    * Otherwise don't use postcss-css-variables.
-    */
-   let cssVariablesOptions = null;
-   if (moduleInfo.themeVariables) {
-      cssVariablesOptions = defaultCssVariablesOptions;
-      cssVariablesOptions.variables = moduleInfo.themeVariables;
-   }
    return through.obj(
 
       /* @this Stream */
@@ -254,7 +245,10 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                   file.contents.toString(),
                   moduleInfo.newThemesModule,
                   moduleInfo.path,
-                  { autoprefixerOptions, cssVariablesOptions },
+                  {
+                     autoprefixerOptions,
+                     cssVariablesOptions: taskParameters.cache.getCssVariablesoptions()
+                  },
                   gulpModulesInfo
                ],
                file.history[0],

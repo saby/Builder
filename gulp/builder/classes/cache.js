@@ -455,6 +455,17 @@ class Cache {
       return this.currentStore.themesMeta;
    }
 
+   addCssVariables(moduleVariables) {
+      const { variables } = this.currentStore.themesMeta.cssVariablesOptions;
+      Object.keys(moduleVariables).forEach((currentVariable) => {
+         variables[currentVariable] = moduleVariables[currentVariable];
+      });
+   }
+
+   getCssVariablesoptions() {
+      return this.currentStore.themesMeta.cssVariablesOptions;
+   }
+
    /**
     * Добавляет в кеш информацию о дополнительных генерируемых файлах.
     * Это нужно, чтобы в финале инкрементальной сборки удалить только не актуальные файлы.
