@@ -18,5 +18,6 @@ module.exports = new Set([
    'sbisru',
    'videoPlayer',
    'consultant',
-   'plugin'
+   'plugin',
+   'eduLanding'
 ]);
