@@ -96,8 +96,9 @@ function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap
    // there is no need in module-dependencies meta in debug mode. It's only needed by templates that
    // delivers now "as is" and doesn't compile in debug mode. Thus, module-dependencies meta now can be
    // disabled in debug mode too. Also enable it in builder unit test to check if it's properly working.
-   const needModuleDependencies = (config.isReleaseMode || config.builderTests) &&
-      (config.dependenciesGraph || config.customPack || config.deprecatedStaticHtml || config.checkModuleDependencies);
+   const needModuleDependencies = (config.isReleaseMode || moduleInfo.builderTests) &&
+      (moduleInfo.dependenciesGraph || moduleInfo.customPack ||
+         moduleInfo.deprecatedStaticHtml || moduleInfo.checkModuleDependencies);
 
    const pathsForImportSet = new Set();
    for (const modulePath of modulesMap.values()) {
@@ -138,37 +139,39 @@ function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap
                })
             )
             .pipe(changedInPlace(taskParameters, moduleInfo))
-            .pipe(gulpIf(config.typescript, compileEsAndTs(taskParameters, moduleInfo)))
+            .pipe(gulpIf(!!moduleInfo.typescript, compileEsAndTs(taskParameters, moduleInfo)))
             .pipe(addComponentInfo(taskParameters, moduleInfo))
 
             // compileLess зависит от addComponentInfo. Нужно для сбора темизируемых less.
-            .pipe(gulpIf(config.less, compileLess(taskParameters, moduleInfo, gulpModulesInfo)))
-            .pipe(gulpIf(config.htmlWml, gulpBuildHtmlTmpl(taskParameters, moduleInfo)))
-            .pipe(gulpIf(config.deprecatedWebPageTemplates, buildStaticHtml(taskParameters, moduleInfo, modulesMap)))
+            .pipe(gulpIf(!!moduleInfo.less, compileLess(taskParameters, moduleInfo, gulpModulesInfo)))
+            .pipe(gulpIf(!!moduleInfo.htmlWml, gulpBuildHtmlTmpl(taskParameters, moduleInfo)))
+            .pipe(
+               gulpIf(!!moduleInfo.deprecatedWebPageTemplates, buildStaticHtml(taskParameters, moduleInfo, modulesMap))
+            )
 
             // versionizeToStub зависит от compileLess, buildStaticHtml и gulpBuildHtmlTmpl
             .pipe(
                gulpIf(
-                  !!config.version && !taskParameters.config.localStand,
+                  !!moduleInfo.version && !taskParameters.config.localStand,
                   versionizeToStub(taskParameters, moduleInfo)
                )
             )
             .pipe(gulpIf(hasLocalization, indexDictionary(taskParameters, moduleInfo)))
             .pipe(
                gulpIf(
-                  (config.deprecatedXhtml && config.isReleaseMode) && !moduleInfo.isUnitTestModule,
+                  (!!moduleInfo.deprecatedXhtml && config.isReleaseMode) && !moduleInfo.isUnitTestModule,
                   localizeXhtml(taskParameters, moduleInfo)
                )
             )
             .pipe(
                gulpIf(
-                  (config.wml && config.isReleaseMode) && !moduleInfo.isUnitTestModule,
+                  (!!moduleInfo.wml && config.isReleaseMode) && !moduleInfo.isUnitTestModule,
                   buildTmpl(taskParameters, moduleInfo)
                )
             )
             .pipe(
                gulpIf(
-                  (config.deprecatedXhtml && config.isReleaseMode) && !moduleInfo.isUnitTestModule,
+                  (!!moduleInfo.deprecatedXhtml && config.isReleaseMode) && !moduleInfo.isUnitTestModule,
                   buildXhtml(taskParameters, moduleInfo)
                )
             )
@@ -181,26 +184,30 @@ function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap
              * оригинальной скомпиленной библиотеки.
              * Также в библиотеках нужен кэш шаблонов, чтобы паковать приватные части шаблонов.
              */
-            .pipe(gulpIf(config.minimize && !moduleInfo.isUnitTestModule, packLibrary(taskParameters, moduleInfo)))
+            .pipe(
+               gulpIf(!!moduleInfo.minimize && !moduleInfo.isUnitTestModule, packLibrary(taskParameters, moduleInfo))
+            )
 
             // packOwnDeps зависит от buildTmp  l, buildXhtml
-            .pipe(gulpIf(config.deprecatedOwnDependencies, packOwnDeps(taskParameters, moduleInfo)))
-            .pipe(gulpIf(config.minimize && !moduleInfo.isUnitTestModule, minifyCss(taskParameters, moduleInfo)))
+            .pipe(gulpIf(!!moduleInfo.deprecatedOwnDependencies, packOwnDeps(taskParameters, moduleInfo)))
+            .pipe(gulpIf(!!moduleInfo.minimize && !moduleInfo.isUnitTestModule, minifyCss(taskParameters, moduleInfo)))
 
             // minifyJs зависит от packOwnDeps
-            .pipe(gulpIf(config.minimize && !moduleInfo.isUnitTestModule, minifyJs(taskParameters, moduleInfo)))
-            .pipe(gulpIf(config.minimize && !moduleInfo.isUnitTestModule, minifyOther(taskParameters, moduleInfo)))
+            .pipe(gulpIf(!!moduleInfo.minimize && !moduleInfo.isUnitTestModule, minifyJs(taskParameters, moduleInfo)))
+            .pipe(
+               gulpIf(!!moduleInfo.minimize && !moduleInfo.isUnitTestModule, minifyOther(taskParameters, moduleInfo))
+            )
 
             // createVersionedModules и createCdnModules зависит от versionizeToStub
             .pipe(
                gulpIf(
-                  !!config.version && !taskParameters.config.localStand,
+                  !!moduleInfo.version && !taskParameters.config.localStand,
                   createVersionedModules(taskParameters, moduleInfo)
                )
             )
             .pipe(
                gulpIf(
-                  !!config.version && !taskParameters.config.localStand,
+                  !!moduleInfo.version && !taskParameters.config.localStand,
                   createCdnModules(taskParameters, moduleInfo)
                )
             )
@@ -210,15 +217,15 @@ function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap
                   file.basename = transliterate(file.basename);
                })
             )
-            .pipe(gulpIf(config.presentationServiceMeta, createRoutesInfoJson(taskParameters, moduleInfo)))
-            .pipe(gulpIf(config.presentationServiceMeta, createNavigationModulesJson(taskParameters, moduleInfo)))
+            .pipe(gulpIf(!!moduleInfo.presentationServiceMeta, createRoutesInfoJson(taskParameters, moduleInfo)))
+            .pipe(gulpIf(!!moduleInfo.presentationServiceMeta, createNavigationModulesJson(taskParameters, moduleInfo)))
 
             // createContentsJson зависит от buildStaticHtml и addComponentInfo
             .pipe(gulpIf(config.contents, createContentsJson(taskParameters, moduleInfo)))
-            .pipe(gulpIf(config.customPack, createLibrariesJson(taskParameters, moduleInfo)))
+            .pipe(gulpIf(!!moduleInfo.customPack, createLibrariesJson(taskParameters, moduleInfo)))
 
             // createStaticTemplatesJson зависит от buildStaticHtml и gulpBuildHtmlTmpl
-            .pipe(gulpIf(config.presentationServiceMeta, createStaticTemplatesJson(taskParameters, moduleInfo)))
+            .pipe(gulpIf(!!moduleInfo.presentationServiceMeta, createStaticTemplatesJson(taskParameters, moduleInfo)))
 
             // For the record, gulp-if has a strange logic:
             // if it gets undefined as a condition, plugin executes in any case.

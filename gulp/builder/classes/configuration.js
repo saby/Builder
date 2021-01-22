@@ -179,6 +179,8 @@ class BuildConfiguration {
     * Configuring all common flags for Builder plugins
     */
    configureBuildFlags() {
+      const flagsList = [];
+
       // write all bool and string parameters of read config. Builder will use only known flags.
       Object.keys(this.rawConfig).forEach((currentOption) => {
          if (
@@ -186,6 +188,7 @@ class BuildConfiguration {
             (typeof this.rawConfig[currentOption] === 'boolean' || typeof this.rawConfig[currentOption] === 'string')
          ) {
             this[currentOption] = this.rawConfig[currentOption];
+            flagsList.push(currentOption);
          }
       });
 
@@ -204,12 +207,15 @@ class BuildConfiguration {
             default:
                break;
          }
+         flagsList.push('autoprefixer');
       }
 
       // parse themes from config and use it to build theme interface modules
       if (this.rawConfig.hasOwnProperty('themes') && this.rawConfig.themes instanceof Array) {
          this.themes = parseThemesFlag(this.rawConfig.themes);
+         flagsList.push('themes');
       }
+      return flagsList;
    }
 
    /**
@@ -240,7 +246,7 @@ class BuildConfiguration {
          this.version = this.rawConfig.version;
       }
 
-      this.configureBuildFlags();
+      const flagsList = this.configureBuildFlags();
       this.cachePath = this.rawConfig.cache;
       this.isReleaseMode = this.getBuildMode() === 'release';
 
@@ -375,6 +381,7 @@ class BuildConfiguration {
       if (this.compiled) {
          this.additionalCachePath = path.dirname(this.compiled);
       }
+      return flagsList;
    }
 
    /**
@@ -386,7 +393,7 @@ class BuildConfiguration {
       const { config, nativeWatcher } = ConfigurationReader.getProcessParameters(argv);
       this.configFile = config;
       this.rawConfig = ConfigurationReader.readConfigFileSync(this.configFile, process.cwd());
-      this.configMainBuildInfo();
+      const flagsList = this.configMainBuildInfo();
 
       // native watcher executing state. If true,
       // source modules symlinks can't be recreated, because watcher watches theirs directories
@@ -441,6 +448,13 @@ class BuildConfiguration {
          if (moduleInfo.name === 'HotReload' && this.staticServer) {
             moduleInfo.staticServer = this.staticServer;
          }
+         flagsList.forEach((currentFlag) => {
+            if (module.hasOwnProperty(currentFlag)) {
+               moduleInfo[currentFlag] = module[currentFlag];
+            } else if (!moduleInfo.hasOwnProperty(currentFlag)) {
+               moduleInfo[currentFlag] = this[currentFlag];
+            }
+         });
          this.modules.push(moduleInfo);
       }
       if (mainModulesForTemplates.View && mainModulesForTemplates.UI) {
