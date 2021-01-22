@@ -2229,6 +2229,73 @@ describe('gulp/builder/generate-workflow.js', () => {
 
          await clearWorkspace();
       });
+      it('custom pack must have an ability to work with debug files', async() => {
+         const fixtureFolder = path.join(__dirname, 'fixture/custompack');
+         await prepareTest(fixtureFolder);
+         await linkPlatform(sourceFolder);
+
+         const testResults = async() => {
+            // there shouldn't be any artifacts of minimize
+            (await isRegularFile('InterfaceModule1', 'amdModule.min.css')).should.equal(false);
+            (await isRegularFile('InterfaceModule1', 'amdModule.min.js')).should.equal(false);
+
+            // there shouldn't be any artifacts of typescript compile and libraries pack
+            (await isRegularFile('InterfaceModule1', 'library.js')).should.equal(false);
+            (await isRegularFile('InterfaceModule1', 'library.min.js')).should.equal(false);
+            (await isRegularFile('InterfaceModule1/private', 'module1.js')).should.equal(false);
+            (await isRegularFile('InterfaceModule1/private', 'module1.min.js')).should.equal(false);
+            (await isRegularFile('InterfaceModule1/private', 'module2.js')).should.equal(false);
+            (await isRegularFile('InterfaceModule1/private', 'module2.min.js')).should.equal(false);
+
+            // there shouldn't be any artifacts of custom pack
+            (await isRegularFile('InterfaceModule1/.builder', 'superbundle-for-builder-tests.package.js.package.json')).should.equal(false);
+            (await isRegularFile('InterfaceModule1/packages', 'superbundle-for-builder-tests.package.min.css')).should.equal(false);
+            (await isRegularFile('InterfaceModule1/packages', 'superbundle-for-builder-tests.package.min.js')).should.equal(false);
+         };
+
+         const desktopConfig = {
+            cache: cacheFolder,
+            output: outputFolder,
+            typescript: true,
+            less: true,
+            wml: true,
+            builderTests: true,
+            minimize: true,
+            debugCustomPack: true,
+            dependenciesGraph: true,
+            distributive: false,
+            joinedMeta: true,
+            modules: [
+               {
+                  name: 'Модуль',
+                  path: path.join(sourceFolder, 'Модуль')
+               },
+               {
+                  name: 'ExternalInterfaceModule',
+                  path: path.join(sourceFolder, 'ExternalInterfaceModule')
+               },
+               {
+                  name: 'InterfaceModule1',
+                  path: path.join(sourceFolder, 'InterfaceModule1'),
+                  minimize: false,
+                  typescript: false,
+                  less: false,
+                  wml: false,
+                  debugCustomPack: false,
+                  dependenciesGraph: false
+               }
+            ]
+         };
+         await fs.writeJSON(configPath, desktopConfig);
+
+         await runWorkflowWithTimeout();
+         await testResults();
+
+         await runWorkflowWithTimeout();
+         await testResults();
+
+         await clearWorkspace();
+      });
       it('packed modules must be removed when "sources" flag has "false" value', async() => {
          const fixtureFolder = path.join(__dirname, 'fixture/custompack');
          await prepareTest(fixtureFolder);
