@@ -50,6 +50,22 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
             relativeFilePath = path.join(moduleInfo.name, relativeFilePath);
 
+            const jsInSources = file.history[0].replace('.ts', '.js');
+            if (await fs.pathExists(jsInSources)) {
+               const message =
+                  `Существующий JS-файл мешает записи результата компиляции '${file.path}'.`;
+
+               // выводим в режиме debug, т.к. это подготовительный этап сборки и никому не интересно особо
+               logger.debug({
+                  message,
+                  filePath: jsInSources,
+                  moduleInfo
+               });
+               callback(null, file);
+               taskParameters.storePluginTime('typescript', startTime);
+               return;
+            }
+
             if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
                const compiledBase = path.join(
                   taskParameters.config.compiled,
@@ -74,22 +90,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   return;
                }
                logger.debug(`There is no corresponding compiled file for source file: ${file.history[0]}. It has to be compiled, then.`);
-            }
-
-            const jsInSources = file.history[0].replace('.ts', '.js');
-            if (await fs.pathExists(jsInSources)) {
-               const message =
-                  `Существующий JS-файл мешает записи результата компиляции '${file.path}'.`;
-
-               // выводим в режиме debug, т.к. это подготовительный этап сборки и никому не интересно особо
-               logger.debug({
-                  message,
-                  filePath: jsInSources,
-                  moduleInfo
-               });
-               callback(null, file);
-               taskParameters.storePluginTime('typescript', startTime);
-               return;
             }
 
             const result = await compileEsAndTs(relativeFilePath, file.contents.toString(), moduleInfo.name);
