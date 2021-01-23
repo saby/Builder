@@ -118,7 +118,7 @@ module.exports = function generateTaskForSaveJoinedMeta(taskParameters) {
                resultThemesMeta[`themes/${currentTheme}${fileSuffix}.css`] = themes[currentTheme].files.map(file => `${file}${fileSuffix}.css`);
             }
          });
-         await fs.outputJson(path.join(root, 'themesMeta.json'), resultThemesMeta);
+         await fs.outputJson(path.join(root, 'themes.json'), resultThemesMeta);
       };
    }
    return async function saveJoinedMeta() {
