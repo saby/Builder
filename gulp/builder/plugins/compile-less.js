@@ -181,7 +181,8 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
             }
 
             let relativeFilePath;
-            if (moduleInfo.newThemesModule && file.basename === 'theme.less') {
+            const isThemeLess = file.basename === 'theme.less';
+            if (moduleInfo.newThemesModule && isThemeLess) {
                let modifier = '';
                relativeFilePath = getRelativePath(moduleInfo.path, file.history[0]).replace('.less', '');
                moduleInfo.modifiers.forEach((currentModifier) => {
@@ -247,7 +248,8 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                   moduleInfo.path,
                   {
                      autoprefixerOptions,
-                     cssVariablesOptions: taskParameters.cache.getCssVariablesoptions()
+                     cssVariablesOptions: taskParameters.cache.getCssVariablesoptions(),
+                     isThemeLess
                   },
                   gulpModulesInfo
                ],
