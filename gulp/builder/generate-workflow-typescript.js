@@ -33,9 +33,9 @@ function generateBuildWorkflowTypescript(processArgv) {
    return generateTaskForTypescriptCompile(taskParameters, output);
 }
 
-function generateTaskForTypescriptCompile(taskParameters, output, tscFlags) {
+function generateTaskForTypescriptCompile(taskParameters, output) {
    return function runTypescriptCompiler() {
-      return typescriptCompiler(taskParameters, output, tscFlags);
+      return typescriptCompiler(taskParameters, output);
    };
 }
 
