@@ -1,5 +1,5 @@
 (function () {var bundleExports = {};
-require(["UI/Executor","i18n!Modul","require"],function(UI_Executor,i18n_Modul,require) {
+define('Modul/lazy-private.package.min',['UI/Executor','i18n!Modul','require'],function(UI_Executor,i18n_Modul,require) {
 var wml_Modul_private;
 Object.defineProperty(bundleExports, 'wml!Modul/private', {get: function() {if (!wml_Modul_private) {wml_Modul_private = {};var result = function(e,t){function r(){debugger;}var b=e.TClosure,a=Array.prototype.slice.call(arguments),i,n,o=function e(t,r,a,i,n,o,d){var u=0,c=0,f=b.validateNodeKey(r&&r.key),l={id:[],def:void 0},s=b.calcParent(this,'undefined'===typeof currentPropertyName?void 0:currentPropertyName,t);if('undefined'===typeof o)o=false;var v=b.createGenerator(i,o,d),p='Modul/private',y=b.getRk(p),m=this;try{var h=v.joinElements([v.createTag('div',{attributes:{},events:'undefined'===typeof window?{}:{},key:f+'0_'},[],r,l,s)],f,l);if(l&&l.def)h=v.chain(h,l,this),l=void 0;}catch(e){b.templateError(p,e,t);}return h||v.createText('');};return o.stable=true,o.reactiveProps=[],o.isWasabyTemplate=true,o;}(UI_Executor,i18n_Modul);if (result) {wml_Modul_private = result;}}return wml_Modul_private;},enumerable: true});
 var Modul_private;
@@ -14,13 +14,14 @@ var InterfaceModule1__private_module2;
 Object.defineProperty(bundleExports, 'InterfaceModule1/_private/module2', {get: function() {if (!InterfaceModule1__private_module2) {InterfaceModule1__private_module2 = {};var result = function(e,t){'use strict';Object.defineProperty(t,'__esModule',{value:true});var r=function(){function e(e){this.variables=e;}return e;}();t.default=r;}(require,InterfaceModule1__private_module2);if (result) {InterfaceModule1__private_module2 = result;}}return InterfaceModule1__private_module2;},enumerable: true});
 var InterfaceModule1__private_module1;
 Object.defineProperty(bundleExports, 'InterfaceModule1/_private/module1', {get: function() {if (!InterfaceModule1__private_module1) {InterfaceModule1__private_module1 = {};var result = function(e,t){'use strict';Object.defineProperty(t,'__esModule',{value:true});var r=function(){function e(e){this.variables=e;}return e;}();t.default=r;}(require,InterfaceModule1__private_module1);if (result) {InterfaceModule1__private_module1 = result;}}return InterfaceModule1__private_module1;},enumerable: true});
-(function(){define('css!InterfaceModule2/moduleStyle',['css!Modul/lazy-private.package'],'');define('css!InterfaceModule1/moduleStyle',['css!Modul/lazy-private.package'],'');define('css!InterfaceModule1/amdModule',['css!Modul/lazy-private.package'],'');})();
-define('wml!Modul/private',  function() {return bundleExports['wml!Modul/private'];});
-define('Modul/private',  function() {return bundleExports['Modul/private'];});
-define('InterfaceModule2/amdModule', ['css!InterfaceModule2/amdModule'],  function() {return bundleExports['InterfaceModule2/amdModule'];});
-define('InterfaceModule1/library',  function() {return bundleExports['InterfaceModule1/library'];});
-define('InterfaceModule1/amdModule', ['css!InterfaceModule1/amdModule'],  function() {return bundleExports['InterfaceModule1/amdModule'];});
-define('InterfaceModule1/_private/module2',  function() {return bundleExports['InterfaceModule1/_private/module2'];});
-define('InterfaceModule1/_private/module1',  function() {return bundleExports['InterfaceModule1/_private/module1'];});
 });
+
+(function(){define('css!InterfaceModule2/moduleStyle',['css!Modul/lazy-private.package'],'');define('css!InterfaceModule1/moduleStyle',['css!Modul/lazy-private.package'],'');define('css!InterfaceModule1/amdModule',['css!Modul/lazy-private.package'],'');})();
+define('wml!Modul/private',['Modul/lazy-private.package.min'], function() {return bundleExports['wml!Modul/private'];});
+define('Modul/private',['Modul/lazy-private.package.min'], function() {return bundleExports['Modul/private'];});
+define('InterfaceModule2/amdModule',['css!InterfaceModule2/amdModule','Modul/lazy-private.package.min'],  function() {return bundleExports['InterfaceModule2/amdModule'];});
+define('InterfaceModule1/library',['Modul/lazy-private.package.min'], function() {return bundleExports['InterfaceModule1/library'];});
+define('InterfaceModule1/amdModule',['css!InterfaceModule1/amdModule','Modul/lazy-private.package.min'],  function() {return bundleExports['InterfaceModule1/amdModule'];});
+define('InterfaceModule1/_private/module2',['Modul/lazy-private.package.min'], function() {return bundleExports['InterfaceModule1/_private/module2'];});
+define('InterfaceModule1/_private/module1',['Modul/lazy-private.package.min'], function() {return bundleExports['InterfaceModule1/_private/module1'];});
 })();
