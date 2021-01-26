@@ -25,7 +25,13 @@ const INTERCEPT_IGNORE = [
     * 2) create a common library for these aspects - there will be overhead of transferred
     * data due to useless aspects in library.
     */
-   'I18n'
+   'I18n',
+
+   /**
+    * It's a wasaby-dev-tools module and it builds by builder only in tests,
+    * so there is no need in libraries intersections check
+    */
+   'injection'
 ];
 
 // плагины, которые должны попасть в links
