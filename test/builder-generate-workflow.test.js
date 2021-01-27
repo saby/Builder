@@ -2643,15 +2643,19 @@ describe('gulp/builder/generate-workflow.js', () => {
             'StableES.es',
             'StableTS.ts',
             'Stable.routes.ts',
-            'Stable.routes.js'
+            'Stable.routes.js',
+            'ReactTest.tsx',
+            'ReactTest.js'
          ]);
 
          const EsOutputPath = path.join(moduleOutputFolder, 'StableES.js');
          const TsOutputPath = path.join(moduleOutputFolder, 'StableTS.js');
+         const TsxOutputPath = path.join(moduleOutputFolder, 'ReactTest.js');
          const RoutesTsOutputPath = path.join(moduleOutputFolder, 'Stable.routes.js');
 
          const EsContent = await fs.readFile(EsOutputPath);
          const TsContent = await fs.readFile(TsOutputPath);
+         const TsxContent = await fs.readFile(TsxOutputPath);
          const RoutesTsContent = await fs.readFile(RoutesTsOutputPath);
 
          removeRSymbol(RoutesTsContent.toString()).should.equal(
@@ -2690,6 +2694,16 @@ describe('gulp/builder/generate-workflow.js', () => {
                '    };\n' +
                '    exports.default = Factory;\n' +
                '});\n'
+         );
+         removeRSymbol(TsxContent.toString()).should.equal(
+             'define("Modul/ReactTest", ["require", "exports", "tslib", "react/jsx-runtime"], function (require, exports, tslib_1, jsx_runtime_1) {\n' +
+             '    "use strict";\n' +
+             '    Object.defineProperty(exports, "__esModule", { value: true });\n' +
+             '    function Square(props) {\n' +
+             '        return (jsx_runtime_1.jsx("button", tslib_1.__assign({ className: "square", onClick: props.onClick }, { children: props.value }), void 0));\n' +
+             '    }\n' +
+             '    exports.default = Square;\n' +
+             '});\n'
          );
       };
 

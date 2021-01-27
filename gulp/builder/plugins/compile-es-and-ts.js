@@ -11,7 +11,7 @@ const through = require('through2'),
    logger = require('../../../lib/logger').logger(),
    transliterate = require('../../../lib/transliterate'),
    execInPool = require('../../common/exec-in-pool'),
-   esExt = /\.(es|ts)$/,
+   esExt = /\.(es|tsx?)$/,
    jsExt = /\.js$/;
 
 /**
@@ -31,7 +31,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                return;
             }
 
-            if (!['.es', '.ts', '.js'].includes(file.extname)) {
+            if (!['.es', '.ts', '.js', '.tsx'].includes(file.extname)) {
                callback(null, file);
                return;
             }
@@ -46,9 +46,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             if (file.extname === '.js') {
                const
                   esInSource = await fs.pathExists(file.path.replace(jsExt, '.es')),
-                  tsInSource = await fs.pathExists(file.path.replace(jsExt, '.ts'));
+                  tsInSource = await fs.pathExists(file.path.replace(jsExt, '.ts')),
+                  tsxInSource = await fs.pathExists(file.path.replace(jsExt, '.tsx'));
 
-               if (esInSource || tsInSource) {
+               if (esInSource || tsInSource || tsxInSource) {
                   callback(null);
                } else {
                   callback(null, file);
@@ -94,7 +95,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   compiledBase,
                   file.relative
                );
-               const compiledPath = path.join(compiledSourcePath.replace(/\.ts/, '.js'));
+               const compiledPath = path.join(compiledSourcePath.replace(/\.tsx?/, '.js'));
                const [, result] = await execInPool(
                   taskParameters.pool,
                   'readCompiledFile',
@@ -115,7 +116,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   if (taskParameters.config.minimize) {
                      const resultForCache = {
                         text: result,
-                        moduleName: relativeFilePath.replace(/\\/g, '/').replace('.ts', '')
+                        moduleName: relativeFilePath.replace(/\\/g, '/').replace(/\.tsx?$/, '')
                      };
 
                      // алиас для совместимости с кэшем шаблонов при паковке библиотек.
