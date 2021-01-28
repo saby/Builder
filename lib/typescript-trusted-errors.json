@@ -1616,5 +1616,14 @@
   "View/Executor/_Utils/RequireHelper.ts(61,14): error TS2554:",
   "WS.Core/res/js/_revive-controls/control.ts(15,43): error TS2554:",
   "EngineUnit",
-  "LongOperations/_notifier"
+  "LongOperations/_notifier",
+  "Recruitment/Candidate/_page/Utils/Sources.ts",
+  "Recruitment/Candidate/_tag/Utils/Source.ts",
+  "Recruitment/CandidateAttachment/_requiredScans/Utils/Sources.ts",
+  "Recruitment/CandidateEvent/_filter/Utils/Sources.ts",
+  "Recruitment/CandidateEvent/_page/Utils/Sources.ts",
+  "Recruitment/CandidateEvent/_report/Utils/Source.ts",
+  "Recruitment/CandidateResult/_tree/Utils/Source.ts",
+  "Recruitment/VacancyEnquiry/_document/Tabs/Candidates/Utils/Sources.ts",
+  "Recruitment/VacancyEnquiry/_page/Utils/Sources.ts"
 ]
