@@ -34,6 +34,7 @@
    "dependencies": {
       "async": "2.6.1",
       "autoprefixer": "9.5.0",
+      "postcss-discard-duplicates": "4.0.2",
       "clean-css": "4.1.11",
       "escodegen": "1.11.0",
       "esprima": "4.0.1",
@@ -55,7 +56,7 @@
       "strip-bom": "3.0.0",
       "tensor-xmldom": "0.2.0-b9",
       "through2": "2.0.3",
-      "saby-typescript": "git+https://platform-git.sbis.ru/saby/TypeScript.git#rc-21.1100",
+      "saby-typescript": "git+https://platform-git.sbis.ru/saby/TypeScript.git#21.2000/feature/update-tsc-version",
       "saby-units": "git+https://platform-git.sbis.ru/saby/Units.git#rc-21.1100",
       "uglify-js": "3.3.23",
       "vinyl": "2.2.0",
