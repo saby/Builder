@@ -62,7 +62,8 @@
       "workerpool": "6.0.0",
       "semver": "6.3.0",
       "react": "17.0.1",
-      "react-dom": "17.0.1"
+      "react-dom": "17.0.1",
+      "postcss-discard-duplicates": "4.0.2"
    },
    "devDependencies": {
       "@tensor-corp/eslint-config": "2.0.3",
