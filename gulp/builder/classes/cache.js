@@ -475,7 +475,7 @@ class Cache {
       const { fallbackList } = this.currentStore.themesMeta;
       let LAST_OVERALL_HASH;
       if (this.lastStore.themesMeta.hasOwnProperty('fallbackList')) {
-         LAST_OVERALL_HASH = this.lastStore.themesMeta.fallbackList.OVERALL_HASH
+         LAST_OVERALL_HASH = this.lastStore.themesMeta.fallbackList.OVERALL_HASH;
       } else {
          LAST_OVERALL_HASH = '';
       }
