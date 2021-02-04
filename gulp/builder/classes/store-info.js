@@ -54,7 +54,16 @@ class StoreInfo {
           * 2) list of parts of the theme with theirs relatives paths
           * 3) parameter value whether it should be rebuilt
           */
-         themes: {}
+         themes: {},
+
+         // all essential info about fallback.json meta
+         // 1) variables map(from which fallback.json it was taken)
+         // 2) overall hash sum(it's required to make
+         // a decision whether drop cache for all built less files)
+         fallbackList: {
+            variablesMap: {},
+            OVERALL_HASH: ''
+         }
       };
    }
 
