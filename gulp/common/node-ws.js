@@ -48,7 +48,9 @@ function initWs(requiredModules) {
    global.wsConfig = {
       appRoot,
       wsRoot: path.join(appRoot, '/WS.Core'),
-      resourceRoot: appRoot
+      resourceRoot: appRoot,
+      IS_BUILDER: true,
+      RESOURCES_PATH: process.env['resources-path'] || '/'
    };
    global.wsBindings = {
       ITransport() {
