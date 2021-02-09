@@ -186,7 +186,9 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                let modifier = '';
                relativeFilePath = getRelativePath(moduleInfo.path, file.history[0]).replace('.less', '');
                moduleInfo.modifiers.forEach((currentModifier) => {
-                  if (relativeFilePath.startsWith(path.join(moduleInfo.name, currentModifier, path.sep))) {
+                  // prevent situation when empty modifier passes check for current theme after the modifier was
+                  // found, e.g. when modifier is "dark" , but "" modifier also pass check, we need to use "dark", then.
+                  if (relativeFilePath === path.join(moduleInfo.name, currentModifier, path.sep) && !modifier) {
                      modifier = currentModifier;
                   }
                });
