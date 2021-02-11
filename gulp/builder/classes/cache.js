@@ -112,7 +112,8 @@ class Cache {
       return this.lastStore.startBuildTime === 0;
    }
 
-   async load(patchBuild) {
+   async load(modulesForPatch) {
+      const patchBuild = modulesForPatch && modulesForPatch.length > 0;
       await this.lastStore.load(this.config.cachePath);
 
       /**
@@ -128,6 +129,23 @@ class Cache {
       // read current builder hash from root of builder.
       this.currentStore.hashOfBuilder = await fs.readFile(path.join(__dirname, '../../../builderHashFile'), 'utf8');
       this.currentStore.startBuildTime = new Date().getTime();
+
+      if (patchBuild && this.lastStore.themesMeta) {
+         const lastStoreThemes = this.lastStore.themesMeta.themes;
+         const currentStoreThemes = this.currentStore.themesMeta.themes;
+         Object.keys(lastStoreThemes).forEach((currentTheme) => {
+            lastStoreThemes[currentTheme].forEach((currentThemePart) => {
+               const moduleName = currentThemePart.split('/').shift();
+               if (!modulesForPatch.includes(moduleName)) {
+                  if (!currentStoreThemes.hasOwnProperty(currentTheme)) {
+                     currentStoreThemes[currentTheme] = [];
+                  }
+                  currentStoreThemes[currentTheme].push(currentThemePart);
+               }
+            });
+         });
+      }
+
       await pMap(
          this.config.modules,
          async(moduleInfo) => {
@@ -439,9 +457,9 @@ class Cache {
 
    setBaseThemeInfo(resultThemeName) {
       const { themes } = this.currentStore.themesMeta;
-      themes[resultThemeName] = {
-         files: []
-      };
+      if (!themes.hasOwnProperty(resultThemeName)) {
+         themes[resultThemeName] = [];
+      }
    }
 
    /**
@@ -454,8 +472,8 @@ class Cache {
    addThemePartIntoMeta(resultThemeName, relativePath) {
       const prettyRelativePath = helpers.unixifyPath(relativePath);
       const { themes } = this.currentStore.themesMeta;
-      if (!themes[resultThemeName].files.hasOwnProperty(prettyRelativePath)) {
-         themes[resultThemeName].files.push(prettyRelativePath);
+      if (!themes[resultThemeName].includes(prettyRelativePath)) {
+         themes[resultThemeName].push(prettyRelativePath);
       }
    }
 

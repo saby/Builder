@@ -110,7 +110,7 @@ function generateTaskForLoadCache(taskParameters) {
       if (taskParameters.config.compiled) {
          await taskParameters.cache.loadCompiled();
       }
-      await taskParameters.cache.load(modulesForPatch && modulesForPatch.length > 0);
+      await taskParameters.cache.load(modulesForPatch);
       taskParameters.storeTaskTime('loadCache', startTime);
    };
 }
