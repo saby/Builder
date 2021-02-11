@@ -84,13 +84,13 @@ async function generateJoinedThemes(root, fileSuffix, themes) {
    await pMap(
       Object.keys(themes),
       async(currentTheme) => {
-         const debugContent = await getJoinedThemeContent(root, '', themes[currentTheme].files);
+         const debugContent = await getJoinedThemeContent(root, '', themes[currentTheme]);
          await fs.outputFile(
             path.join(root, 'themes', `${currentTheme}.css`),
             debugContent
          );
          if (typeof fileSuffix === 'string') {
-            const releaseContent = await getJoinedThemeContent(root, fileSuffix, themes[currentTheme].files);
+            const releaseContent = await getJoinedThemeContent(root, fileSuffix, themes[currentTheme]);
             await fs.outputFile(
                path.join(root, 'themes', `${currentTheme}${fileSuffix}.css`),
                releaseContent
@@ -113,9 +113,9 @@ module.exports = function generateTaskForSaveJoinedMeta(taskParameters) {
          const resultThemesMeta = {};
          const { themes } = taskParameters.cache.getThemesMeta();
          Object.keys(themes).forEach((currentTheme) => {
-            resultThemesMeta[`themes/${currentTheme}.css`] = themes[currentTheme].files.map(file => `${file}.css`);
+            resultThemesMeta[`themes/${currentTheme}.css`] = themes[currentTheme].map(file => `${file}.css`);
             if (typeof fileSuffix === 'string') {
-               resultThemesMeta[`themes/${currentTheme}${fileSuffix}.css`] = themes[currentTheme].files.map(file => `${file}${fileSuffix}.css`);
+               resultThemesMeta[`themes/${currentTheme}${fileSuffix}.css`] = themes[currentTheme].map(file => `${file}${fileSuffix}.css`);
             }
          });
          await fs.outputJson(path.join(root, 'themes.json'), resultThemesMeta);
