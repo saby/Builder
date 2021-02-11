@@ -249,7 +249,8 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                   {
                      autoprefixerOptions,
                      cssVariablesOptions: taskParameters.cache.getCssVariablesoptions(),
-                     isThemeLess
+                     isThemeLess,
+                     root: path.dirname(moduleInfo.path)
                   },
                   gulpModulesInfo
                ],
