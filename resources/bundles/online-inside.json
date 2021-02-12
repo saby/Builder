@@ -407,7 +407,7 @@
   "resources/NC/packages/NCControls.package.min",
   "resources/NC/packages/NCCore.package.min",
   "resources/NC/packages/NCShared.package.min",
-  "resources/NavigationPanels/NavigationPanels.package.min",
+  "resources/NavigationPanels/page-superbundle.package.min",
   "resources/News/SuggestNewsList/SuggestNewsList.package.min",
   "resources/News/VDom/FeedVDom.package.min",
   "resources/News/VDom/Emoji/WasabyEmoji.package.min",
