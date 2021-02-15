@@ -25,7 +25,7 @@ const through = require('through2'),
    execInPool = require('../../common/exec-in-pool'),
    fs = require('fs-extra'),
    helpers = require('../../../lib/helpers'),
-   esExt = /\.(es|ts)$/;
+   esExt = /\.(es|ts|tsx)$/;
 
 const excludeRegexes = [
    /.*\.min\.js$/,
@@ -171,8 +171,14 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             }
 
             if (!file.modulepack) {
+               let minText;
+               if (file.productionContents) {
+                  minText = file.productionContents.toString();
+               } else {
+                  minText = file.contents.toString();
+               }
+
                // если файл не возможно минифицировать, то запишем оригинал
-               let minText = file.contents.toString();
                const [error, minified] = await execInPool(taskParameters.pool, 'uglifyJs', [
                   file.path,
                   minText,
@@ -199,7 +205,12 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             } else {
                // минимизируем оригинальный JS
                // если файл не возможно минифицировать, то запишем оригинал
-               let minOriginalText = file.contents.toString();
+               let minOriginalText;
+               if (file.productionContents) {
+                  minOriginalText = file.productionContents.toString();
+               } else {
+                  minOriginalText = file.contents.toString();
+               }
                const [errorOriginal, minifiedOriginal] = await execInPool(taskParameters.pool, 'uglifyJs', [
                   file.path,
                   minOriginalText,

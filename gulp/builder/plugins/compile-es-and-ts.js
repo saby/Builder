@@ -141,10 +141,18 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                logger.debug(`There is no corresponding compiled file for source file: ${file.history[0]}. It has to be compiled, then.`);
             }
 
+            let extraOptions;
+            if (file.extname === '.tsx') {
+               extraOptions = { development: { 'jsx': 'react-jsxdev' } };
+               if (taskParameters.config.isReleaseMode) {
+                  extraOptions.production = { 'jsx': 'react-jsx' };
+               }
+            }
+
             const [error, result] = await execInPool(
                taskParameters.pool,
                'compileEsAndTs',
-               [relativeFilePath, file.contents.toString(), moduleInfo.name],
+               [relativeFilePath, file.contents.toString(), moduleInfo.name, extraOptions],
                file.history[0],
                moduleInfo
             );
@@ -159,7 +167,9 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                return;
             }
 
-            taskParameters.storePluginTime('typescript', result.passedTime, true);
+            Object.keys(result).forEach((currentMode) => {
+               taskParameters.storePluginTime('typescript', result[currentMode].passedTime, true);
+            });
             taskParameters.cache.addOutputFile(file.history[0], outputPath, moduleInfo);
 
             /**
@@ -167,12 +177,17 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
              * builder flag "minimize"
              */
             if (taskParameters.config.minimize) {
-               // алиас для совместимости с кэшем шаблонов при паковке библиотек.
-               result.nodeName = result.moduleName;
-               moduleInfo.cache.storeCompiledES(file.history[0], result);
+               const currentResult = result.production || result.development;
+
+               // alias for bacward compatibility with templates cache during libraries packing
+               currentResult.nodeName = currentResult.moduleName;
+               moduleInfo.cache.storeCompiledES(file.history[0], currentResult);
             }
             const newFile = file.clone();
-            newFile.contents = Buffer.from(result.text);
+            newFile.contents = Buffer.from(result.development.text);
+            if (result.production) {
+               newFile.productionContents = Buffer.from(result.production.text);
+            }
             newFile.compiled = true;
             newFile.path = outputPath;
             newFile.base = moduleInfo.output;
