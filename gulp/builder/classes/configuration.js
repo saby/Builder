@@ -432,6 +432,9 @@ class BuildConfiguration {
             case 'UI':
                mainModulesForTemplates.UI = true;
                break;
+            case 'Compiler':
+               mainModulesForTemplates.Compiler = true;
+               break;
             default:
                break;
          }
@@ -457,7 +460,7 @@ class BuildConfiguration {
          });
          this.modules.push(moduleInfo);
       }
-      if (mainModulesForTemplates.View && mainModulesForTemplates.UI) {
+      if (mainModulesForTemplates.View && mainModulesForTemplates.UI && mainModulesForTemplates.Compiler) {
          this.templateBuilder = true;
       }
 

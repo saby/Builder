@@ -860,6 +860,10 @@ describe('gulp/builder/generate-workflow.js', () => {
             {
                name: 'UI',
                path: path.join(sourceFolder, 'UI')
+            },
+            {
+               name: 'Compiler',
+               path: path.join(sourceFolder, 'Compiler')
             }
          ]
       };
@@ -1156,6 +1160,10 @@ describe('gulp/builder/generate-workflow.js', () => {
             {
                name: 'UI',
                path: path.join(sourceFolder, 'UI')
+            },
+            {
+               name: 'Compiler',
+               path: path.join(sourceFolder, 'Compiler')
             }
          ]
       };
@@ -1340,6 +1348,10 @@ describe('gulp/builder/generate-workflow.js', () => {
             {
                name: 'UI',
                path: path.join(sourceFolder, 'View')
+            },
+            {
+               name: 'Compiler',
+               path: path.join(sourceFolder, 'Compiler')
             }
          ]
       };
@@ -1509,6 +1521,10 @@ describe('gulp/builder/generate-workflow.js', () => {
             {
                name: 'UI',
                path: path.join(sourceFolder, 'UI')
+            },
+            {
+               name: 'Compiler',
+               path: path.join(sourceFolder, 'Compiler')
             },
             {
                name: 'Vdom',
@@ -2343,6 +2359,10 @@ describe('gulp/builder/generate-workflow.js', () => {
                   path: path.join(sourceFolder, 'UI')
                },
                {
+                  name: 'Compiler',
+                  path: path.join(sourceFolder, 'Compiler')
+               },
+               {
                   name: 'Vdom',
                   path: path.join(sourceFolder, 'Vdom')
                },
@@ -2554,6 +2574,10 @@ describe('gulp/builder/generate-workflow.js', () => {
             {
                name: 'UI',
                path: path.join(sourceFolder, 'UI')
+            },
+            {
+               name: 'Compiler',
+               path: path.join(sourceFolder, 'Compiler')
             },
             {
                name: 'Vdom',
@@ -2870,6 +2894,10 @@ describe('gulp/builder/generate-workflow.js', () => {
             {
                name: 'UI',
                path: path.join(sourceFolder, 'UI')
+            },
+            {
+               name: 'Compiler',
+               path: path.join(sourceFolder, 'Compiler')
             },
             {
                name: 'Some fake name',
