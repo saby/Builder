@@ -2663,23 +2663,28 @@ describe('gulp/builder/generate-workflow.js', () => {
          const resultsFiles = await fs.readdir(moduleOutputFolder);
          resultsFiles.should.have.members([
             'StableES.js',
+            'StableES.min.js',
             'StableTS.js',
+            'StableTS.min.js',
             'StableES.es',
             'StableTS.ts',
             'Stable.routes.ts',
             'Stable.routes.js',
             'ReactTest.tsx',
-            'ReactTest.js'
+            'ReactTest.js',
+            'ReactTest.min.js'
          ]);
 
          const EsOutputPath = path.join(moduleOutputFolder, 'StableES.js');
          const TsOutputPath = path.join(moduleOutputFolder, 'StableTS.js');
-         const TsxOutputPath = path.join(moduleOutputFolder, 'ReactTest.js');
+         const TsxDevOutputPath = path.join(moduleOutputFolder, 'ReactTest.js');
+         const TsxProdOutputPath = path.join(moduleOutputFolder, 'ReactTest.min.js');
          const RoutesTsOutputPath = path.join(moduleOutputFolder, 'Stable.routes.js');
 
          const EsContent = await fs.readFile(EsOutputPath);
          const TsContent = await fs.readFile(TsOutputPath);
-         const TsxContent = await fs.readFile(TsxOutputPath);
+         const TsxDevContent = await fs.readFile(TsxDevOutputPath);
+         const TsxProdContent = await fs.readFile(TsxProdOutputPath);
          const RoutesTsContent = await fs.readFile(RoutesTsOutputPath);
 
          removeRSymbol(RoutesTsContent.toString()).should.equal(
@@ -2719,15 +2724,27 @@ describe('gulp/builder/generate-workflow.js', () => {
                '    exports.default = Factory;\n' +
                '});\n'
          );
-         removeRSymbol(TsxContent.toString()).should.equal(
-            'define("Modul/ReactTest", ["require", "exports", "tslib", "react/jsx-runtime"], function (require, exports, tslib_1, jsx_runtime_1) {\n' +
+
+         // check if debug version of tsx result has development react-jsx library
+         removeRSymbol(TsxDevContent.toString()).should.equal(
+            'define("Modul/ReactTest", ["require", "exports", "tslib", "react/jsx-dev-runtime"], function (require, exports, tslib_1, jsx_dev_runtime_1) {\n' +
             '    "use strict";\n' +
             '    Object.defineProperty(exports, "__esModule", { value: true });\n' +
+            '    var _jsxFileName = "\\u041C\\u043E\\u0434\\u0443\\u043B\\u044C/ReactTest.tsx";\n' +
             '    function Square(props) {\n' +
-            '        return (jsx_runtime_1.jsx("button", tslib_1.__assign({ className: "square", onClick: props.onClick }, { children: props.value }), void 0));\n' +
+            '        return (jsx_dev_runtime_1.jsxDEV("button", tslib_1.__assign({ className: "square", onClick: props.onClick }, { children: props.value }), void 0, false, { fileName: _jsxFileName, lineNumber: 2, columnNumber: 13 }, this));\n' +
             '    }\n' +
             '    exports.default = Square;\n' +
             '});\n'
+         );
+
+         // check if release version of tsx result has production react-jsx library
+         removeRSymbol(TsxProdContent.toString()).should.equal(
+            'define("Modul/ReactTest",["require","exports","tslib","react/jsx-runtime"],function(e,t,u,i){' +
+            '"use strict";' +
+            'function n(e){return i.jsx("button",u.__assign({className:"square",onClick:e.onClick},{children:e.value}),void 0)}' +
+            'Object.defineProperty(t,"__esModule",{value:true}),t.default=n' +
+            '});'
          );
       };
 
@@ -2738,6 +2755,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          cache: cacheFolder,
          output: outputFolder,
          typescript: true,
+         minimize: true,
          modules: [
             {
                name: 'Модуль',
