@@ -427,6 +427,10 @@ describe('versionize-content', () => {
                path: path.join(sourceFolder, 'UI')
             },
             {
+               name: 'Compiler',
+               path: path.join(sourceFolder, 'Compiler')
+            },
+            {
                name: 'Vdom',
                path: path.join(sourceFolder, 'Vdom')
             },

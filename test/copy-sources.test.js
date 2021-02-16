@@ -134,6 +134,11 @@ describe('copy sources', () => {
                required: true
             },
             {
+               name: 'Compiler',
+               path: path.join(sourceFolder, 'Compiler'),
+               required: true
+            },
+            {
                name: 'Vdom',
                path: path.join(sourceFolder, 'Vdom'),
                required: true
