@@ -74,21 +74,24 @@ async function getJoinedThemeContent(root, fileSuffix, files) {
  * Generates themes for current project from
  * each theme parts by themes meta
  * @param{String} root - current application root
+ * @param{boolean} isSourcesSaved - a sign are sources will be saved in a build result
  * @param{String} fileSuffix - suffix for file if needed
  * (for release and debug mode it is '.min' and '' respectively)
  * @param{Object} themes - all meta information about
  * themes in current building project
  * @returns {Promise<void>}
  */
-async function generateJoinedThemes(root, fileSuffix, themes) {
+async function generateJoinedThemes(root, isSourcesSaved, fileSuffix, themes) {
    await pMap(
       Object.keys(themes),
       async(currentTheme) => {
-         const debugContent = await getJoinedThemeContent(root, '', themes[currentTheme]);
-         await fs.outputFile(
-            path.join(root, 'themes', `${currentTheme}.css`),
-            debugContent
-         );
+         if (isSourcesSaved) {
+            const debugContent = await getJoinedThemeContent(root, '', themes[currentTheme]);
+            await fs.outputFile(
+               path.join(root, 'themes', `${currentTheme}.css`),
+               debugContent
+            );
+         }
          if (typeof fileSuffix === 'string') {
             const releaseContent = await getJoinedThemeContent(root, fileSuffix, themes[currentTheme]);
             await fs.outputFile(
@@ -108,12 +111,15 @@ async function generateJoinedThemes(root, fileSuffix, themes) {
 module.exports = function generateTaskForSaveJoinedMeta(taskParameters) {
    const root = taskParameters.config.rawConfig.output;
    const fileSuffix = taskParameters.config.isReleaseMode ? '.min' : null;
+   const isSourcesSaved = taskParameters.config.sources;
    if (!taskParameters.config.joinedMeta) {
       return async function saveOnlyThemesMeta() {
          const resultThemesMeta = {};
          const { themes } = taskParameters.cache.getThemesMeta();
          Object.keys(themes).forEach((currentTheme) => {
-            resultThemesMeta[`themes/${currentTheme}.css`] = themes[currentTheme].map(file => `${file}.css`);
+            if (isSourcesSaved) {
+               resultThemesMeta[`themes/${currentTheme}.css`] = themes[currentTheme].map(file => `${file}.css`);
+            }
             if (typeof fileSuffix === 'string') {
                resultThemesMeta[`themes/${currentTheme}${fileSuffix}.css`] = themes[currentTheme].map(file => `${file}${fileSuffix}.css`);
             }
@@ -126,7 +132,7 @@ module.exports = function generateTaskForSaveJoinedMeta(taskParameters) {
 
       // save joined module-dependencies for non-jinnee application
       const themesMeta = taskParameters.cache.getThemesMeta();
-      await generateJoinedThemes(root, fileSuffix, themesMeta.themes);
+      await generateJoinedThemes(root, isSourcesSaved, fileSuffix, themesMeta.themes);
       if (taskParameters.config.dependenciesGraph) {
          const moduleDeps = taskParameters.cache.getModuleDependencies();
          await fs.writeJson(path.join(root, 'module-dependencies.json'), moduleDeps);
