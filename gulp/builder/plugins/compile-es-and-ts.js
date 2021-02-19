@@ -135,6 +135,11 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   newFile.compiledBase = compiledBase;
                   this.push(newFile);
                   taskParameters.cache.addOutputFile(file.history[0], outputPath, moduleInfo);
+                  taskParameters.cache.addDependencies(
+                     moduleInfo.appRoot,
+                     file.history[0],
+                     taskParameters.cache.getCompiledDependencies(relativeFilePath) || []
+                  );
                   callback(null, file);
                   return;
                }
