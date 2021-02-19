@@ -20,7 +20,7 @@ const generateTaskForBuildModules = require('./generate-task/build-modules'),
    generateTaskForPrepareWS = require('../common/generate-task/prepare-ws'),
    generateTaskForSaveJoinedMeta = require('../common/generate-task/save-joined-meta'),
    { checkModuleDependenciesExisting } = require('../../lib/check-module-dependencies'),
-   { typescriptCompiler } = require('../../lib/typescript-compiler'),
+   generateTaskForTypescriptCompile = require('./generate-task/typescript-compiler'),
    generateTaskForSaveLoggerReport = require('../common/generate-task/save-logger-report'),
    Cache = require('./classes/cache'),
    Configuration = require('./classes/configuration.js'),
@@ -182,19 +182,6 @@ function generateTaskForClearCache(taskParameters) {
       const startTime = Date.now();
       await taskParameters.cache.clearCacheIfNeeded();
       taskParameters.storeTaskTime('clearCache', startTime);
-   };
-}
-
-function generateTaskForTypescriptCompile(taskParameters) {
-   if (!taskParameters.config.tsc) {
-      return function skipRunTypescriptCompiler(done) {
-         done();
-      };
-   }
-   return async function runTypescriptCompiler() {
-      const startTime = Date.now();
-      await typescriptCompiler(taskParameters);
-      taskParameters.storeTaskTime('tsc compiler', startTime);
    };
 }
 
