@@ -83,6 +83,7 @@ function generateTaskForMarkThemeModules(taskParameters) {
    const tasks = modulesWithThemes.map((moduleInfo) => {
       const input = [
          path.join(moduleInfo.path, '/**/_theme.less'),
+         path.join(moduleInfo.path, '/**/theme.less'),
          path.join(moduleInfo.path, '/fallback.json')
       ];
       moduleInfo.modifiers = [];
@@ -114,7 +115,7 @@ function generateTaskForMarkThemeModules(taskParameters) {
             )
             .pipe(mapStream((file, done) => {
                const fileName = path.basename(file.path);
-               if (fileName === '_theme.less') {
+               if (['_theme.less', 'theme.less'].includes(fileName)) {
                   /**
                    * Interface module name for new theme should always contains 3 parts:
                    * 1)Interface module name for current theme
