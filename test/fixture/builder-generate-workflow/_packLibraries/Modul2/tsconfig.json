@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "baseUrl": ".",
+    "importHelpers": true,
+    "lib": ["dom", "es5", "es2016", "es2017.object", "es2017.string", "es2018.promise", "scripthost"],
+    "module": "amd",
+    "moduleResolution": "classic",
+    "noUnusedLocals": true,
+    "paths": {
+      "Core/*": ["WS.Core/core/*"],
+      "Lib/*": ["WS.Core/lib/*"],
+      "Transport/*": ["WS.Core/transport/*"]
+    },
+    "target": "es5",
+    "types" : ["requirejs"],
+    "jsx": "react-jsx"
+  }
+}
