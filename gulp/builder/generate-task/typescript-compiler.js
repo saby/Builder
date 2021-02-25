@@ -23,7 +23,7 @@ const processTsConfig = (taskParameters, moduleInfo) => through.obj(
          const newFile = file.clone();
          currentTsConfig.extends = '../tsconfig.json';
          currentTsConfigName = newFile.path.replace('.json', '.normalized.json');
-         await fs.outputJson(currentTsConfigName, JSON.stringify(currentTsConfig));
+         await fs.outputJson(currentTsConfigName, currentTsConfig);
       }
 
       await strictTypescriptCompiler(taskParameters, moduleInfo.name, currentTsConfigName);
