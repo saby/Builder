@@ -67,8 +67,8 @@ class StoreInfo {
       };
    }
 
-   static getLastRunningParametersPath(cacheDirectory) {
-      return path.join(cacheDirectory, 'last_build_gulp_config.json');
+   static getLastRunningParametersPath(cacheDirectory, isPatchBuild) {
+      return path.join(cacheDirectory, `last_build_gulp_config${isPatchBuild ? '_for_patch' : ''}.json`);
    }
 
    async load(cacheDirectory) {
@@ -133,7 +133,7 @@ class StoreInfo {
       }
    }
 
-   async save(cacheDirectory, logFolder) {
+   async save(cacheDirectory, logFolder, isPatchBuild) {
       await fs.outputJson(
          path.join(cacheDirectory, 'builder-info.json'),
          {
@@ -175,7 +175,7 @@ class StoreInfo {
       );
 
       await fs.outputJson(
-         StoreInfo.getLastRunningParametersPath(cacheDirectory),
+         StoreInfo.getLastRunningParametersPath(cacheDirectory, isPatchBuild),
          this.runningParameters,
          {
             spaces: 1
@@ -197,6 +197,10 @@ class StoreInfo {
          path.join(cacheDirectory, 'save-cache-for-less.json'),
          {}
       );
+
+      // save a sign that cache was saved successfully. Needs by builder
+      // to make a correct decision whether cache should be removed
+      await fs.outputFile(path.join(cacheDirectory, 'cache.lockfile'), '');
    }
 
    /**
