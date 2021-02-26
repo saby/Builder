@@ -1,23 +1,22 @@
 /* eslint-disable global-require */
 
 /**
- * Common executable file of Builder. More info see in README.md
+ * Основной исполняемый файл Builder'а. Подробности по запуску в README.md
  * @author Kolbeshin F.A.
  */
 
 'use strict';
 
-const NODE_VERSION = '12.16.0';
+const NODE_VERSION = '10.14.2';
 const getLogsLevel = require('./lib/get-log-level');
 const semver = require('semver');
 
 try {
-   // First of all, check Node.Js version. Use maximum available technologies of current Tensor
-   // LTS installed.
+   // В самом начале проверим версию node. используем минимум возможностей node.js и ES6
    if (!semver.satisfies(process.versions.node, `>=${NODE_VERSION}`)) {
-      // don't use logger here, it's a bit risky.
+      // не рискуем выводить через logger
       // eslint-disable-next-line no-console
-      console.log(`[00:00:00] [ERROR] A minimal required Node.Js version is ${NODE_VERSION}. Current version: ${process.versions.node}`);
+      console.log(`[00:00:00] [ERROR] Для запуска требуется Node.js v${NODE_VERSION} или выше`);
       process.exit(1);
    }
 
@@ -33,14 +32,13 @@ try {
       process.exit(1);
    });
 
-   // In some cases 10 records of error stack isn't enough to find out the original caller
+   // не всегда понятно по 10 записям, откуда пришёл вызов.
    Error.stackTraceLimit = 100;
 
    // логгер - прежде всего
    const logger = require('./lib/logger').setGulpLogger(getLogsLevel(process.argv));
 
-   // returning of a proper exit code is important here, build should be failed only if
-   // there are actual errors(could be minor warnings)
+   // важно вернуть правильный код при выходе. сборка должна падать, если есть ошибки
    process.on('exit', (resultCode) => {
       logger.saveLoggerReport(process.env.logFolder);
       logger.info(`Main process was exited with code: ${resultCode}`);
@@ -51,8 +49,8 @@ try {
    const gulp = require('gulp');
    logger.debug(`Параметры запуска: ${JSON.stringify(process.argv)}`);
 
-   // workflow is built by gulp_configuration file, thus we have to split build, grabber and watcher tasks
-   // to avoid unnecessary operations
+   // т.к. мы строим Workflow на основе файла конфигурации, то нужно отделить build от grabber,
+   // чтобы не выполнялись лишние действия
    if (process.argv.includes('buildOnChange')) {
       const generateBuildWorkflowOnChange = require('./gulp/builder/generate-workflow-on-change.js');
       gulp.task('buildOnChange', generateBuildWorkflowOnChange(process.argv));
