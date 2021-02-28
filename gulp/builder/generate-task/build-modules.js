@@ -130,7 +130,7 @@ function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap
                   errorHandler(err) {
                      taskParameters.cache.markCacheAsFailed();
                      logger.error({
-                        message: 'Задача buildModule завершилась с ошибкой',
+                        message: 'Task buildModule was completed with error',
                         error: err,
                         moduleInfo
                      });
