@@ -74,7 +74,15 @@ class StoreInfo {
    async load(cacheDirectory) {
       if (await fs.pathExists(path.join(cacheDirectory, 'builder-info.json'))) {
          logger.debug(`Reading builder cache from directory "${cacheDirectory}"`);
-         this.runningParameters = await fs.readJSON(StoreInfo.getLastRunningParametersPath(cacheDirectory));
+         const commonStoredConfigPath = StoreInfo.getLastRunningParametersPath(cacheDirectory);
+         if (await fs.pathExists(commonStoredConfigPath)) {
+            this.runningParameters = await fs.readJSON(commonStoredConfigPath);
+         } else {
+            // if there is no stored common gulp_config, first build was a patch. It happens,
+            // when builder cache was removed, also it's a common situation for builder unit tests
+            this.runningParameters = await fs.readJSON(StoreInfo.getLastRunningParametersPath(cacheDirectory, true));
+         }
+
 
          try {
             const builderInfo = await fs.readJson(path.join(cacheDirectory, 'builder-info.json'));

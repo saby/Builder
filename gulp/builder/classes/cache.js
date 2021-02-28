@@ -224,9 +224,10 @@ class Cache {
                   });
                });
          }
+         const modulesForPatchNames = modulesForPatch.map(moduleInfo => moduleInfo.name);
 
-         this.migrateCacheForPatch(modulesForPatch, 'inputPaths');
-         this.migrateCacheForPatch(modulesForPatch, 'dependencies');
+         this.migrateCacheForPatch(modulesForPatchNames, 'inputPaths');
+         this.migrateCacheForPatch(modulesForPatchNames, 'dependencies');
       }
 
       await pMap(
