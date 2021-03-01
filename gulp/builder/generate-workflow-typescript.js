@@ -30,13 +30,7 @@ function generateBuildWorkflowTypescript(processArgv) {
       console.log('output directory wasn\'t added. Using default directory instead');
    }
 
-   return generateTaskForTypescriptCompile(taskParameters, output);
-}
-
-function generateTaskForTypescriptCompile(taskParameters, output) {
-   return function runTypescriptCompiler() {
-      return typescriptCompiler(taskParameters, output);
-   };
+   return typescriptCompiler(taskParameters, output);
 }
 
 module.exports = generateBuildWorkflowTypescript;
