@@ -247,6 +247,26 @@ function generateSaveResultsTask(taskParameters, results, applicationRoot, modul
          taskParameters.cache.getModuleDependencies()
       );
 
+      const moduleDependencies = taskParameters.cache.getModuleDependencies().links;
+      const internalModulesCycles = taskParameters.checkLazyBundlesForCycles(moduleDependencies);
+      const packagesWithInternalCycles = Object.keys(internalModulesCycles);
+      if (packagesWithInternalCycles.length > 0) {
+         packagesWithInternalCycles.forEach((currentBundleName) => {
+            internalModulesCycles[currentBundleName].forEach((currentSequence) => {
+               logger.error({
+                  message: `Found a cyclic dependency from one internal module of lazy package to another: ${currentSequence.join(' --> ')}`,
+                  filePath: currentBundleName
+               });
+            });
+         });
+      }
+
+      // save module-dependencies with updated meta info about dependencies of internal modules
+      // of each generated lazy bundle
+      await taskParameters.cache.storeModuleDependencies();
+
+      await taskParameters.saveLazyBundles();
+      await taskParameters.saveLazyBundlesMap();
       await taskParameters.saveRemovalListMeta();
    };
 }
