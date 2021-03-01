@@ -27,6 +27,34 @@ const MARKUP_DEPEND_FILES_REGEX = /(\.xhtml)|(\.wml)|(\.tmpl)|(\.ts)|(\.js)$/;
  */
 const CACHED_FILES_EXTENSIONS = /(\.less)|(\.js)|(\.es)|(\.ts)$/;
 
+// important flags for builder cache
+const CACHE_INDEPENDENT_FLAGS = new Set([
+
+   // list of modules shouldn't affect cache invalidation, removed module will be removed from cache
+   // new module will be compiled and added to cache
+   'modules',
+
+   // changed logs folder can't be a sane reason for a cache removal
+   'logs',
+
+   // tsc uses its own cache for incremental build
+   'tsc',
+   'tsconfig',
+
+   // all non-incremental tasks are independent of data from builder cache
+   'joinedMeta',
+   'customPack',
+   'checkModuleDependencies',
+   'deprecatedStaticHtml',
+   'inlineScripts',
+   'compress',
+   'staticServer'
+]);
+
+// non-important flags for builder cache. e.g. path can be changed
+// and if file hash by content was changed, it'll be rebuilt, then.
+const MODULE_CACHE_INDEPENDENT_FLAGS = new Set(['path', 'rebuild']);
+
 /**
  * Creates a hash by content for current file
  * @param fileContents
@@ -59,6 +87,38 @@ function getFileHash(fileContents, hashByContent, fileStamp) {
    return hash;
 }
 
+// filter object by current filter function
+function filterObject(object, filter) {
+   const result = {};
+   Object.keys(object).forEach((currentKey) => {
+      if (filter(currentKey)) {
+         result[currentKey] = object[currentKey];
+      }
+   });
+   return result;
+}
+
+/**
+ * check common list of flags that affects builder cache generating
+ * @param lastRunningParameters - previous build running parameters
+ * @param currentRunningParameters - current build running parameters
+ * @returns {boolean} true if flags were changed between 2 builds
+ */
+function checkCommonFlags(lastRunningParameters, currentRunningParameters, finishText) {
+   const isFlagDependent = flag => !CACHE_INDEPENDENT_FLAGS.has(flag);
+   const currentCacheFlags = filterObject(currentRunningParameters, isFlagDependent);
+   const lastCacheFlags = filterObject(lastRunningParameters, isFlagDependent);
+
+   try {
+      assert.deepStrictEqual(currentCacheFlags, lastCacheFlags);
+   } catch (error) {
+      logger.info(`Common list of flags was changed. ${finishText}`);
+      logger.info(error);
+      return true;
+   }
+   return false;
+}
+
 /**
  * Класс кеша для реализации инкрементальной сборки.
  * Использует результаты работы предыдущей сборки, чтобы не делать повторную работу.
@@ -71,6 +131,7 @@ class Cache {
       this.dropCacheForMarkup = false;
       this.dropCacheForStaticMarkup = false;
       this.dropCacheForLess = false;
+      this.dropCacheForTsc = false;
       this.previousRunFailed = false;
 
       // js и less файлы инвалидируются с зависимостями
@@ -112,6 +173,21 @@ class Cache {
       return this.lastStore.startBuildTime === 0;
    }
 
+   // moves old cache if it's interface module isn't participating in
+   // current patch build
+   migrateCacheForPatch(modulesForPatch, cacheName) {
+      if (this.lastStore[cacheName]) {
+         const lastStoreCacheForCurrentName = this.lastStore[cacheName];
+         const currentStoreCacheForCurrentName = this.currentStore[cacheName];
+         Object.keys(lastStoreCacheForCurrentName).forEach((currentPath) => {
+            const moduleName = currentPath.split('/').shift();
+            if (!modulesForPatch.includes(moduleName)) {
+               currentStoreCacheForCurrentName[currentPath] = lastStoreCacheForCurrentName[currentPath];
+            }
+         });
+      }
+   }
+
    async load(modulesForPatch) {
       const patchBuild = modulesForPatch && modulesForPatch.length > 0;
       await this.lastStore.load(this.config.cachePath);
@@ -130,20 +206,28 @@ class Cache {
       this.currentStore.hashOfBuilder = await fs.readFile(path.join(__dirname, '../../../builderHashFile'), 'utf8');
       this.currentStore.startBuildTime = new Date().getTime();
 
-      if (patchBuild && this.lastStore.themesMeta) {
-         const lastStoreThemes = this.lastStore.themesMeta.themes;
-         const currentStoreThemes = this.currentStore.themesMeta.themes;
-         Object.keys(lastStoreThemes).forEach((currentTheme) => {
-            lastStoreThemes[currentTheme].forEach((currentThemePart) => {
-               const moduleName = currentThemePart.split('/').shift();
-               if (!modulesForPatch.includes(moduleName)) {
-                  if (!currentStoreThemes.hasOwnProperty(currentTheme)) {
-                     currentStoreThemes[currentTheme] = [];
-                  }
-                  currentStoreThemes[currentTheme].push(currentThemePart);
-               }
-            });
-         });
+      if (patchBuild) {
+         if (this.lastStore.themesMeta) {
+            const lastStoreThemes = this.lastStore.themesMeta.themes;
+            const currentStoreThemes = this.currentStore.themesMeta.themes;
+            Object.keys(lastStoreThemes)
+               .forEach((currentTheme) => {
+                  lastStoreThemes[currentTheme].forEach((currentThemePart) => {
+                     const moduleName = currentThemePart.split('/')
+                        .shift();
+                     if (!modulesForPatch.includes(moduleName)) {
+                        if (!currentStoreThemes.hasOwnProperty(currentTheme)) {
+                           currentStoreThemes[currentTheme] = [];
+                        }
+                        currentStoreThemes[currentTheme].push(currentThemePart);
+                     }
+                  });
+               });
+         }
+         const modulesForPatchNames = modulesForPatch.map(moduleInfo => moduleInfo.name);
+
+         this.migrateCacheForPatch(modulesForPatchNames, 'inputPaths');
+         this.migrateCacheForPatch(modulesForPatchNames, 'dependencies');
       }
 
       await pMap(
@@ -164,7 +248,54 @@ class Cache {
    }
 
    save() {
-      return this.currentStore.save(this.config.cachePath, this.config.logFolder);
+      return this.currentStore.save(
+         this.config.cachePath,
+         this.config.logFolder,
+         this.config.modulesForPatch.length > 0
+      );
+   }
+
+   /**
+    * checks difference between modules lists of previous and current builds.
+    * if there any changes, typescript cache should be removed, because otherwise
+    * tsc command needs enormously bigger amount of time than it should with it's cache
+    */
+   checkModulesLists(lastRunningParameters, currentRunningParameters) {
+      const lastModulesList = lastRunningParameters.modules.map(currentModule => currentModule.name).sort();
+      const currentModulesList = currentRunningParameters.modules.map(currentModule => currentModule.name).sort();
+      try {
+         assert.deepStrictEqual(lastModulesList, currentModulesList);
+      } catch (error) {
+         logger.info('List of modules has been changed. tsc cache will be removed');
+         logger.info(error);
+         this.dropCacheForTsc = true;
+      }
+   }
+
+   // checks if there is any output directory for stayed module(exists
+   // in both previous and current builds) that was somehow removed.
+   async checkOutputModulesDirectories(lastModulesList, finishText) {
+      const stayedModules = {};
+      this.config.modules.filter(
+         currentModule => lastModulesList.has(currentModule.name)
+      ).forEach((currentModule) => {
+         stayedModules[currentModule.name] = currentModule;
+      });
+
+      // check output existing only for modules that weren't removed
+      // since the last build
+      let outputCheckResult = false;
+      await pMap(
+         Object.values(stayedModules),
+         async(moduleInfo) => {
+            const isOutputExists = await fs.pathExists(moduleInfo.output);
+            if (!isOutputExists) {
+               logger.info(`Output ${moduleInfo.output} for module ${moduleInfo.name} was somehow removed. ${finishText}`);
+               outputCheckResult = true;
+            }
+         }
+      );
+      return outputCheckResult;
    }
 
    /**
@@ -176,28 +307,17 @@ class Cache {
       if (!this.config.checkConfig) {
          return false;
       }
-      const finishText = 'Кеш и результат предыдущей сборки будут удалены, если существуют.';
+      const finishText = 'Cache and a result from a previous build will be removed.';
       if (this.previousRunFailed) {
-         logger.info(`В директории кэша с предыдущей сборки остался файл builder.lockfile. ${finishText}`);
+         logger.info(`There is a "builder.lockfile" in builder cache. ${finishText}`);
          return true;
       }
       if (this.lastStore.hashOfBuilder === 'unknown') {
-         logger.info(`Не удалось обнаружить валидный кеш от предыдущей сборки. ${finishText}`);
+         logger.info('Cache isn\'t existing, results from a previous build will be removed if exists');
          return true;
       }
       if (this.lastStore.runningParameters.criticalErrors) {
-         logger.info(`Предыдущий билд завершился с критическими ошибками. ${finishText}`);
-         return true;
-      }
-      const lastRunningParameters = { ...this.lastStore.runningParameters };
-      const currentRunningParameters = { ...this.currentStore.runningParameters };
-      const lastModulesList = lastRunningParameters.modules.map(currentModule => currentModule.name).sort();
-      const currentModulesList = currentRunningParameters.modules.map(currentModule => currentModule.name).sort();
-      try {
-         assert.deepStrictEqual(lastModulesList, currentModulesList);
-      } catch (error) {
-         logger.info(`Параметры запуска builder'а поменялись. Изменился список модулей на сборку ${finishText}`);
-         logger.info(error);
+         logger.info(`Previous build was completed with critical errors. ${finishText}`);
          return true;
       }
 
@@ -213,52 +333,57 @@ class Cache {
          return true;
       }
 
-      // если нет хотя бы одной папки не оказалось на месте, нужно сбросить кеш
-      const promisesExists = [];
-      for (const moduleInfo of this.config.modules) {
-         promisesExists.push(fs.pathExists(moduleInfo.output));
+      const lastRunningParameters = { ...this.lastStore.runningParameters };
+      const currentRunningParameters = { ...this.currentStore.runningParameters };
+
+      // check whether or not tsc cache should be removed
+      this.checkModulesLists(lastRunningParameters, currentRunningParameters);
+
+      // check is there difference between common builder flags that have their influence on a whole project build.
+      const isCommonFlagsChanged = checkCommonFlags(lastRunningParameters, currentRunningParameters, finishText);
+      if (isCommonFlagsChanged) {
+         return true;
       }
-      const resultsExists = await Promise.all(promisesExists);
-      if (resultsExists.includes(false)) {
-         logger.info(`Как минимум один из результирующих каталогов был удалён. ${finishText}`);
+
+      const lastModulesIndexes = {};
+      const lastModulesList = new Set(lastRunningParameters.modules.map((currentModule, index) => {
+         lastModulesIndexes[currentModule.name] = index;
+         return currentModule.name;
+      }));
+
+      if (await this.checkOutputModulesDirectories(lastModulesList, finishText)) {
          return true;
       }
 
       /**
-       * for patch and branch tests skip deep checker.
+       * for patch and branch tests skip deep modules checker.
        * In patch build some modules have extra flags for rebuild
-       * In branch tests build some modules have another paths(specified to branch name)
-       *
-        */
-      const skipDeepConfigCheck = this.config.modulesForPatch.length > 0 || this.config.branchTests;
+       */
+      const skipDeepConfigCheck = this.config.modulesForPatch.length > 0;
       if (skipDeepConfigCheck) {
          return false;
       }
 
-      // поле version всегда разное
-      if (lastRunningParameters.version !== '' || currentRunningParameters.version !== '') {
-         if (lastRunningParameters.version === '' || currentRunningParameters.version === '') {
-            logger.info(`Параметры запуска builder'а поменялись. ${finishText}`);
-            return true;
+      // checks each interface module between 2 builds to have equal common flags
+      // that have any influence for builder cache
+      let modulesDifferenceCheck = false;
+      const isDependentModuleFlag = flag => !MODULE_CACHE_INDEPENDENT_FLAGS.has(flag);
+      currentRunningParameters.modules.forEach((currentModule) => {
+         const lastModule = lastRunningParameters.modules[lastModulesIndexes[currentModule.name]];
+         if (lastModule) {
+            const lastModuleConfig = filterObject(lastModule, isDependentModuleFlag);
+            const currentModuleConfig = filterObject(currentModule, isDependentModuleFlag);
+            try {
+               assert.deepStrictEqual(lastModuleConfig, currentModuleConfig);
+            } catch (error) {
+               logger.info(`List of flags for module ${currentModule.name} was changed. ${finishText}`);
+               logger.info(error);
+               modulesDifferenceCheck = true;
+            }
          }
-         lastRunningParameters.version = '';
-         currentRunningParameters.version = '';
-      }
+      });
 
-      // list of modules shouldn't affect builder cache anyhow. Builder will either build new interface module that
-      // wasn't in a project before or delete all information about the one(cache, artifacts of this module in output).
-      // That should give us an opportunity to get build faster with incremental build of non-changing modules and new
-      // build of new ones.
-      delete lastRunningParameters.modules;
-      delete currentRunningParameters.modules;
-      try {
-         assert.deepStrictEqual(lastRunningParameters, currentRunningParameters);
-      } catch (error) {
-         logger.info(`Параметры запуска builder'а поменялись. ${finishText}`);
-         return true;
-      }
-
-      return false;
+      return modulesDifferenceCheck;
    }
 
    /**
@@ -316,6 +441,11 @@ class Cache {
          if (await fs.pathExists(this.config.rawConfig.output)) {
             removePromises.push(fs.remove(this.config.rawConfig.output));
          }
+      }
+      if (this.dropCacheForTsc) {
+         const cachePath = path.join(this.config.cachePath, 'typescript-cache');
+         removePromises.push(fs.remove(cachePath));
+         logger.info(`tsc cache file ${cachePath} was successfully removed`);
       }
 
       if (removePromises.length === 0) {
