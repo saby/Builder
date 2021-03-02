@@ -909,6 +909,16 @@ class Cache {
    }
 
    /**
+    * stores updated module-dependencies meta.
+    * e.g. lazy bundles results have to be stored in builder cache
+    * for further debugging if it's necessary
+    * @returns {Promise<void>}
+    */
+   async storeModuleDependencies() {
+      await fs.outputJson(path.join(this.config.cachePath, 'module-dependencies.json'), this.moduleDependencies);
+   }
+
+   /**
     * Получить список файлов, которые нужно удалить из целевой директории после инкрементальной сборки
     * @returns {Promise<string[]>}
     */

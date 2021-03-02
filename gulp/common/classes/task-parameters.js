@@ -30,6 +30,8 @@ class TaskParameters {
       this.librariesMeta = {};
       this.changedModules = new Set();
       this.themedModulesMap = new Map();
+      this.lazyBundles = {};
+      this.lazyBundlesMap = {};
    }
 
    setThemedModule(themedModuleName, originModuleName) {
@@ -106,6 +108,119 @@ class TaskParameters {
          this.filesToRemoveFromOutput.push(`${outputPath}.br`);
          this.filesToRemoveFromOutput.push(`${outputPath}.gz`);
       }
+   }
+
+   addLazyBundle(bundleName, externalDependencies, internalDependencies) {
+      this.lazyBundles[bundleName] = {
+         externalDependencies,
+         internalModules: []
+      };
+      for (const module of internalDependencies.keys()) {
+         if (this.lazyBundlesMap.hasOwnProperty(module)) {
+            throw new Error(`Attempt to pack module ${module} from lazy package ${this.lazyBundlesMap[module]} to another lazy package`);
+         } else {
+            this.lazyBundlesMap[module] = bundleName;
+            this.lazyBundles[bundleName].internalModules.push(module);
+         }
+      }
+   }
+
+   /**
+    * recursively checks cyclic dependencies between external dependencies of lazy bundle and it's internal modules
+    * @param dependencies
+    * @param internalModules
+    * @param currentModule
+    * @param currentSequence
+    * @returns {{sequence: [], cyclic: boolean}}
+    */
+   recursiveChecker(cyclicSequences, dependencies, internalModules, currentModule, currentSequence) {
+      currentSequence.push(currentModule);
+
+      // if current module creates cycle dependency, mark current sequence as cyclic
+      // and return a result to log it properly to understand what happened
+      if (
+         currentSequence.length > 1 && internalModules.includes(currentModule)
+      ) {
+         cyclicSequences.push(currentSequence);
+         return currentSequence;
+      }
+      const currentDependencies = dependencies[currentModule];
+      if (currentDependencies) {
+         currentDependencies.forEach((currentDependency) => {
+            const newSequence = [...currentSequence];
+            this.recursiveChecker(
+               cyclicSequences,
+               dependencies,
+               internalModules,
+               currentDependency,
+               newSequence
+            );
+         });
+      }
+      return currentSequence;
+   }
+
+   checkLazyBundlesForCycles(dependencies) {
+      const cyclicSequences = {};
+      Object.keys(this.lazyBundles).forEach((currentLazyBundleName) => {
+         const currentLazyBundle = this.lazyBundles[currentLazyBundleName];
+         const result = [];
+
+         // store external dependencies of bundle as dependencies of each lazy package internal module
+         // to catch an issue when one lazy package has a cycle from another lazy package.
+         this.lazyBundles[currentLazyBundleName].internalModules.forEach((currentInternalModule) => {
+            if (dependencies[currentInternalModule]) {
+               dependencies[`${currentInternalModule}_old`] = dependencies[currentInternalModule];
+               const normalizedModuleDependencies = this.lazyBundles[currentLazyBundleName].externalDependencies;
+               dependencies[currentInternalModule] = [currentLazyBundleName];
+               dependencies[currentLazyBundleName] = normalizedModuleDependencies;
+            }
+         });
+         currentLazyBundle.externalDependencies.forEach((externalDependency) => {
+            this.recursiveChecker(
+               result,
+               dependencies,
+               currentLazyBundle.internalModules,
+               externalDependency,
+               []
+            );
+         });
+         if (result.length > 0) {
+            cyclicSequences[currentLazyBundleName] = [];
+            result.forEach((currentCycle) => {
+               const externalEntryPoint = currentCycle[0];
+               const dependingInternalModules = currentLazyBundle.internalModules.filter(
+                  currentInternalModule => dependencies[currentInternalModule] &&
+                     (dependencies[currentInternalModule].includes(externalEntryPoint) ||
+                        dependencies[`${currentInternalModule}_old`].includes(externalEntryPoint))
+               );
+
+               // add internal module entry point to have an understanding which internal module
+               // exactly have an external dependency that creates a cycle between the dependency and
+               // another internal module of current lazy package
+               dependingInternalModules.forEach(
+                  currentInternalModule => cyclicSequences[currentLazyBundleName].push(
+                     [currentInternalModule, ...currentCycle]
+                  )
+               );
+            });
+         }
+      });
+      return cyclicSequences;
+   }
+
+   async saveLazyBundles() {
+      await fs.outputJson(
+         path.join(this.config.cachePath, 'lazy-bundles.json'),
+         this.lazyBundles
+      );
+   }
+
+   async saveLazyBundlesMap() {
+      await fs.outputJson(
+         path.join(this.config.cachePath, 'lazy-bundles-map.json'),
+         this.lazyBundlesMap
+      );
    }
 
    async saveRemovalListMeta() {
