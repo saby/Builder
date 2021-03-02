@@ -21,7 +21,6 @@ define('Modul/Modul', [
             var includedTemplates = {};
             var scopeForTemplate, attrsForTemplate;
             var templateFunction = function Modul__es6_test(data, attr, context, isVdom, sets, forceCompatible, generatorConfig) {
-                var forCounter = 0;
                 var templateCount = 0;
                 var key = thelpers.validateNodeKey(attr && attr.key);
                 var defCollection = {
