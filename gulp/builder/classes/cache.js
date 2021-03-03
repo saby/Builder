@@ -336,6 +336,17 @@ class Cache {
       const lastRunningParameters = { ...this.lastStore.runningParameters };
       const currentRunningParameters = { ...this.currentStore.runningParameters };
 
+      // version parameter is always different between 2 builds
+      if (lastRunningParameters.version !== '' || currentRunningParameters.version !== '') {
+         if (lastRunningParameters.version === '' || currentRunningParameters.version === '') {
+            const versionParamStatus = lastRunningParameters.version === '' ? 'enabled' : 'disabled';
+            logger.info(`Version parameter has been ${versionParamStatus}. ${finishText}`);
+            return true;
+         }
+         lastRunningParameters.version = '';
+         currentRunningParameters.version = '';
+      }
+
       // check whether or not tsc cache should be removed
       this.checkModulesLists(lastRunningParameters, currentRunningParameters);
 
