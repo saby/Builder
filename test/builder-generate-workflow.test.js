@@ -1758,11 +1758,7 @@ describe('gulp/builder/generate-workflow.js', () => {
             'lazy-private.package.min.css.gz',
             'lazy-private.package.min.js',
             'lazy-private.package.min.js.br',
-            'lazy-private.package.min.js.gz',
-            'private.min.wml',
-            'private.min.wml.br',
-            'private.min.wml.gz',
-            'private.wml'
+            'lazy-private.package.min.js.gz'
          ];
 
          // output directory must have brotli(except windows os) and gzip files, only for minified files and packages.
@@ -1958,8 +1954,7 @@ describe('gulp/builder/generate-workflow.js', () => {
             'Modul/private',
             'css!ExternalInterfaceModule/moduleStyle',
             'css!Modul/Stable',
-            'html!Modul/Page',
-            'wml!Modul/private'
+            'html!Modul/Page'
          ]);
          const rootBundlesRouteMeta = await fs.readJson(path.join(outputFolder, 'bundlesRoute.json'));
          rootBundlesRouteMeta.hasOwnProperty('ExternalInterfaceModule/amdModule').should.equal(true);
@@ -1976,8 +1971,7 @@ describe('gulp/builder/generate-workflow.js', () => {
             'css!InterfaceModule1/amdModule': 'resources/Modul/TestBSort/test-superbundle.package.min.css',
             'Modul/private': 'resources/Modul/test-brotli.package.min.js',
             'css!Modul/Stable': 'resources/Modul/test-brotli.package.min.css',
-            'html!Modul/Page': 'resources/Modul/test-brotli.package.min.js',
-            'wml!Modul/private': 'resources/Modul/test-brotli.package.min.js'
+            'html!Modul/Page': 'resources/Modul/test-brotli.package.min.js'
          });
       });
       it('patch module', async() => {
@@ -2076,8 +2070,7 @@ describe('gulp/builder/generate-workflow.js', () => {
             'css!InterfaceModule1/moduleStyle': 'resources/Modul/TestBSort/test-superbundle.package.min.css',
             'css!InterfaceModule1/amdModule': 'resources/Modul/TestBSort/test-superbundle.package.min.css',
             'css!Modul/Stable': 'resources/Modul/test-brotli.package.min.css',
-            'html!Modul/Page': 'resources/Modul/test-brotli.package.min.js',
-            'wml!Modul/private': 'resources/Modul/test-brotli.package.min.js'
+            'html!Modul/Page': 'resources/Modul/test-brotli.package.min.js'
          });
       });
       it('patch - after patch build output result must contain only results of patched module and joined builder meta', async() => {
@@ -3077,8 +3070,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          const correctStoreDepsForModule = [
             'Modul/_es5/Module.js',
             'Modul/_es6/Модуль.es',
-            'Modul/_es6/Модуль2.es',
-            'Modul/_es6/test.wml'
+            'Modul/_es6/Модуль2.es'
          ];
          const dependenciesStore = await fs.readJson(path.join(cacheFolder, 'dependencies.json'));
          dependenciesStore['Modul/Модуль.es'].should.have.members(correctStoreDepsForModule);
@@ -3157,8 +3149,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          const correctStoreDepsForModule = [
             'Modul/_es5/Module.js',
             'Modul/_es6/Модуль.es',
-            'Modul/_es6/Модуль2.es',
-            'Modul/_es6/test.wml'
+            'Modul/_es6/Модуль2.es'
          ];
          const dependenciesStore = await fs.readJson(path.join(cacheFolder, 'dependencies.json'));
          dependenciesStore['Modul/Модуль.es'].should.have.members(correctStoreDepsForModule);
