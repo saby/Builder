@@ -1,73 +1,11 @@
 define('Modul/Modul', [
     'tslib',
     'i18n!Modul/_es6/Modul',
-    'i18n!Modul',
-    'UI/Executor',
     'require',
     'exports',
     'css!theme?Modul/_es6/test'
-], function (tslib_1, rk_1, rk, Executor, require, exports) {
+], function (tslib_1, rk, require, exports) {
     Object.defineProperty(exports, '__esModule', { value: true });
-        exports['wml!Modul/_es6/test'] = true;
-        var wml_Modul__es6_test = function () {
-        var exports = {};
-        var result = function (Executor, rk) {
-            function debug() {
-                debugger;
-            }
-            var thelpers = Executor.TClosure;
-            var deps = Array.prototype.slice.call(arguments);
-            var depsLocal = {};
-            var includedTemplates = {};
-            var scopeForTemplate, attrsForTemplate;
-            var templateFunction = function Modul__es6_test(data, attr, context, isVdom, sets, forceCompatible, generatorConfig) {
-                var templateCount = 0;
-                var key = thelpers.validateNodeKey(attr && attr.key);
-                var defCollection = {
-                    id: [],
-                    def: undefined
-                };
-                var viewController = thelpers.calcParent(this, typeof currentPropertyName === 'undefined' ? undefined : currentPropertyName, data);
-                if (typeof forceCompatible === 'undefined') {
-                    forceCompatible = false;
-                }
-                var markupGenerator = thelpers.createGenerator(isVdom, forceCompatible, generatorConfig);
-                var filename = 'Modul/_es6/test';
-                var rk = thelpers.getRk(filename);
-                var funcContext = thelpers.getContext(this);
-                try {
-                    var out = markupGenerator.joinElements([markupGenerator.createTag('div', {
-                            'attributes': { 'class': 'test' },
-                            'events': typeof window === 'undefined' ? {} : {},
-                            'key': key + '0_'
-                        }, [], attr, defCollection, viewController)], key, defCollection);
-                    if (defCollection && defCollection.def) {
-                        out = markupGenerator.chain(out, defCollection, this);
-                        defCollection = undefined;
-                    }
-                } catch (e) {
-                    thelpers.templateError(filename, e, data);
-                }
-                return out || markupGenerator.createText('');
-            };
-            templateFunction.stable = true;
-            templateFunction.reactiveProps = [];
-            templateFunction.isWasabyTemplate = true;
-            return templateFunction;
-        }(Executor, rk);
-        if (result instanceof Function) {
-            return result;
-        } else if (result && Object.getPrototypeOf(result) !== Object.prototype) {
-            return result;
-        } else {
-            for (var property in result) {
-                if (result.hasOwnProperty(property)) {
-                    exports[property] = result[property];
-                }
-            }
-        }
-        return exports;
-    }();
         exports['Modul/_es6/Modul2'] = true;
         var Modul__es6_Modul2 = function () {
         'use strict';
@@ -89,7 +27,7 @@ define('Modul/Modul', [
                 });
             }
             exports.default = prepareOptions;
-        }(require, exports, tslib_1, typeof css_theme_Modul__es6_test === 'undefined' ? null : css_theme_Modul__es6_test, wml_Modul__es6_test);
+        }(require, exports, tslib_1, typeof css_theme_Modul__es6_test === 'undefined' ? null : css_theme_Modul__es6_test);
         if (result instanceof Function) {
             return result;
         } else if (result && Object.getPrototypeOf(result) !== Object.prototype) {
@@ -141,7 +79,7 @@ define('Modul/Modul', [
                 return test1;
             }
             exports.someTest = someTest;
-        }(require, exports, rk_1, Modul__es5_Module);
+        }(require, exports, rk, Modul__es5_Module);
         if (result instanceof Function) {
             return result;
         } else if (result && Object.getPrototypeOf(result) !== Object.prototype) {
