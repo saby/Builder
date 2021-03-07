@@ -137,6 +137,11 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             moduleInfo.cache.storeBuildedMarkup(file.history[0], result);
             newText = result.text;
 
+            // save compiled result into source file if we have to
+            if (taskParameters.config.debugCustomPack) {
+               file.contents = Buffer.from(newText);
+            }
+
             if (taskParameters.config.isReleaseMode) {
                // Write original file if tmpl can't be compiled
 
@@ -185,8 +190,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                })
             );
             taskParameters.cache.addOutputFile(file.history[0], outputMinFile, moduleInfo);
-         } else {
-            file.contents = Buffer.from(newText);
          }
       } catch (error) {
          taskParameters.cache.markFileAsFailed(file.history[0]);
