@@ -7,6 +7,7 @@
   "resources/SBISPlugin/packages/sbisplugin_utils.package.min",
   "resources/SBISPlugin/packages/sbisplugin_certPage.package.min",
   "resources/SBISPlugin/packages/sbisplugin_settingsPage.package.min",
+  "resources/SBISPlugin/packages/sbisplugin_feed.package.min",
   "resources/SBISPlugin/packages/sbisplugin_feedPage.package.min",
   "resources/SBISPluginBase/packages/sbisplugin_base.package.min",
   "resources/SBISPluginBase/packages/sbisplugin_base_utils.package.min",
