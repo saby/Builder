@@ -101,7 +101,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                      }
                   }
                   if (modulepackContent.length > 0) {
-                     modulepackContent.push(jsFile.contents.toString());
+                     const jsContent = jsFile.library ? jsFile.modulepack.toString() : jsFile.contents.toString();
+                     modulepackContent.push(jsContent);
                      jsFile.modulepack = modulepackContent.join('\n');
                   }
 
