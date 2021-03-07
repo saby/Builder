@@ -96,6 +96,9 @@ class BuildConfiguration {
       // generate packages based on custom developer's configuration
       this.customPack = false;
 
+      // same as customPack but with debug sources to be packed
+      this.debugCustomPack = false;
+
       // generate project dependencies tree meta
       this.dependenciesGraph = false;
 
@@ -183,7 +186,8 @@ class BuildConfiguration {
     * @returns {string}
     */
    getBuildMode() {
-      const packingEnabled = this.deprecatedOwnDependencies || this.customPack || this.deprecatedStaticHtml;
+      const packingEnabled = this.deprecatedOwnDependencies || this.customPack || this.deprecatedStaticHtml ||
+      this.debugCustomPack;
 
       // if we are getting packing task as input, minimization should be enabled
       if (packingEnabled && !this.minimize) {

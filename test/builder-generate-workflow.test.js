@@ -2076,6 +2076,58 @@ describe('gulp/builder/generate-workflow.js', () => {
           */
          (await isRegularFile(moduleOutputFolder, 'bundlesRoute.json')).should.equal(false);
          (await isRegularFile(moduleOutputFolder, 'bundles.json')).should.equal(true);
+         await clearWorkspace();
+      });
+      it('custom pack must have an ability to work with debug files', async() => {
+         const fixtureFolder = path.join(__dirname, 'fixture/custompack');
+         await prepareTest(fixtureFolder);
+         await linkPlatform(sourceFolder);
+
+         const testResults = async() => {
+            const correctPackagePath = path.join(fixtureFolder, 'correctResult/superbundle-with-debug');
+            const packagePath = path.join(outputFolder, 'WS.Core/superbundle-for-builder-tests.package.min');
+            const compiledCssPackage = await fs.readFile(`${packagePath}.css`, 'utf8');
+            const compiledJsPackage = await fs.readFile(`${packagePath}.js`, 'utf8');
+            const correctCssPackage = await fs.readFile(`${correctPackagePath}.css`, 'utf8');
+            const correctJsPackage = await fs.readFile(`${correctPackagePath}.js`, 'utf8');
+            compiledCssPackage.should.equal(correctCssPackage);
+            removeRSymbol(compiledJsPackage).should.equal(removeRSymbol(correctJsPackage));
+         };
+
+         const desktopConfig = {
+            cache: cacheFolder,
+            output: outputFolder,
+            typescript: true,
+            less: true,
+            wml: true,
+            builderTests: true,
+            minimize: true,
+            debugCustomPack: true,
+            joinedMeta: true,
+            modules: [
+               {
+                  name: 'Модуль',
+                  path: path.join(sourceFolder, 'Модуль')
+               },
+               {
+                  name: 'ExternalInterfaceModule',
+                  path: path.join(sourceFolder, 'ExternalInterfaceModule')
+               },
+               {
+                  name: 'InterfaceModule1',
+                  path: path.join(sourceFolder, 'InterfaceModule1')
+               }
+            ]
+         };
+         await fs.writeJSON(configPath, desktopConfig);
+
+         await runWorkflowWithTimeout();
+         await testResults();
+
+         await runWorkflowWithTimeout();
+         await testResults();
+
+         await clearWorkspace();
       });
    });
 
