@@ -63,6 +63,7 @@ const parsePlugins = dep => [
 function getCssAndJstplFiles(inputFiles) {
    const
       cssFiles = [],
+      jsonFiles = [],
       jstplFiles = [];
 
    inputFiles.forEach((filePath) => {
@@ -85,8 +86,11 @@ function getCssAndJstplFiles(inputFiles) {
       if (filePath.endsWith('.jstpl')) {
          jstplFiles.push(filePath);
       }
+      if (filePath.endsWith('.json')) {
+         jsonFiles.push(filePath);
+      }
    });
-   return [cssFiles, jstplFiles];
+   return [cssFiles, jstplFiles, jsonFiles];
 }
 
 function getNodePath(prettyPath, ext) {
@@ -114,6 +118,36 @@ function getNodePath(prettyPath, ext) {
  * @returns {stream}
  */
 module.exports = function declarePlugin(taskParameters, moduleInfo) {
+   const { resourcesUrl } = taskParameters.config;
+   const addAdditionalMeta = taskParameters.config.branchTests || taskParameters.config.builderTests;
+   const storeNode = (mDeps, nodeName, objectToStore, filePath) => {
+      const ext = path.extname(filePath);
+      const relativePath = path.relative(path.dirname(moduleInfo.path), filePath);
+      const rebasedRelativePath = resourcesUrl ? path.join('resources', relativePath) : relativePath;
+      const prettyPath = helpers.prettifyPath(transliterate(rebasedRelativePath));
+
+
+      objectToStore.path = getNodePath(prettyPath, ext);
+      mDeps.nodes[nodeName] = objectToStore;
+
+      /**
+       * WS.Core interface module only has actual requirejs substitutions.
+       * Store all of these for branch tests.
+       */
+      if (moduleInfo.name === 'WS.Core' && addAdditionalMeta) {
+         mDeps.requireJsSubstitutions[`${nodeName}`] = helpers.prettifyPath(relativePath);
+      }
+   };
+   const addNodesWithExtension = (mDeps, files, plugin, extensionToReplace) => {
+      for (const filePath of files) {
+         const relativePath = path.relative(path.dirname(moduleInfo.path), filePath);
+         const prettyPath = modulePathToRequire.getPrettyPath(
+            helpers.prettifyPath(transliterate(relativePath))
+         );
+         const nodeName = `${plugin}!${extensionToReplace ? prettyPath.replace(extensionToReplace, '') : prettyPath}`;
+         storeNode(mDeps, nodeName, {}, filePath);
+      }
+   };
    return through.obj(
       function onTransform(file, encoding, callback) {
          const startTime = Date.now();
@@ -124,9 +158,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
       /* @this Stream */
       function onFlush(callback) {
          const startTime = Date.now();
-         const addAdditionalMeta = taskParameters.config.branchTests || taskParameters.config.builderTests;
          try {
-            const { resourcesUrl } = taskParameters.config;
             const sourceRoot = helpers.unixifyPath(
                path.join(taskParameters.config.cachePath, 'temp-modules')
             );
@@ -139,24 +171,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                json.lessDependencies = {};
                json.requireJsSubstitutions = {};
             }
-            const storeNode = (mDeps, nodeName, objectToStore, filePath) => {
-               const ext = path.extname(filePath);
-               const relativePath = path.relative(path.dirname(moduleInfo.path), filePath);
-               const rebasedRelativePath = resourcesUrl ? path.join('resources', relativePath) : relativePath;
-               const prettyPath = helpers.prettifyPath(transliterate(rebasedRelativePath));
-
-
-               objectToStore.path = getNodePath(prettyPath, ext);
-               mDeps.nodes[nodeName] = objectToStore;
-
-               /**
-                * WS.Core interface module only has actual requirejs substitutions.
-                * Store all of these for branch tests.
-                 */
-               if (moduleInfo.name === 'WS.Core' && addAdditionalMeta) {
-                  mDeps.requireJsSubstitutions[`${nodeName}`] = helpers.prettifyPath(relativePath);
-               }
-            };
             const componentsInfo = moduleInfo.cache.getComponentsInfo();
             Object.keys(componentsInfo).forEach((filePath) => {
                const info = componentsInfo[filePath];
@@ -220,21 +234,12 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                }
             }
 
-            const [cssFiles, jstplFiles] = getCssAndJstplFiles(
+            const [cssFiles, jstplFiles, jsonFiles] = getCssAndJstplFiles(
                taskParameters.cache.getInputPathsByFolder(moduleInfo.path)
             );
-            for (const filePath of cssFiles) {
-               const relativePath = path.relative(path.dirname(moduleInfo.path), filePath);
-               const prettyPath = modulePathToRequire.getPrettyPath(helpers.prettifyPath(transliterate(relativePath)));
-               const nodeName = `css!${prettyPath.replace('.css', '')}`;
-               storeNode(json, nodeName, {}, filePath);
-            }
-            for (const filePath of jstplFiles) {
-               const relativePath = path.relative(path.dirname(moduleInfo.path), filePath);
-               const prettyPath = modulePathToRequire.getPrettyPath(helpers.prettifyPath(transliterate(relativePath)));
-               const nodeName = `text!${prettyPath}`;
-               storeNode(json, nodeName, {}, filePath);
-            }
+            addNodesWithExtension(json, cssFiles, 'css', '.css');
+            addNodesWithExtension(json, jstplFiles, 'text');
+            addNodesWithExtension(json, jsonFiles, 'json', '.json');
 
             /**
              * сохраняем мета-данные по module-dependencies по требованию.
