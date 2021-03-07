@@ -370,7 +370,7 @@ async function limitingNativePackFiles(
             concurrency: 10
          }
       );
-      jsExternalModuleUsageMessages.forEach(message => logger.warning({
+      jsExternalModuleUsageMessages.forEach(message => logger.error({
          message,
          filePath: packageConfig.path,
          moduleInfo: packageConfig.moduleInfo
