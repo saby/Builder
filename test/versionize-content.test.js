@@ -383,7 +383,7 @@ describe('versionize-content', () => {
          path: filePath
       };
       result = versionizeContent.versionizeTemplates(currentFile, currentModuleInfo, true, 'test-version');
-      result.newText.should.equal('src="/materials/resources/contents.min.js?x_module=%{BUILD_NUMBER}&x_app=%{PRODUCT_NAME}"');
+      result.newText.should.equal('src="/materials/resources/contents.min.js?x_module=%{BUILD_NUMBER}"');
       result.errors.should.equal(false);
       currentFile.versioned.should.equal(true);
 
@@ -450,7 +450,7 @@ describe('versionize-content', () => {
          templateSourceContent.includes('bundles.js"') &&
          templateSourceContent.includes('src="{{item.get(image) ? item.get(image) : \'/resources/SBIS3.CONTROLS/themes/online/img/defaultFolder.png\'}}" />');
       templateSourceNotChanged.should.equal(true);
-      const templateCompiledChanged = templateCompiledContent.includes('contents.min.js?x_module=%{BUILD_NUMBER}&amp;x_app=%{PRODUCT_NAME}') &&
+      const templateCompiledChanged = templateCompiledContent.includes('contents.min.js?x_module=%{BUILD_NUMBER}') &&
          templateCompiledContent.includes('config.min.js?x_module=%{MODULE_VERSION_STUB=WS.Core}"') &&
          templateCompiledContent.includes('"/cdn/requirejs/2.3.5-p3/require-min.js"');
       templateCompiledChanged.should.equal(true);
