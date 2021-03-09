@@ -79,6 +79,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                mapPath = path.basename(outputMapFile);
             }
          }
+
          if (file.cached) {
             if (outputMinFile) {
                taskParameters.cache.addOutputFile(file.history[0], outputMinFile, moduleInfo);
