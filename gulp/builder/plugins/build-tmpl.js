@@ -68,10 +68,16 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             callback(null, file);
             return;
          }
-         let outputMinFile = '';
+         let outputMinFile = '', outputMapFile = '';
+         let mapText, mapPath;
          if (taskParameters.config.isReleaseMode) {
-            const relativePath = path.relative(moduleInfo.path, file.history[0]).replace(templateExtReg, '.min$1');
-            outputMinFile = path.join(moduleInfo.output, transliterate(relativePath));
+            const relativePath = path.relative(moduleInfo.path, file.history[0]);
+            outputMinFile = path.join(moduleInfo.output, transliterate(relativePath.replace(templateExtReg, '.min$1')));
+
+            if (taskParameters.config.sourceMaps) {
+               outputMapFile = `${path.join(moduleInfo.output, transliterate(relativePath))}.map`;
+               mapPath = path.basename(outputMapFile);
+            }
          }
          if (file.cached) {
             if (outputMinFile) {
@@ -202,7 +208,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                const [errorUglify, obj] = await execInPool(
                   taskParameters.pool,
                   'uglifyJs',
-                  [file.path, newText, true],
+                  [file.path, newText, true, mapPath],
                   relativeFilePath.replace(templateExtReg, '.min$1'),
                   moduleInfo
                );
@@ -223,6 +229,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                } else {
                   taskParameters.storePluginTime('build tmpl', obj.passedTime, true);
                   newText = obj.code;
+                  mapText = obj.map;
                }
             }
          }
@@ -244,6 +251,16 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   pushToServer: taskParameters.config.staticServer
                })
             );
+            if (mapText) {
+               this.push(
+                  new Vinyl({
+                     base: moduleInfo.output,
+                     path: outputMapFile,
+                     contents: Buffer.from(mapText),
+                     history: [...file.history]
+                  })
+               );
+            }
             taskParameters.cache.addOutputFile(file.history[0], outputMinFile, moduleInfo);
          }
       } catch (error) {

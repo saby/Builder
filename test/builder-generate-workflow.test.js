@@ -1484,6 +1484,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          compress: true,
          joinedMeta: true,
          dependenciesGraph: true,
+         sourceMaps: true,
          modules: [
             {
                name: 'Модуль',
@@ -1707,6 +1708,7 @@ describe('gulp/builder/generate-workflow.js', () => {
             'TestASort',
             'TestBSort',
             'Page.min.wml',
+            'Page.wml.map',
             'Page.min.wml.gz',
             'Page.min.wml.br',
             'Page.wml',
@@ -1741,6 +1743,7 @@ describe('gulp/builder/generate-workflow.js', () => {
             'private.min.css.gz',
             'private.min.css.br',
             'private.min.js',
+            'private.js.map',
             'private.min.js.gz',
             'private.min.js.br',
             'private.min.original.js',
@@ -2022,11 +2025,13 @@ describe('gulp/builder/generate-workflow.js', () => {
             '.builder',
             '_private',
             'amdModule.js',
+            'amdModule.js.map',
             'amdModule.min.js',
             'amdModule.css',
             'amdModule.min.css',
             'extend.package.json',
             'library.modulepack.js',
+            'library.modulepack.js.map',
             'library.ts',
             'library.js',
             'library.min.js',
@@ -2053,9 +2058,11 @@ describe('gulp/builder/generate-workflow.js', () => {
          testDirectory.should.have.members([
             'module1.ts',
             'module1.js',
+            'module1.js.map',
             'module1.min.js',
             'module2.ts',
             'module2.js',
+            'module2.js.map',
             'module2.min.js',
          ]);
       });
