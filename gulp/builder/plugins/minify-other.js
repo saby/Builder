@@ -29,7 +29,12 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
       /* @this Stream */
       function onTransform(file, encoding, callback) {
          const startTime = Date.now();
-         const isJsonJs = file.basename.endsWith('.json.js');
+         let isJsonJs;
+         try {
+            isJsonJs = file.basename.endsWith('.json.js');
+         } catch(err) {
+            debugger;
+         }
 
          try {
             if (!isJsonJs && !includeExts.includes(file.extname)) {

@@ -173,6 +173,9 @@ class BuildConfiguration {
        * @type {boolean}
        */
       this.themes = true;
+
+      // enable sourcemaps for minified resources
+      this.sourceMaps = false;
    }
 
    /**
