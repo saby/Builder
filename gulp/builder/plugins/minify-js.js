@@ -93,6 +93,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             }
 
             let outputFileWoExt;
+            let outputMapFile, outputModulepackMapFile, mapPath, modulePackMapPath;
             const extName = esExt.test(file.history[0]) ? esExt : file.extname;
 
             /**
@@ -109,6 +110,12 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             } else {
                const relativePathWoExt = path.relative(moduleInfo.path, file.history[0]).replace(extName, '');
                outputFileWoExt = path.join(moduleInfo.output, transliterate(relativePathWoExt));
+               if (taskParameters.config.sourceMaps) {
+                  outputModulepackMapFile = `${outputFileWoExt}.modulepack.js.map`;
+                  outputMapFile = `${outputFileWoExt}.js.map`;
+                  mapPath = `${path.basename(outputMapFile)}`;
+                  modulePackMapPath = `${path.basename(outputModulepackMapFile)}`;
+               }
             }
             const outputMinJsFile = `${outputFileWoExt}.min.js`;
             const outputMinOriginalJsFile = `${outputFileWoExt}.min.original.js`;
@@ -170,6 +177,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                logger.debug(`There is no corresponding minified compiled file for source file: ${file.history[0]}. It has to be compiled, then.`);
             }
 
+            let mapText;
             if (!file.modulepack) {
                let minText;
                if (file.productionContents) {
@@ -182,7 +190,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                const [error, minified] = await execInPool(taskParameters.pool, 'uglifyJs', [
                   file.path,
                   minText,
-                  false
+                  false,
+                  mapPath
                ]);
                if (error) {
                   taskParameters.cache.markFileAsFailed(file.history[0]);
@@ -195,12 +204,22 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                } else {
                   taskParameters.storePluginTime('minify js', minified.passedTime, true);
                   minText = minified.code;
+                  mapText = minified.map;
                }
                const newFile = file.clone();
                newFile.contents = Buffer.from(minText);
                newFile.base = moduleInfo.output;
                newFile.path = outputMinJsFile;
                this.push(newFile);
+               if (mapText) {
+                  this.push(
+                     new Vinyl({
+                        base: moduleInfo.output,
+                        path: outputMapFile,
+                        contents: Buffer.from(mapText)
+                     })
+                  );
+               }
                taskParameters.cache.addOutputFile(file.history[0], outputMinJsFile, moduleInfo);
             } else {
                // минимизируем оригинальный JS
@@ -248,7 +267,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                const [error, minified] = await execInPool(taskParameters.pool, 'uglifyJs', [
                   file.path,
                   minText,
-                  file.library
+                  file.library,
+                  modulePackMapPath
                ]);
                if (error) {
                   taskParameters.cache.markFileAsFailed(file.history[0]);
@@ -261,12 +281,22 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                } else {
                   taskParameters.storePluginTime('minify js', minified.passedTime, true);
                   minText = minified.code;
+                  mapText = minified.map;
                }
                const newFile = file.clone();
                newFile.base = moduleInfo.output;
                newFile.path = outputMinJsFile;
                newFile.contents = Buffer.from(minText);
                this.push(newFile);
+               if (mapText) {
+                  this.push(
+                     new Vinyl({
+                        base: moduleInfo.output,
+                        path: outputModulepackMapFile,
+                        contents: Buffer.from(mapText)
+                     })
+                  );
+               }
                if (file.versioned) {
                   moduleInfo.cache.storeVersionedModule(file.history[0], outputMinJsFile);
                }
@@ -278,7 +308,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                 * запакованный контент. В минифицированном варианте могут поменяться имена переменнных и
                 * тест проходить не будет.
                 */
-               if (taskParameters.config.rawConfig.builderTests) {
+               if (taskParameters.config.rawConfig.builderTests || mapPath) {
                   this.push(
                      new Vinyl({
                         base: moduleInfo.output,
