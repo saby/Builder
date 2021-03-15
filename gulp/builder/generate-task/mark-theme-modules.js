@@ -165,9 +165,14 @@ function generateTaskForMarkThemeModules(taskParameters) {
    });
 
    const collectStyleThemes = startTask('markThemeModules', taskParameters);
+   const checkCssVariablesCache = (done) => {
+      taskParameters.cache.checkCssVariablesCache();
+      done();
+   };
    return gulp.series(
       collectStyleThemes.start,
       gulp.parallel(tasks),
+      checkCssVariablesCache,
       collectStyleThemes.finish
    );
 }
