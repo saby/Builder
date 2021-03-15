@@ -632,22 +632,30 @@ class Cache {
 
       const { variables } = this.currentStore.themesMeta.cssVariablesOptions;
       const { fallbackList } = this.currentStore.themesMeta;
+
+      variablesList.forEach((currentVariable) => {
+         variables[currentVariable] = moduleVariables[currentVariable];
+         fallbackList.variablesMap[currentVariable] = fallbackName;
+      });
+   }
+
+   // checks overall css variables cache. If there are any changes sincle the last build,
+   // all less cache will be dropped
+   checkCssVariablesCache() {
+      const { variables } = this.currentStore.themesMeta.cssVariablesOptions;
+      const { fallbackList } = this.currentStore.themesMeta;
+
       let LAST_OVERALL_HASH;
       if (this.lastStore.themesMeta.hasOwnProperty('fallbackList')) {
          LAST_OVERALL_HASH = this.lastStore.themesMeta.fallbackList.OVERALL_HASH;
       } else {
          LAST_OVERALL_HASH = '';
       }
-
-      variablesList.forEach((currentVariable) => {
-         variables[currentVariable] = moduleVariables[currentVariable];
-         fallbackList.variablesMap[currentVariable] = fallbackName;
-      });
       fallbackList.OVERALL_HASH = generateHash(JSON.stringify(variables));
       if (fallbackList.OVERALL_HASH !== LAST_OVERALL_HASH) {
          // if overall list of css variables and it's values is changed, drop cache of all
          // less
-         logger.info(`${fallbackName} content has been changed, all less files will be rebuilt.`);
+         logger.info('Css variables content has been changed, all less files will be rebuilt.');
          this.dropCacheForLess = true;
       }
    }
