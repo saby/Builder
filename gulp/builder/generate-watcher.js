@@ -250,7 +250,7 @@ class WatcherTask {
                // run files rebuild only if there is anything to rebuild
                // and common build isn't running yet
                if (changedFiles.length > 0 && !this.commonBuildStarted) {
-                  if (changedFiles.length > 20) {
+                  if (changedFiles.length > 100) {
                      // remove all of changed files from list to catch all
                      // new changes after this common rebuild was started
                      this.reset();
