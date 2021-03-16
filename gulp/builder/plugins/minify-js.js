@@ -154,19 +154,18 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   newFile.path = outputMinJsFile;
                   newFile.origin = compiledPath;
                   newFile.compiledBase = compiledBase;
-                  if (file.modulepack) {
+
+                  const compiledOriginalPath = compiledPath.replace('.js', '.original.js');
+                  if (await fs.pathExists(compiledOriginalPath)) {
+                     const newOriginalFile = file.clone();
+                     newOriginalFile.base = moduleInfo.output;
+                     newOriginalFile.path = outputMinOriginalJsFile;
+                     newOriginalFile.origin = compiledOriginalPath;
+                     newOriginalFile.compiledBase = compiledBase;
+                     taskParameters.cache.addOutputFile(file.history[0], outputMinOriginalJsFile, moduleInfo);
+                     this.push(newOriginalFile);
                      if (file.versioned) {
                         moduleInfo.cache.storeVersionedModule(file.history[0], outputMinJsFile);
-                     }
-                     if (!file.library) {
-                        const compiledOriginalPath = compiledPath.replace('.js', '.original.js');
-                        const newOriginalFile = file.clone();
-                        newOriginalFile.base = moduleInfo.output;
-                        newOriginalFile.path = outputMinOriginalJsFile;
-                        newOriginalFile.origin = compiledOriginalPath;
-                        newOriginalFile.compiledBase = compiledBase;
-                        taskParameters.cache.addOutputFile(file.history[0], outputMinOriginalJsFile, moduleInfo);
-                        this.push(newOriginalFile);
                      }
                   }
                   this.push(newFile);
