@@ -134,6 +134,12 @@ class TaskParameters {
     * @returns {{sequence: [], cyclic: boolean}}
     */
    recursiveChecker(cyclicSequences, dependencies, internalModules, currentModule, currentSequence) {
+      // catch all cyclic dependencies even if it's a cycle between 2 external dependencies of current lazy package
+      if (currentSequence.includes(currentModule)) {
+         currentSequence.push(currentModule);
+         cyclicSequences.push(currentSequence);
+         return currentSequence;
+      }
       currentSequence.push(currentModule);
 
       // if current module creates cycle dependency, mark current sequence as cyclic
