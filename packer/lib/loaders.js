@@ -300,7 +300,7 @@ async function cssLoader(
       sourceFile: module.fullPath,
       css: cssContent,
       relativePackagePath,
-      resourcesUrl: pluginConfig && pluginConfig.resourcesUrl
+      resourcesUrl: pluginConfig && pluginConfig.resourcesUrl ? 'resources/' : ''
    });
    cssContent = styleTagLoader(cssContent);
    cssContent = addAMDShell(cssContent, module.fullName);
