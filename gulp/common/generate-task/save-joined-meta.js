@@ -81,7 +81,8 @@ async function getJoinedThemeContent(root, fileSuffix, files) {
  * themes in current building project
  * @returns {Promise<void>}
  */
-async function generateJoinedThemes(root, isThemeForReleaseOnly, fileSuffix, themes) {
+async function generateJoinedThemes(root, isThemeForReleaseOnly, fileSuffix, themes, resourceRoot) {
+   const RESOURCE_ROOT_REG = /%\{RESOURCE_ROOT\}/g;
    await pMap(
       Object.keys(themes),
       async(currentTheme) => {
@@ -89,14 +90,14 @@ async function generateJoinedThemes(root, isThemeForReleaseOnly, fileSuffix, the
             const debugContent = await getJoinedThemeContent(root, '', themes[currentTheme]);
             await fs.outputFile(
                path.join(root, 'themes', `${currentTheme}.css`),
-               debugContent
+               debugContent.replace(RESOURCE_ROOT_REG, resourceRoot)
             );
          }
          if (typeof fileSuffix === 'string') {
             const releaseContent = await getJoinedThemeContent(root, fileSuffix, themes[currentTheme]);
             await fs.outputFile(
                path.join(root, 'themes', `${currentTheme}${fileSuffix}.css`),
-               releaseContent
+               releaseContent.replace(RESOURCE_ROOT_REG, resourceRoot)
             );
          }
       }
@@ -132,7 +133,8 @@ module.exports = function generateTaskForSaveJoinedMeta(taskParameters) {
 
       // save joined module-dependencies for non-jinnee application
       const themesMeta = taskParameters.cache.getThemesMeta();
-      await generateJoinedThemes(root, isThemeForReleaseOnly, fileSuffix, themesMeta.themes);
+      const resourceRoot = `${taskParameters.config.applicationForRebase}${taskParameters.config.resourcesUrl ? 'resources/' : ''}`;
+      await generateJoinedThemes(root, isThemeForReleaseOnly, fileSuffix, themesMeta.themes, resourceRoot);
       if (taskParameters.config.dependenciesGraph) {
          const moduleDeps = taskParameters.cache.getModuleDependencies();
          await fs.writeJson(path.join(root, 'module-dependencies.json'), moduleDeps);

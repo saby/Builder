@@ -35,7 +35,7 @@ function rebaseUrlsToAbsolutePath(cssConfig) {
                    * 2) for ordinary stand - site root + resources + relative link by site root
                    * A normalized relative path will be returned according to these facts.
                    */
-                  return `${resourcesUrl ? 'resources/' : ''}${helpers.prettifyPath(
+                  return `${resourcesUrl || ''}${helpers.prettifyPath(
                      path.relative(
                         dir.to,
                         path.join(dir.from, asset.url)
