@@ -77,7 +77,7 @@ function needSymlink(config, moduleInfo, isFirstBuild) {
          return false;
       }
 
-      if (file.extname === '.html' && (hasLocalization || config.debugCustomPack)) {
+      if (file.extname === '.html' && (hasLocalization || config.debugCustomPack || config.isReleaseMode)) {
          return false;
       }
 
