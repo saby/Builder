@@ -76,10 +76,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo, gd) {
             moduleInfo,
             filePath: file.path
          });
-
-         // mark cache as failed if something wrong with html packing.
-         // An error may be occurred if source html template is broken
-         taskParameters.cache.markCacheAsFailed();
       }
       callback(null, file);
    });
