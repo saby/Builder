@@ -123,7 +123,7 @@ describe('custompack', () => {
 
       (result instanceof Error).should.equal(true);
       result.message.should.equal(
-         'В ваш пакет ничего не запаковалось, проверьте правильность описания правил паковки в package.json файле'
+         'There is an empty result for a current custom package. Check your .package.json for a valid packing rules'
       );
    });
    it('should save js and css packages when only styles included', async() => {
