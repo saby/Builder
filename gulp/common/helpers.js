@@ -9,7 +9,8 @@ const path = require('path'),
    fs = require('fs-extra'),
    logger = require('../../lib/logger').logger(),
    getLogLevel = require('../../lib/get-log-level'),
-   workerPool = require('workerpool');
+   workerPool = require('workerpool'),
+   builderConstants = require('../../lib/builder-constants');
 
 /**
  * check source file necessity in output directory by
@@ -45,7 +46,7 @@ function checkSourceNecessityByConfig(config, extension) {
  */
 function needSymlink(config, moduleInfo, isFirstBuild) {
    const hasLocalization = config.localizations.length > 0;
-   return (file) => {
+   const checkForSymlink = (file) => {
       if (file.useSymlink) {
          // if it's a file from compiled sources to be symlink to, rebase it to
          // compiled sources directory, otherwise symlink it "as is"
@@ -95,6 +96,18 @@ function needSymlink(config, moduleInfo, isFirstBuild) {
       // also symlinks can't be used if there was path transliteration. Symlinks doesn't work in this case.
       // It's Gulp own error
       return file.history.length === 1;
+   };
+   return (file) => {
+      const isSymlink = checkForSymlink(file);
+      if (isSymlink && file.path.length >= builderConstants.MAX_PATH) {
+         const message = `Current path exceeded a maximum system path length(${file.path.length} symbols). Should be less than ${builderConstants.MAX_PATH} symbols.`;
+         logger.error({
+            message,
+            filePath: file.path,
+            moduleInfo
+         });
+      }
+      return isSymlink;
    };
 }
 
