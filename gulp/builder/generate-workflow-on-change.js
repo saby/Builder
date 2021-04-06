@@ -67,13 +67,18 @@ function getFilesToBuild(prettyRoot, filePath, dependencies) {
  * @returns {Undertaker.TaskFunction} gulp задача
  */
 function generateBuildWorkflowOnChange(processArgv) {
-   const { filePath } = ConfigurationReader.getProcessParameters(processArgv);
+   const { filePath, hotReloadPort } = ConfigurationReader.getProcessParameters(processArgv);
 
    // загрузка конфигурации должна быть синхронной, иначе не построятся задачи для сборки модулей
    const config = new Configuration();
    config.loadSync(processArgv);
    if (!filePath) {
       throw new Error('Не указан параметр --filePath');
+   }
+
+   // if hot reload port is selected by user, use it to push changes
+   if (hotReloadPort) {
+      config.staticServer = `localhost:${hotReloadPort}`;
    }
 
    const taskParameters = new TaskParameters(config, new Cache(config));
