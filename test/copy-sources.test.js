@@ -139,6 +139,16 @@ describe('copy sources', () => {
                required: true
             },
             {
+               name: 'UICore',
+               path: path.join(sourceFolder, 'UICore'),
+               required: true
+            },
+            {
+               name: 'UICommon',
+               path: path.join(sourceFolder, 'UICommon'),
+               required: true
+            },
+            {
                name: 'Vdom',
                path: path.join(sourceFolder, 'Vdom'),
                required: true
