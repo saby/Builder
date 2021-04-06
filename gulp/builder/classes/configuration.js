@@ -403,10 +403,10 @@ class BuildConfiguration {
       if (!nativeWatcher) {
          clearSourcesSymlinks(this.cachePath);
       }
-      const mainModulesForTemplates = {
-         View: false,
-         UI: false
-      };
+      const mainModulesForTemplates = [];
+
+      // list of required interface modules for templates build
+      const templateModules = ['View', 'UICore', 'UI', 'Compiler', 'UICommon'];
       for (const module of this.rawConfig.modules) {
          const moduleInfo = new ModuleInfo(module, this.outputPath, this.staticServer);
 
@@ -426,21 +426,13 @@ class BuildConfiguration {
          }
 
          /**
-          * Builder needs "View" and "UI" Interface modules for template's build plugin.
+          * Builder needs "View",  "UI", "UICore", "UICommon" and "Compiler"
+          * interface modules for template's build plugin.
           */
-         switch (moduleInfo.name) {
-            case 'View':
-               mainModulesForTemplates.View = true;
-               break;
-            case 'UI':
-               mainModulesForTemplates.UI = true;
-               break;
-            case 'Compiler':
-               mainModulesForTemplates.Compiler = true;
-               break;
-            default:
-               break;
+         if (templateModules.includes(moduleInfo.name)) {
+            mainModulesForTemplates.push(moduleInfo.name);
          }
+
          moduleInfo.symlinkInputPathToAvoidProblems(this.cachePath, true);
 
          moduleInfo.contents.buildMode = this.getBuildMode();
@@ -463,7 +455,10 @@ class BuildConfiguration {
          });
          this.modules.push(moduleInfo);
       }
-      if (mainModulesForTemplates.View && mainModulesForTemplates.UI && mainModulesForTemplates.Compiler) {
+
+      // templates can be built only if there is a whole pack of required interface modules
+      // for templates build
+      if (mainModulesForTemplates.length === 5) {
          this.templateBuilder = true;
       }
 
