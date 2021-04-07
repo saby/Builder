@@ -145,9 +145,9 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                const compiledPath = path.join(compiledSourcePath.replace(/(\.ts|\.js)/, '.min.js'));
 
                // for js there is only a symlink needed to be created, so we can get a result faster
-               // due to avoid read of minified compiled js file
+               // to avoid read of minified compiled js file
                const hashesAreEqual = taskParameters.cache.compareWithCompiled(relativeFilePath);
-               if (hashesAreEqual) {
+               if (hashesAreEqual && await fs.pathExists(compiledPath)) {
                   file.useSymlink = true;
                   const newFile = file.clone();
                   newFile.base = moduleInfo.output;
