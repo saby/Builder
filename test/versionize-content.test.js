@@ -431,6 +431,14 @@ describe('versionize-content', () => {
                path: path.join(sourceFolder, 'Compiler')
             },
             {
+               name: 'UICore',
+               path: path.join(sourceFolder, 'UICore')
+            },
+            {
+               name: 'UICommon',
+               path: path.join(sourceFolder, 'UICommon')
+            },
+            {
                name: 'Vdom',
                path: path.join(sourceFolder, 'Vdom')
             },
