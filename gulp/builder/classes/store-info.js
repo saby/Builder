@@ -62,7 +62,7 @@ class StoreInfo {
          // a decision whether drop cache for all built less files)
          fallbackList: {
             variablesMap: {},
-            OVERALL_HASH: ''
+            hashes: {}
          }
       };
    }
