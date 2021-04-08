@@ -641,21 +641,22 @@ class Cache {
 
    // checks overall css variables cache. If there are any changes sincle the last build,
    // all less cache will be dropped
-   checkCssVariablesCache() {
-      const { variables } = this.currentStore.themesMeta.cssVariablesOptions;
+   checkCurrentCssVariablesCache(moduleName, currentCssVariables) {
       const { fallbackList } = this.currentStore.themesMeta;
 
-      let LAST_OVERALL_HASH;
+      let LAST_MODULE_HASH;
       if (this.lastStore.themesMeta.hasOwnProperty('fallbackList')) {
-         LAST_OVERALL_HASH = this.lastStore.themesMeta.fallbackList.OVERALL_HASH;
+         if (this.lastStore.themesMeta.fallbackList.hasOwnProperty('hashes')) {
+            LAST_MODULE_HASH = this.lastStore.themesMeta.fallbackList.hashes[moduleName] || '';
+         }
       } else {
-         LAST_OVERALL_HASH = '';
+         LAST_MODULE_HASH = '';
       }
-      fallbackList.OVERALL_HASH = generateHash(JSON.stringify(variables));
-      if (fallbackList.OVERALL_HASH !== LAST_OVERALL_HASH) {
+      fallbackList.hashes[moduleName] = generateHash(JSON.stringify(currentCssVariables));
+      if (fallbackList.hashes[moduleName] !== LAST_MODULE_HASH) {
          // if overall list of css variables and it's values is changed, drop cache of all
          // less
-         logger.info('Css variables content has been changed, all less files will be rebuilt.');
+         logger.info(`Css variables content has been changed for module ${moduleName}, all less files will be rebuilt.`);
          this.dropCacheForLess = true;
       }
    }
