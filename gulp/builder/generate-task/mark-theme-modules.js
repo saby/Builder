@@ -150,6 +150,7 @@ function generateTaskForMarkThemeModules(taskParameters) {
                   try {
                      const currentThemeVariables = JSON.parse(file.contents);
                      taskParameters.cache.addCssVariables(`${moduleInfo.name}/fallback.json`, currentThemeVariables);
+                     taskParameters.cache.checkCurrentCssVariablesCache(moduleInfo.name, currentThemeVariables);
                   } catch (error) {
                      logger.error({
                         message: 'An error occurred when tried to parse fallback.json',
@@ -165,14 +166,9 @@ function generateTaskForMarkThemeModules(taskParameters) {
    });
 
    const collectStyleThemes = startTask('markThemeModules', taskParameters);
-   const checkCssVariablesCache = (done) => {
-      taskParameters.cache.checkCssVariablesCache();
-      done();
-   };
    return gulp.series(
       collectStyleThemes.start,
       gulp.parallel(tasks),
-      checkCssVariablesCache,
       collectStyleThemes.finish
    );
 }
