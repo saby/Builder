@@ -12,6 +12,8 @@
   "resources/WS.Core/online-superbundle.package.min",
   "resources/Types/online-superbundle.package.min",
   "resources/UI/online-superbundle.package.min",
+  "resources/UICore/online-superbundle.package.min",
+  "resources/UICommon/online-superbundle.package.min",
   "resources/Superbundles/online-superbundle.package.min",
 
   "resources/EngineLink/page-superbundle.package.min",
