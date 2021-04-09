@@ -305,7 +305,11 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                         json.nodes[currentNode] = compiledMDeps.nodes[currentNode];
                      }
                      if (compiledMDeps.packedLibraries.hasOwnProperty(currentNode)) {
-                        json.packedLibraries[currentNode] = compiledMDeps.nodes[currentNode];
+                        json.packedLibraries[currentNode] = compiledMDeps.packedLibraries[currentNode];
+                        moduleInfo.cache.storeComponentParameters(`${currentNode}.ts`, {
+                           packedModules: compiledMDeps.packedLibraries[currentNode],
+                           componentDep: compiledMDeps.links[currentNode]
+                        });
                      }
                   });
                }
