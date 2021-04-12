@@ -230,11 +230,15 @@ function generateTaskForBuildFile(taskParameters, currentModuleInfo, gulpModules
          .pipe(gulpChmod({ read: true, write: true }))
          .pipe(mapStream((file, callback) => {
             if (!['.ts', '.less'].includes(file.extname)) {
-               const outputFilePath = path.join(
-                  currentModuleInfo.runtimeModuleName,
-                  file.relative
-               ).replace(/\\/g, '/');
-               taskParameters.addChangedFile(outputFilePath);
+               // don't push information about minified files onto hot reload server, it's useless and
+               // ruins debugging, because minified version overwrites debug version
+               if (!path.basename(file.path).endsWith(`.min${file.extname}`)) {
+                  const outputFilePath = path.join(
+                     currentModuleInfo.runtimeModuleName,
+                     file.relative
+                  ).replace(/\\/g, '/');
+                  taskParameters.addChangedFile(outputFilePath);
+               }
             }
             callback(null, file);
          }))
