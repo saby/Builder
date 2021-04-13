@@ -22,7 +22,10 @@ const GRANTED_EXTENSIONS = [
 const NON_CACHED_META = [
    'contents.json',
    'ru.js',
-   'en.js'
+   'en.js',
+
+   // dont push minified versions of files
+   '.min.js'
 ];
 
 /**
