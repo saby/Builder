@@ -612,10 +612,11 @@ class Cache {
     */
    addThemePartIntoMeta(resultThemeName, relativePath) {
       const prettyRelativePath = helpers.unixifyPath(relativePath);
-      const { themes } = this.currentStore.themesMeta;
+      const { themes, themesMap } = this.currentStore.themesMeta;
       if (!themes[resultThemeName].includes(prettyRelativePath)) {
          themes[resultThemeName].push(prettyRelativePath);
       }
+      themesMap[prettyRelativePath] = resultThemeName;
    }
 
    getThemesMeta() {

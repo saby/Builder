@@ -85,6 +85,10 @@ class TaskParameters {
       this.changedModules.add(fileName);
    }
 
+   removeChangedFile(fileName) {
+      this.changedModules.delete(fileName);
+   }
+
    normalizePluginsTime() {
       const { plugins, summary } = this.tasksTimer[this.currentTask];
 
