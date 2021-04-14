@@ -38,7 +38,8 @@ const Cache = require('./classes/cache'),
    logger = require('../../lib/logger').logger(),
    transliterate = require('../../lib/transliterate'),
    pushChanges = require('../../lib/push-changes'),
-   { generateDownloadModuleCache, generateSaveModuleCache } = require('./classes/modules-cache');
+   { generateDownloadModuleCache, generateSaveModuleCache } = require('./classes/modules-cache'),
+   generateJoinedThemes = require('../../lib/save-themes');
 
 const {
    needSymlink,
@@ -47,7 +48,7 @@ const {
    generateTaskForTerminatePool
 } = require('../common/helpers');
 
-function getFilesToBuild(prettyRoot, filePath, dependencies) {
+function getFilesToBuild(prettyRoot, filePath, themesParts, dependencies) {
    const filesToBuild = [filePath];
    const prettyFilePath = helpers.unixifyPath(filePath);
    const relativeFilePath = helpers.removeLeadingSlashes(
@@ -55,10 +56,34 @@ function getFilesToBuild(prettyRoot, filePath, dependencies) {
    );
    Object.keys(dependencies).forEach((currentFile) => {
       if (dependencies[currentFile].includes(relativeFilePath)) {
-         filesToBuild.push(path.join(prettyRoot, currentFile));
+         const fullPath = path.join(prettyRoot, currentFile);
+         filesToBuild.push(fullPath);
+         if (path.basename(fullPath) === 'theme.less') {
+            themesParts.push(currentFile);
+         }
       }
    });
    return filesToBuild;
+}
+
+// watcher's mini task for generating of themes.
+function generateSaveThemesTask(taskParameters, themesParts) {
+   return async function saveThemesMeta() {
+      // don't waste time if there is no changes in themes parts
+      if (themesParts.length > 0) {
+         const root = taskParameters.config.rawConfig.output;
+         const fileSuffix = taskParameters.config.isReleaseMode ? '.min' : null;
+         const isThemeForReleaseOnly = !taskParameters.config.sources && taskParameters.config.isReleaseMode;
+         const themesMeta = taskParameters.cache.getThemesMeta();
+         themesParts.forEach((currentThemePart) => {
+            const themeName = themesMeta.themesMap[currentThemePart.replace('.less', '')];
+            taskParameters.addChangedFile(`themes/${themeName}.css`);
+            taskParameters.removeChangedFile(currentThemePart.replace('.less', '.css'));
+         });
+         const resourceRoot = `${taskParameters.config.applicationForRebase}${taskParameters.config.resourcesUrl ? 'resources/' : ''}`;
+         await generateJoinedThemes(root, isThemeForReleaseOnly, fileSuffix, themesMeta.themes, resourceRoot);
+      }
+   };
 }
 
 /**
@@ -170,6 +195,7 @@ function generateTaskForPushOfChanges(taskParameters) {
 }
 
 function generateTaskForBuildFile(taskParameters, currentModuleInfo, gulpModulesInfo, filePathInProject) {
+   const themesParts = [];
    const currentModuleOutput = path.join(
       taskParameters.config.rawConfig.output,
       currentModuleInfo.runtimeModuleName
@@ -181,6 +207,7 @@ function generateTaskForBuildFile(taskParameters, currentModuleInfo, gulpModules
       const filesToBuild = getFilesToBuild(
          prettyRoot,
          filePathInProject,
+         themesParts,
          taskParameters.cache.getLastStoreDependencies()
       );
       logger.info(`These are files to be rebuilt: ${JSON.stringify(filesToBuild, null, 3)}`);
@@ -265,6 +292,7 @@ function generateTaskForBuildFile(taskParameters, currentModuleInfo, gulpModules
       generateDownloadModuleCache(taskParameters, currentModuleInfo, true),
       buildModule,
       generateSaveModuleCache(currentModuleInfo),
+      generateSaveThemesTask(taskParameters, themesParts),
       buildFile.finish
    );
 }
