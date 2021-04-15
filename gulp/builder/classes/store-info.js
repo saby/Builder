@@ -56,6 +56,12 @@ class StoreInfo {
           */
          themes: {},
 
+         /**
+          * Object with info about which theme includes current theme part
+          * e.g. theme "default__cola" has a part of it in file Controls-default-theme/cola/theme.less
+          */
+         themesMap: {},
+
          // all essential info about fallback.json meta
          // 1) variables map(from which fallback.json it was taken)
          // 2) overall hash sum(it's required to make
