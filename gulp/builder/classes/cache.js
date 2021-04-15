@@ -501,21 +501,23 @@ class Cache {
          if (lastModuleCache.componentsInfo.hasOwnProperty(prettyRelativePath)) {
             currentModuleCache.componentsInfo[prettyRelativePath] = lastModuleCache.componentsInfo[prettyRelativePath];
          }
-         if (lastModuleCache.markupCache.hasOwnProperty(prettyPath)) {
-            currentModuleCache.markupCache[prettyPath] = lastModuleCache.markupCache[prettyPath];
+         if (lastModuleCache.markupCache.hasOwnProperty(prettyRelativePath)) {
+            currentModuleCache.markupCache[prettyRelativePath] = lastModuleCache.markupCache[prettyRelativePath];
          }
-         if (lastModuleCache.esCompileCache.hasOwnProperty(prettyPath)) {
-            currentModuleCache.esCompileCache[prettyPath] = lastModuleCache.esCompileCache[prettyPath];
+         if (lastModuleCache.esCompileCache.hasOwnProperty(prettyRelativePath)) {
+            currentModuleCache.esCompileCache[prettyRelativePath] = lastModuleCache.esCompileCache[prettyRelativePath];
          }
-         if (lastModuleCache.routesInfo.hasOwnProperty(prettyPath)) {
-            currentModuleCache.routesInfo[prettyPath] = lastModuleCache.routesInfo[prettyPath];
+         if (lastModuleCache.routesInfo.hasOwnProperty(prettyRelativePath)) {
+            currentModuleCache.routesInfo[prettyRelativePath] = lastModuleCache.routesInfo[prettyRelativePath];
          }
-         if (lastModuleCache.versionedModules.hasOwnProperty(prettyPath)) {
-            currentModuleCache.versionedModules[prettyPath] = lastModuleCache.versionedModules[prettyPath];
+         if (lastModuleCache.versionedModules.hasOwnProperty(prettyRelativePath)) {
+            currentModuleCache.versionedModules[
+               prettyRelativePath
+            ] = lastModuleCache.versionedModules[prettyRelativePath];
          }
 
-         if (lastModuleCache.cdnModules.hasOwnProperty(prettyPath)) {
-            currentModuleCache.cdnModules[prettyPath] = lastModuleCache.cdnModules[prettyPath];
+         if (lastModuleCache.cdnModules.hasOwnProperty(prettyRelativePath)) {
+            currentModuleCache.cdnModules[prettyRelativePath] = lastModuleCache.cdnModules[prettyRelativePath];
          }
          if (this.lastStore.dependencies.hasOwnProperty(prettyRelativePath)) {
             this.currentStore.dependencies[prettyRelativePath] = this.lastStore.dependencies[prettyRelativePath];
