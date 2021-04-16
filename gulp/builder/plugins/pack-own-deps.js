@@ -39,17 +39,17 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             const componentsInfo = moduleInfo.cache.getComponentsInfo();
             const markupCache = moduleInfo.cache.getMarkupCache();
             const nodenameToMarkup = new Map();
-            for (const filePath of Object.keys(markupCache)) {
-               const markupObj = markupCache[filePath];
+            for (const relativePath of Object.keys(markupCache)) {
+               const markupObj = markupCache[relativePath];
                if (markupObj) {
                   nodenameToMarkup.set(markupObj.nodeName, {
                      text: markupObj.text,
                      versioned: markupObj.versioned,
-                     filePath
+                     filePath: relativePath
                   });
                }
             }
-            const getFullPathInSource = (dep) => {
+            const getRelativePathInSource = (dep) => {
                const moduleNameOutput = path.basename(moduleInfo.output);
                let relativeFileName = '';
                if (dep.startsWith('html!')) {
@@ -59,12 +59,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                } else {
                   relativeFileName = `${relativeFileName.replace('wml!', '')}.wml`;
                }
+
+               // return filePath only if it's an own dependency(also in the same interface module)
                if (relativeFileName.startsWith(moduleNameOutput)) {
-                  const relativeFileNameWoModule = relativeFileName
-                     .split('/')
-                     .slice(1)
-                     .join('/');
-                  return path.join(moduleInfo.path, relativeFileNameWoModule);
+                  return relativeFileName;
                }
                return '';
             };
@@ -81,7 +79,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                      for (const dep of componentInfo.componentDep) {
                         if (dep.startsWith('html!') || dep.startsWith('tmpl!') || dep.startsWith('wml!')) {
                            ownDeps.push(dep);
-                           const fullPath = getFullPathInSource(dep);
+                           const fullPath = getRelativePathInSource(dep);
                            if (fullPath) {
                               filesDepsForCache.add(fullPath);
                            }

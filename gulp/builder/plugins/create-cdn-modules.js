@@ -37,8 +37,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                (file.basename.endsWith('.html') || file.basename.endsWith(`.min${file.extname}`));
          }
          if (cdnCondition) {
+            let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
+            relativeFilePath = path.join(path.basename(moduleInfo.path), relativeFilePath);
             moduleInfo.cache.storeCdnModule(
-               file.history[0],
+               relativeFilePath,
                transliterate(file.history[file.history.length - 1])
             );
          }

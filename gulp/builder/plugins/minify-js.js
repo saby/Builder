@@ -128,12 +128,12 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                return;
             }
 
+            const relativeFilePath = helpers.getRelativePath(
+               moduleInfo.appRoot,
+               file.history[0],
+               moduleInfo.outputRoot
+            );
             if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
-               const relativeFilePath = helpers.getRelativePath(
-                  moduleInfo.appRoot,
-                  file.history[0],
-                  moduleInfo.outputRoot
-               );
                const compiledBase = path.join(
                   taskParameters.config.compiled,
                   path.basename(moduleInfo.output)
@@ -165,7 +165,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                      taskParameters.cache.addOutputFile(file.history[0], outputMinOriginalJsFile, moduleInfo);
                      this.push(newOriginalFile);
                      if (file.versioned) {
-                        moduleInfo.cache.storeVersionedModule(file.history[0], outputMinJsFile);
+                        moduleInfo.cache.storeVersionedModule(relativeFilePath, outputMinJsFile);
                      }
                   }
                   this.push(newFile);
@@ -297,7 +297,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   );
                }
                if (file.versioned) {
-                  moduleInfo.cache.storeVersionedModule(file.history[0], outputMinJsFile);
+                  moduleInfo.cache.storeVersionedModule(relativeFilePath, outputMinJsFile);
                }
                taskParameters.cache.addOutputFile(file.history[0], outputMinJsFile, moduleInfo);
 

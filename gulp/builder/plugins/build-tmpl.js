@@ -118,7 +118,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
             if (result) {
                file.useSymlink = true;
-               moduleInfo.cache.storeBuildedMarkup(file.history[0], {
+               moduleInfo.cache.storeBuildedMarkup(relativeFilePath, {
                   nodeName: `${extension}!${relativeFilePath.replace(file.extname, '').replace(/\\/g, '/')}`,
                   text: result
                });
@@ -130,11 +130,11 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                newFile.compiledBase = compiledBase;
                this.push(newFile);
                if (file.versioned) {
-                  moduleInfo.cache.storeVersionedModule(file.history[0], outputMinFile);
+                  moduleInfo.cache.storeVersionedModule(relativeFilePath, outputMinFile);
                   file.versioned = false;
                }
                if (file.cdnLinked) {
-                  moduleInfo.cache.storeCdnModule(file.history[0], outputMinFile);
+                  moduleInfo.cache.storeCdnModule(relativeFilePath, outputMinFile);
                }
                taskParameters.cache.addOutputFile(file.history[0], outputMinFile, moduleInfo);
                callback(null, file);
@@ -195,7 +195,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             if (file.cdnLinked) {
                result.cdnLinked = true;
             }
-            moduleInfo.cache.storeBuildedMarkup(file.history[0], result);
+            moduleInfo.cache.storeBuildedMarkup(relativeFilePath, result);
             newText = result.text;
 
             // save compiled result into source file if we have to
@@ -237,11 +237,11 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
          if (outputMinFile) {
             if (file.versioned) {
-               moduleInfo.cache.storeVersionedModule(file.history[0], outputMinFile);
+               moduleInfo.cache.storeVersionedModule(relativeFilePath, outputMinFile);
                file.versioned = false;
             }
             if (file.cdnLinked) {
-               moduleInfo.cache.storeCdnModule(file.history[0], outputMinFile);
+               moduleInfo.cache.storeCdnModule(relativeFilePath, outputMinFile);
             }
             this.push(
                new Vinyl({
