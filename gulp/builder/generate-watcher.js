@@ -287,8 +287,9 @@ class WatcherTask {
                         if (this.filesHash[filePath] !== hash) {
                            // add current compiled file hash into current watcher hash list
                            this.filesHash[filePath] = hash;
+                           const hotReloadFlag = processParameters.hotReloadPort ? `--hotReloadPort="${processParameters.hotReloadPort}"` : '';
                            const currentExecutor = exec(
-                              `node "${gulpBinPath}" buildOnChange --config="${processParameters.config}" --nativeWatcher=true --filePath="${filePath}" --hotReloadPort="${processParameters.hotReloadPort}"`,
+                              `node "${gulpBinPath}" buildOnChange --config="${processParameters.config}" --nativeWatcher=true --filePath="${filePath}" ${hotReloadFlag}`,
                               processOptions
                            );
                            const fileExecutor = new ChildProcess(currentExecutor);
