@@ -27,8 +27,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
           * не забываем записать в кэш информацию
           */
          if (file.versioned && (file.basename.endsWith('.html') || file.basename.endsWith(`.min${file.extname}`))) {
+            let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
+            relativeFilePath = path.join(path.basename(moduleInfo.path), relativeFilePath);
             moduleInfo.cache.storeVersionedModule(
-               file.history[0],
+               relativeFilePath,
                transliterate(file.history[file.history.length - 1])
             );
          }
