@@ -215,6 +215,8 @@ class StoreInfo {
       // save a sign that cache was saved successfully. Needs by builder
       // to make a correct decision whether cache should be removed
       await fs.outputFile(path.join(cacheDirectory, 'cache.lockfile'), '');
+
+      await fs.outputFile(path.join(cacheDirectory, 'relative.lockfile'), '');
    }
 
    /**

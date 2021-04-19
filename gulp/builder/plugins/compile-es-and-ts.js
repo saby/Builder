@@ -122,7 +122,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                      // алиас для совместимости с кэшем шаблонов при паковке библиотек.
                      resultForCache.nodeName = resultForCache.moduleName;
                      moduleInfo.cache.storeCompiledES(
-                        file.history[0],
+                        relativeFilePath,
                         resultForCache
                      );
                   }
@@ -186,7 +186,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
                // alias for bacward compatibility with templates cache during libraries packing
                currentResult.nodeName = currentResult.moduleName;
-               moduleInfo.cache.storeCompiledES(file.history[0], currentResult);
+               moduleInfo.cache.storeCompiledES(relativeFilePath, currentResult);
             }
             const newFile = file.clone();
             newFile.contents = Buffer.from(result.development.text);

@@ -76,7 +76,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
                if (result) {
                   file.useSymlink = true;
-                  moduleInfo.cache.storeBuildedMarkup(file.history[0], {
+                  moduleInfo.cache.storeBuildedMarkup(relativeFilePath, {
                      nodeName: `html!${relativeFilePath.replace('.xhtml', '').replace(/\\/g, '/')}`,
                      text: result
                   });
@@ -88,10 +88,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   newFile.compiledBase = compiledBase;
                   this.push(newFile);
                   if (file.versioned) {
-                     moduleInfo.cache.storeVersionedModule(file.history[0], outputMinFile);
+                     moduleInfo.cache.storeVersionedModule(relativeFilePath, outputMinFile);
                      file.versioned = false;
                   }
-                  taskParameters.cache.addOutputFile(file.history[0], outputMinFile, moduleInfo);
+                  taskParameters.cache.addOutputFile(relativeFilePath, outputMinFile, moduleInfo);
                   callback(null, file);
                   return;
                }
@@ -126,7 +126,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   resultBuild.cdnLinked = true;
                }
                taskParameters.storePluginTime('build xhtml', resultBuild.passedTime, true);
-               moduleInfo.cache.storeBuildedMarkup(file.history[0], resultBuild);
+               moduleInfo.cache.storeBuildedMarkup(relativeFilePath, resultBuild);
                newText = resultBuild.text;
 
                // если xhtml не возможно минифицировать, то запишем оригинал
@@ -146,7 +146,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             }
 
             if (file.versioned) {
-               moduleInfo.cache.storeVersionedModule(file.history[0], outputMinFile);
+               moduleInfo.cache.storeVersionedModule(relativeFilePath, outputMinFile);
                file.versioned = false;
             }
             this.push(

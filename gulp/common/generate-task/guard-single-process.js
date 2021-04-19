@@ -10,7 +10,7 @@ const logger = require('../../../lib/logger').logger(),
    path = require('path'),
    fs = require('fs-extra');
 
-let lockFile, savedCacheLockFile;
+let lockFile, savedCacheLockFile, relativeCacheLockFile;
 
 /**
  * Геренация задачи блокировки. Обязательно должна выполнятся перед всеми другими задачами.
@@ -24,9 +24,16 @@ function generateTaskForLock(taskParameters) {
          await fs.ensureDir(cachePath);
          lockFile = path.join(cachePath, 'builder.lockfile');
          savedCacheLockFile = path.join(cachePath, 'cache.lockfile');
+         relativeCacheLockFile = path.join(cachePath, 'relative.lockfile');
 
          const isFileExist = await fs.pathExists(lockFile);
          const isCacheProperlySaved = await fs.pathExists(savedCacheLockFile);
+
+         // build from the beginning if there is no relative lockfile.
+         const isRelativeCacheSaved = await fs.pathExists(relativeCacheLockFile);
+         if (!isRelativeCacheSaved) {
+            taskParameters.cache.previousRunFailed = true;
+         }
          if (isFileExist && !isCacheProperlySaved) {
             taskParameters.cache.previousRunFailed = true;
          } else {

@@ -246,8 +246,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             });
 
             const markupCache = moduleInfo.cache.getMarkupCache();
-            for (const filePath of Object.keys(markupCache)) {
-               const markupObj = markupCache[filePath];
+            for (const relativePath of Object.keys(markupCache)) {
+               const markupObj = markupCache[relativePath];
                if (markupObj) {
                   /**
                    * There is only tmpl and wml meta information needed to be stored into
@@ -258,7 +258,6 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   if (markupObj.nodeName.startsWith('tmpl!') || markupObj.nodeName.startsWith('wml!')) {
                      json.links[markupObj.nodeName] = markupObj.dependencies || [];
                   }
-                  const relativePath = path.relative(moduleInfo.appRoot, filePath);
                   storeNode(json, markupObj.nodeName, { amd: true }, relativePath);
                }
             }

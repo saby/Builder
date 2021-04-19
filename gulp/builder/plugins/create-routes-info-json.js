@@ -32,6 +32,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             return;
          }
 
+         const relativePath = path.relative(moduleInfo.appRoot, file.history[0]);
+
          const [error, routeInfo] = await execInPool(
             taskParameters.pool,
             'parseRoutes',
@@ -53,9 +55,9 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             if (!routeInfo) {
                // if current file parse was completed with error, remove file
                // from inputPaths to repeat this error further in next build.
-               taskParameters.cache.deleteFailedFromCacheInputs(file.history[0], moduleInfo);
+               taskParameters.cache.deleteFailedFromCacheInputs(relativePath, moduleInfo);
             }
-            moduleInfo.cache.storeRouteInfo(file.history[0], routeInfo);
+            moduleInfo.cache.storeRouteInfo(relativePath, routeInfo);
          }
          callback(null, file);
       },
@@ -70,9 +72,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             const routesInfoBySourceFiles = moduleInfo.cache.getRoutesInfo();
             const resultRoutesInfo = {};
             const { resourcesUrl } = taskParameters.config;
-            Object.keys(routesInfoBySourceFiles).forEach((filePath) => {
-               const routeInfo = routesInfoBySourceFiles[filePath];
-               const relativePath = path.relative(moduleInfo.appRoot, filePath);
+            Object.keys(routesInfoBySourceFiles).forEach((relativePath) => {
+               const routeInfo = routesInfoBySourceFiles[relativePath];
                const rebasedRelativePath = resourcesUrl ? path.join('resources', relativePath) : relativePath;
                const relativeResultPath = helpers.prettifyPath(transliterate(rebasedRelativePath));
                resultRoutesInfo[relativeResultPath.replace(/\.ts$/, '.js')] = routeInfo;
