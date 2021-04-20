@@ -317,8 +317,9 @@ class Cache {
          return true;
       }
 
-      if (!this.versionedMetaRelative) {
+      if (!this.lastStore.versionedMetaRelative) {
          logger.info(`Cache for versioned meta isn't relative. ${finishText}`);
+         return true;
       }
 
       if (this.lastStore.runningParameters.criticalErrors) {
