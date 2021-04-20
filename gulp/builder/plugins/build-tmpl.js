@@ -18,6 +18,7 @@ const through = require('through2'),
    transliterate = require('../../../lib/transliterate'),
    execInPool = require('../../common/exec-in-pool'),
    libPackHelpers = require('../../../lib/pack/helpers/librarypack'),
+   helpers = require('../../../lib/helpers'),
    templateExtReg = /(\.tmpl|\.wml)$/;
 
 /**
@@ -130,7 +131,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                newFile.compiledBase = compiledBase;
                this.push(newFile);
                let relativeOutputFile = path.relative(moduleInfo.output, outputMinFile);
-               relativeOutputFile = path.join(moduleName, relativeOutputFile);
+               relativeOutputFile = helpers.unixifyPath(path.join(moduleName, relativeOutputFile));
                if (file.versioned) {
                   moduleInfo.cache.storeVersionedModule(relativeFilePath, relativeOutputFile);
                   file.versioned = false;
@@ -239,7 +240,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
          if (outputMinFile) {
             let relativeOutputFile = path.relative(moduleInfo.output, outputMinFile);
-            relativeOutputFile = path.join(moduleName, relativeOutputFile);
+            relativeOutputFile = helpers.unixifyPath(path.join(moduleName, relativeOutputFile));
             if (file.versioned) {
                moduleInfo.cache.storeVersionedModule(relativeFilePath, relativeOutputFile);
                file.versioned = false;
