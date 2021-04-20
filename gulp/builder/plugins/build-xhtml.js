@@ -20,6 +20,7 @@ const through = require('through2'),
  * @returns {stream}
  */
 module.exports = function declarePlugin(taskParameters, moduleInfo) {
+   const moduleName = path.basename(moduleInfo.output);
    return through.obj(
 
       /* @this Stream */
@@ -87,8 +88,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   newFile.origin = compiledPath;
                   newFile.compiledBase = compiledBase;
                   this.push(newFile);
+                  let relativeOutputFile = path.relative(moduleInfo.output, outputMinFile);
+                  relativeOutputFile = path.join(moduleName, relativeOutputFile);
                   if (file.versioned) {
-                     moduleInfo.cache.storeVersionedModule(relativeFilePath, outputMinFile);
+                     moduleInfo.cache.storeVersionedModule(relativeFilePath, relativeOutputFile);
                      file.versioned = false;
                   }
                   taskParameters.cache.addOutputFile(relativeFilePath, outputMinFile, moduleInfo);
@@ -145,8 +148,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                }
             }
 
+            let relativeOutputFile = path.relative(moduleInfo.output, outputMinFile);
+            relativeOutputFile = path.join(moduleName, relativeOutputFile);
             if (file.versioned) {
-               moduleInfo.cache.storeVersionedModule(relativeFilePath, outputMinFile);
+               moduleInfo.cache.storeVersionedModule(relativeFilePath, relativeOutputFile);
                file.versioned = false;
             }
             this.push(

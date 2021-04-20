@@ -18,6 +18,9 @@ const through = require('through2'),
  * @returns {stream}
  */
 module.exports = function declarePlugin(taskParameters, moduleInfo) {
+   const prettyCacheModulePath = helpers.unixifyPath(moduleInfo.output);
+   const prettyModulePath = helpers.unixifyPath(moduleInfo.path);
+   const currentModuleName = helpers.unixifyPath(moduleInfo.output).split('/').pop();
    return through.obj(
       function onTransform(file, encoding, callback) {
          const startTime = Date.now();
@@ -39,10 +42,14 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
          if (cdnCondition) {
             let relativeFilePath = path.relative(moduleInfo.path, file.history[0]);
             relativeFilePath = path.join(path.basename(moduleInfo.path), relativeFilePath);
-            moduleInfo.cache.storeCdnModule(
-               relativeFilePath,
-               transliterate(file.history[file.history.length - 1])
+            const prettyFilePath = helpers.unixifyPath(transliterate(file.history[file.history.length - 1]));
+            const isSourcePath = prettyFilePath.includes(prettyModulePath);
+            let relativeOutputPath = path.relative(
+               isSourcePath ? prettyModulePath : prettyCacheModulePath,
+               prettyFilePath
             );
+            relativeOutputPath = helpers.unixifyPath(path.join(currentModuleName, relativeOutputPath));
+            moduleInfo.cache.storeCdnModule(relativeFilePath, relativeOutputPath);
          }
          callback(null, file);
          taskParameters.storePluginTime('presentation service meta', startTime);
@@ -53,25 +60,14 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
          const startTime = Date.now();
          try {
             const cdnModules = [];
-            const versionCache = moduleInfo.cache.getCdnModulesCache();
-            const prettyCacheModulePath = helpers.prettifyPath(transliterate(moduleInfo.output));
-            const prettyModulePath = helpers.prettifyPath(transliterate(moduleInfo.path));
-            const currentModuleName = helpers.prettifyPath(moduleInfo.output).split('/').pop();
-            Object.keys(versionCache).forEach((currentModule) => {
-               cdnModules.push(...versionCache[currentModule]);
-            });
-            const cdnModulesPaths = cdnModules.map((currentFile) => {
-               const
-                  prettyFilePath = transliterate(helpers.prettifyPath(currentFile)),
-                  isSourcePath = prettyFilePath.includes(prettyModulePath),
-                  relativePath = path.relative(isSourcePath ? prettyModulePath : prettyCacheModulePath, prettyFilePath);
-
-               return helpers.unixifyPath(path.join(currentModuleName, relativePath));
+            const cdnCache = moduleInfo.cache.getCdnModulesCache();
+            Object.keys(cdnCache).forEach((currentModule) => {
+               cdnModules.push(...cdnCache[currentModule]);
             });
 
             const file = new Vinyl({
                path: '.builder/cdn_modules.json',
-               contents: Buffer.from(JSON.stringify(cdnModulesPaths.sort())),
+               contents: Buffer.from(JSON.stringify(cdnModules.sort())),
                moduleInfo
             });
             this.push(file);
@@ -80,10 +76,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
              * оставляем версионированные модули, могут пригодиться в дальнейшем при паковке
              * @type {string[]}
              */
-            taskParameters.setCdnModules(currentModuleName, cdnModulesPaths);
+            taskParameters.setCdnModules(currentModuleName, cdnModules);
          } catch (error) {
             logger.error({
-               message: "Ошибка Builder'а",
+               message: "Builder's error during cdn_modules meta generating",
                error,
                moduleInfo
             });
