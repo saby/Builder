@@ -10,6 +10,7 @@ const through = require('through2'),
    path = require('path'),
    Vinyl = require('vinyl'),
    logger = require('../../../lib/logger').logger(),
+   helpers = require('../../../lib/helpers'),
    transliterate = require('../../../lib/transliterate'),
    execInPool = require('../../common/exec-in-pool');
 
@@ -89,7 +90,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   newFile.compiledBase = compiledBase;
                   this.push(newFile);
                   let relativeOutputFile = path.relative(moduleInfo.output, outputMinFile);
-                  relativeOutputFile = path.join(moduleName, relativeOutputFile);
+                  relativeOutputFile = helpers.unixifyPath(path.join(moduleName, relativeOutputFile));
                   if (file.versioned) {
                      moduleInfo.cache.storeVersionedModule(relativeFilePath, relativeOutputFile);
                      file.versioned = false;
@@ -149,7 +150,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             }
 
             let relativeOutputFile = path.relative(moduleInfo.output, outputMinFile);
-            relativeOutputFile = path.join(moduleName, relativeOutputFile);
+            relativeOutputFile = helpers.unixifyPath(path.join(moduleName, relativeOutputFile));
             if (file.versioned) {
                moduleInfo.cache.storeVersionedModule(relativeFilePath, relativeOutputFile);
                file.versioned = false;
