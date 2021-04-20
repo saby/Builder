@@ -129,12 +129,14 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                newFile.origin = compiledPath;
                newFile.compiledBase = compiledBase;
                this.push(newFile);
+               let relativeOutputFile = path.relative(moduleInfo.output, outputMinFile);
+               relativeOutputFile = path.join(moduleName, relativeOutputFile);
                if (file.versioned) {
-                  moduleInfo.cache.storeVersionedModule(relativeFilePath, outputMinFile);
+                  moduleInfo.cache.storeVersionedModule(relativeFilePath, relativeOutputFile);
                   file.versioned = false;
                }
                if (file.cdnLinked) {
-                  moduleInfo.cache.storeCdnModule(relativeFilePath, outputMinFile);
+                  moduleInfo.cache.storeCdnModule(relativeFilePath, relativeOutputFile);
                }
                taskParameters.cache.addOutputFile(file.history[0], outputMinFile, moduleInfo);
                callback(null, file);
@@ -236,12 +238,14 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
          }
 
          if (outputMinFile) {
+            let relativeOutputFile = path.relative(moduleInfo.output, outputMinFile);
+            relativeOutputFile = path.join(moduleName, relativeOutputFile);
             if (file.versioned) {
-               moduleInfo.cache.storeVersionedModule(relativeFilePath, outputMinFile);
+               moduleInfo.cache.storeVersionedModule(relativeFilePath, relativeOutputFile);
                file.versioned = false;
             }
             if (file.cdnLinked) {
-               moduleInfo.cache.storeCdnModule(relativeFilePath, outputMinFile);
+               moduleInfo.cache.storeCdnModule(relativeFilePath, relativeOutputFile);
             }
             this.push(
                new Vinyl({

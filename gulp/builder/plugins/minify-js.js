@@ -61,6 +61,7 @@ const thirdPartyModule = /.*[/\\]third-party[/\\].*/;
  * @returns {stream}
  */
 module.exports = function declarePlugin(taskParameters, moduleInfo) {
+   const moduleName = path.basename(moduleInfo.output);
    return through.obj(
 
       /* @this Stream */
@@ -163,9 +164,11 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                      newOriginalFile.origin = compiledOriginalPath;
                      newOriginalFile.compiledBase = compiledBase;
                      taskParameters.cache.addOutputFile(file.history[0], outputMinOriginalJsFile, moduleInfo);
+                     let relativeOutputFile = path.relative(moduleInfo.output, outputMinJsFile);
+                     relativeOutputFile = path.join(moduleName, relativeOutputFile);
                      this.push(newOriginalFile);
                      if (file.versioned) {
-                        moduleInfo.cache.storeVersionedModule(relativeFilePath, outputMinJsFile);
+                        moduleInfo.cache.storeVersionedModule(relativeFilePath, relativeOutputFile);
                      }
                   }
                   this.push(newFile);
@@ -296,8 +299,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                      })
                   );
                }
+               let relativeOutputFile = path.relative(moduleInfo.output, outputMinJsFile);
+               relativeOutputFile = path.join(moduleName, relativeOutputFile);
                if (file.versioned) {
-                  moduleInfo.cache.storeVersionedModule(relativeFilePath, outputMinJsFile);
+                  moduleInfo.cache.storeVersionedModule(relativeFilePath, relativeOutputFile);
                }
                taskParameters.cache.addOutputFile(file.history[0], outputMinJsFile, moduleInfo);
 
