@@ -165,7 +165,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                      newOriginalFile.compiledBase = compiledBase;
                      taskParameters.cache.addOutputFile(file.history[0], outputMinOriginalJsFile, moduleInfo);
                      let relativeOutputFile = path.relative(moduleInfo.output, outputMinJsFile);
-                     relativeOutputFile = path.join(moduleName, relativeOutputFile);
+                     relativeOutputFile = helpers.unixifyPath(path.join(moduleName, relativeOutputFile));
                      this.push(newOriginalFile);
                      if (file.versioned) {
                         moduleInfo.cache.storeVersionedModule(relativeFilePath, relativeOutputFile);
@@ -300,7 +300,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   );
                }
                let relativeOutputFile = path.relative(moduleInfo.output, outputMinJsFile);
-               relativeOutputFile = path.join(moduleName, relativeOutputFile);
+               relativeOutputFile = helpers.unixifyPath(path.join(moduleName, relativeOutputFile));
                if (file.versioned) {
                   moduleInfo.cache.storeVersionedModule(relativeFilePath, relativeOutputFile);
                }
