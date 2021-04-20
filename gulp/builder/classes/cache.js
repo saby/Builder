@@ -313,9 +313,14 @@ class Cache {
          return true;
       }
       if (this.lastStore.hashOfBuilder === 'unknown') {
-         logger.info('Cache isn\'t existing, results from a previous build will be removed if exists');
+         logger.info(`Cache isn't existing. ${finishText}`);
          return true;
       }
+
+      if (!this.versionedMetaRelative) {
+         logger.info(`Cache for versioned meta isn't relative. ${finishText}`);
+      }
+
       if (this.lastStore.runningParameters.criticalErrors) {
          logger.info(`Previous build was completed with critical errors. ${finishText}`);
          return true;
