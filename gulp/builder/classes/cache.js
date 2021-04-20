@@ -27,6 +27,18 @@ const MARKUP_DEPEND_FILES_REGEX = /(\.xhtml)|(\.wml)|(\.tmpl)|(\.ts)|(\.js)$/;
  */
 const CACHED_FILES_EXTENSIONS = /(\.less)|(\.js)|(\.es)|(\.ts)$/;
 
+/**
+ * Extensions for files that are to be compressed
+ * @type {Set<string>}
+ */
+const COMPRESSED_EXTENSIONS = new Set([
+   '.js',
+   '.json',
+   '.css',
+   '.tmpl',
+   '.wml'
+]);
+
 // important flags for builder cache
 const CACHE_INDEPENDENT_FLAGS = new Set([
 
@@ -688,6 +700,18 @@ class Cache {
       const outputPrettyRelativePath = helpers.getRelativePath(prettyOutput, outputFilePath);
       if (this.currentStore.inputPaths.hasOwnProperty(prettyRelativePath)) {
          this.currentStore.inputPaths[prettyRelativePath].output.push(outputPrettyRelativePath);
+         const outputExt = path.extname(outputFilePath);
+
+         // add archives into input-paths cache, it could be useful for a garbage collector that removes
+         // unneeded artifacts of removed sources.
+         if (
+            this.config.compress &&
+            outputFilePath.endsWith(`.min${outputExt}`) &&
+            COMPRESSED_EXTENSIONS.has(outputExt)
+         ) {
+            this.currentStore.inputPaths[prettyRelativePath].output.push(`${outputPrettyRelativePath}.gz`);
+            this.currentStore.inputPaths[prettyRelativePath].output.push(`${outputPrettyRelativePath}.br`);
+         }
       } else {
          // некоторые файлы являются производными от всего модуля. например en-US.js, en-US.css
          this.currentStore.inputPaths[moduleInfo.name].output.push(outputPrettyRelativePath);
