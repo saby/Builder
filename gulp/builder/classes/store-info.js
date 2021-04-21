@@ -96,7 +96,7 @@ class StoreInfo {
             logger.debug(`"hashOfBuilder" in builder cache: ${this.hashOfBuilder}`);
             this.startBuildTime = builderInfo.startBuildTime;
             logger.debug(`"startBuildTime" in builder cache: ${this.startBuildTime}`);
-            this.versionedMetaRelative = builderInfo.versionedMetaRelative;
+            this.versionedMetaRelativeForDesktop = builderInfo.versionedMetaRelativeForDesktop;
          } catch (error) {
             logger.info({
                message: `Cache file "${path.join(cacheDirectory, 'builder-info.json')}" failed to be read`,
@@ -154,7 +154,7 @@ class StoreInfo {
          {
             hashOfBuilder: this.hashOfBuilder,
             startBuildTime: this.startBuildTime,
-            versionedMetaRelative: true
+            versionedMetaRelativeForDesktop: true
          },
          {
             spaces: 1

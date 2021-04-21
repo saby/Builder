@@ -19,7 +19,7 @@ const through = require('through2'),
  */
 module.exports = function declarePlugin(taskParameters, moduleInfo) {
    const prettyCacheModulePath = helpers.unixifyPath(transliterate(moduleInfo.output));
-   const prettyModulePath = helpers.unixifyPath(moduleInfo.path);
+   const prettyModulePath = helpers.unixifyPath(transliterate(moduleInfo.path));
    const currentModuleName = helpers.unixifyPath(moduleInfo.output).split('/').pop();
    return through.obj(
       function onTransform(file, encoding, callback) {
