@@ -18,7 +18,7 @@ const through = require('through2'),
  * @returns {stream}
  */
 module.exports = function declarePlugin(taskParameters, moduleInfo) {
-   const prettyCacheModulePath = helpers.unixifyPath(moduleInfo.output);
+   const prettyCacheModulePath = helpers.unixifyPath(transliterate(moduleInfo.output));
    const prettyModulePath = helpers.unixifyPath(moduleInfo.path);
    const currentModuleName = helpers.unixifyPath(moduleInfo.output).split('/').pop();
    return through.obj(
