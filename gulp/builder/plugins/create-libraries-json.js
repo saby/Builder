@@ -43,7 +43,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
          const startTime = Date.now();
          try {
             let librariesMeta = [];
-            const prettyCacheModulePath = helpers.prettifyPath(moduleInfo.output);
+            const prettyCacheModulePath = helpers.prettifyPath(transliterate(moduleInfo.output));
             if (await fs.pathExists(path.join(prettyCacheModulePath, '.builder/libraries.json'))) {
                librariesMeta = await fs.readJson(path.join(prettyCacheModulePath, '.builder/libraries.json'));
             }
