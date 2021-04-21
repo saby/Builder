@@ -643,6 +643,10 @@ class Cache {
       return this.currentStore.themesMeta;
    }
 
+   getThemesMetaForWatcher() {
+      return this.lastStore.themesMeta;
+   }
+
    addCssVariables(fallbackName, moduleVariables) {
       const variablesList = Object.keys(moduleVariables);
 
