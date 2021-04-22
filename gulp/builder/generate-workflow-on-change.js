@@ -63,6 +63,9 @@ function getFilesToBuild(prettyRoot, filePath, themesParts, dependencies) {
          }
       }
    });
+   if (path.basename(prettyFilePath) === 'theme.less' && !themesParts.includes(relativeFilePath)) {
+      themesParts.push(relativeFilePath);
+   }
    return filesToBuild;
 }
 

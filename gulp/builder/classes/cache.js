@@ -329,7 +329,7 @@ class Cache {
          return true;
       }
 
-      if (!this.lastStore.versionedMetaRelative) {
+      if (!this.lastStore.versionedMetaRelativeForDesktop) {
          logger.info(`Cache for versioned meta isn't relative. ${finishText}`);
          return true;
       }
