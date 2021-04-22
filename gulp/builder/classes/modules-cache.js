@@ -102,8 +102,7 @@ class ModuleCache {
     * @param {string} filePath имя файла
     */
    removeVersionedModule(filePath) {
-      const prettyPath = helpers.prettifyPath(filePath);
-      delete this.currentStore.versionedModules[prettyPath];
+      delete this.currentStore.versionedModules[filePath];
    }
 
    /**
@@ -137,8 +136,7 @@ class ModuleCache {
     * @param {Object}
     */
    removeCdnModule(filePath) {
-      const prettyPath = helpers.prettifyPath(filePath);
-      delete this.currentStore.cdnModules[prettyPath];
+      delete this.currentStore.cdnModules[filePath];
    }
 
    /**

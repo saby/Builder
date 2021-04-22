@@ -33,14 +33,18 @@ const extensions = new Set([
 ]);
 const privateModuleExt = /(\.min)?(\.js|\.wml|\.tmpl)/;
 
-function getModuleNameWithPlugin(currentModule) {
+function getModuleNameWithPlugin(currentModule, moduleInfo) {
    const prettyFilePath = helpers.unixifyPath(currentModule.path);
-   const prettyRoot = helpers.unixifyPath(path.dirname(currentModule.base));
+   const prettySourcePath = helpers.unixifyPath(currentModule.history[0]);
+   const prettyRoot = helpers.unixifyPath(path.dirname(moduleInfo.output));
+   const prettySourceRoot = helpers.unixifyPath(path.dirname(moduleInfo.path));
    const prettyRelativePath = helpers.removeLeadingSlashes(prettyFilePath.replace(prettyRoot, ''));
+   const prettySourceRelativePath = helpers.removeLeadingSlashes(prettySourcePath.replace(prettySourceRoot, ''));
    const currentModuleName = prettyRelativePath.replace(privateModuleExt, '');
    const currentPlugin = currentModule.extname.slice(1, currentModule.extname.length);
    const result = {
-      currentRelativePath: prettyRelativePath
+      currentRelativePath: prettyRelativePath,
+      sourceRelativePath: prettySourceRelativePath
    };
    switch (currentPlugin) {
       case 'tmpl':
@@ -189,13 +193,17 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                );
             });
          modulesToCheck.forEach((currentModule) => {
-            const { normalizedModuleName, currentRelativePath } = getModuleNameWithPlugin(currentModule);
+            const {
+               normalizedModuleName,
+               currentRelativePath,
+               sourceRelativePath
+            } = getModuleNameWithPlugin(currentModule, moduleInfo);
 
             // remove from gulp stream packed into libraries files
             if (currentModulePrivateLibraries.has(normalizedModuleName)) {
                modulesToRemoveFromMeta.set(currentRelativePath, normalizedModuleName);
-               moduleInfo.cache.removeVersionedModule(currentModule.history[0]);
-               moduleInfo.cache.removeCdnModule(currentModule.history[0]);
+               moduleInfo.cache.removeVersionedModule(sourceRelativePath);
+               moduleInfo.cache.removeCdnModule(sourceRelativePath);
                taskParameters.storePluginTime('copy sources', startTime);
                return;
             }
