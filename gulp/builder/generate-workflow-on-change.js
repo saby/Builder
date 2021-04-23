@@ -77,7 +77,7 @@ function generateSaveThemesTask(taskParameters, themesParts) {
          const root = taskParameters.config.rawConfig.output;
          const fileSuffix = taskParameters.config.isReleaseMode ? '.min' : null;
          const isThemeForReleaseOnly = !taskParameters.config.sources && taskParameters.config.isReleaseMode;
-         const themesMeta = taskParameters.cache.getThemesMeta();
+         const themesMeta = taskParameters.cache.getThemesMetaForWatcher();
          themesParts.forEach((currentThemePart) => {
             const themeName = themesMeta.themesMap[currentThemePart.replace('.less', '')];
             taskParameters.addChangedFile(`themes/${themeName}.css`);
