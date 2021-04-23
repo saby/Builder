@@ -43,7 +43,10 @@ function generateTaskForCompress(taskParameters) {
       const moduleOutput = path.join(taskParameters.config.rawConfig.output, path.basename(moduleInfo.output));
 
       // generate compressed resources only for minified content and fonts.
-      const input = path.join(moduleOutput, '/**/*.min.{js,json,css,tmpl,wml,ttf}');
+      const input = [
+         path.join(moduleOutput, '/**/*.svg'),
+         path.join(moduleOutput, '/**/*.min.{js,json,css,tmpl,wml,ttf}')
+      ];
 
       return function compress() {
          return gulp
