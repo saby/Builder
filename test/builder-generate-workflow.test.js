@@ -189,6 +189,60 @@ describe('gulp/builder/generate-workflow.js', () => {
       await clearWorkspace();
    });
 
+   it('process svg', async() => {
+      const fixtureFolder = path.join(__dirname, 'fixture/builder-generate-workflow/process-svg');
+      await prepareTest(fixtureFolder);
+
+      const config = {
+         cache: cacheFolder,
+         output: outputFolder,
+         modules: [
+            {
+               name: 'Test-icons',
+               path: path.join(sourceFolder, 'Test-icons')
+            }
+         ]
+      };
+      await fs.writeJSON(configPath, config);
+
+      // запустим таску
+      await runWorkflowWithTimeout();
+      const iconsOutputFolder = path.join(outputFolder, 'Test-icons');
+
+      const testResults = async(filteringPackageExists) => {
+         // 'filtering' folder has svg icons matching allowed name pattern, so there should be a package
+         // as a result
+         (await isRegularFile(iconsOutputFolder, 'filtering.svg')).should.equal(filteringPackageExists);
+
+         // 'sorting' folder has none of any svg icon with a valid name, so builder should ignore them
+         // and there should be a void as result of 'sorting' folder analyze
+         (await isRegularFile(iconsOutputFolder, 'sorting.svg')).should.equal(false);
+
+         // svg packer should do several things:
+         // 1) remove all needless attributes, such as version, xmlns, style, fill
+         // 2) change 'svg' tag of current svg icons to symbol
+         // 3) set 'id' attribute as a name of current svg file
+         // 4) write it inside common 'svg' tag of current svg package
+         if (filteringPackageExists) {
+            const filteringResult = await fs.readFile(path.join(iconsOutputFolder, 'filtering.svg'), 'utf8');
+            filteringResult.should.equal('<svg xmlns="http://www.w3.org/2000/svg"><symbol id="icon-Test1" x="0" y="0" viewBox="0 0 28 16"/></svg>');
+         }
+      };
+
+      await testResults(true);
+      await runWorkflowWithTimeout();
+      await testResults(true);
+
+      // remove remaining allowed icon from 'filtering' namespace to check that garbage
+      // collector will remove package also with removed svg.
+      await fs.remove(path.join(sourceFolder, 'Test-icons/filtering/icon-Test1.svg'));
+
+      await runWorkflowWithTimeout();
+      await testResults(false);
+
+      await clearWorkspace();
+   });
+
    it('new type locales: must compile js-locale and write it to contents only for existing json-locales', async() => {
       const fixtureFolder = path.join(__dirname, 'fixture/builder-generate-workflow/locales');
       await prepareTest(fixtureFolder);

@@ -28,6 +28,7 @@ const gulpBuildHtmlTmpl = require('../plugins/build-html-tmpl'),
    indexDictionary = require('../plugins/index-dictionary'),
    localizeXhtml = require('../plugins/localize-xhtml'),
    buildTmpl = require('../plugins/build-tmpl'),
+   processSvg = require('../plugins/process-svg'),
    createContentsJson = require('../plugins/create-contents-json'),
    createLibrariesJson = require('../plugins/create-libraries-json'),
    createStaticTemplatesJson = require('../plugins/create-static-templates-json'),
@@ -140,6 +141,7 @@ function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap
             )
             .pipe(changedInPlace(taskParameters, moduleInfo))
             .pipe(gulpIf(!!moduleInfo.typescript, compileEsAndTs(taskParameters, moduleInfo)))
+            .pipe(gulpIf(!!moduleInfo.icons, processSvg(taskParameters, moduleInfo)))
             .pipe(addComponentInfo(taskParameters, moduleInfo))
 
             // compileLess зависит от addComponentInfo. Нужно для сбора темизируемых less.
