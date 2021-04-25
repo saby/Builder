@@ -16,9 +16,34 @@ function setDefaultStore() {
       markupCache: {},
       esCompileCache: {},
       versionedModules: {},
-      cdnModules: {}
+      cdnModules: {},
+      svgCache: {}
    };
 }
+
+function getSvgCacheByStore(svgCache) {
+   const result = {};
+   Object.keys(svgCache).forEach((currentSvg) => {
+      const svgPathParts = currentSvg.split('/');
+      if (svgPathParts.length >= 3) {
+         // get svg package name as a 1 level directory of icons
+         const packageName = svgPathParts[1];
+         if (!result[packageName]) {
+            result[packageName] = [{
+               path: currentSvg,
+               content: svgCache[currentSvg]
+            }];
+         } else {
+            result[packageName].push({
+               path: currentSvg,
+               content: svgCache[currentSvg]
+            });
+         }
+      }
+   });
+   return result;
+}
+
 class ModuleCache {
    constructor(lastStore) {
       this.markupProperties = ['text', 'nodeName', 'dependencies', 'versioned', 'cdnLinked'];
@@ -79,6 +104,21 @@ class ModuleCache {
    storeCompiledES(filePath, obj) {
       const prettyPath = helpers.prettifyPath(filePath);
       this.currentStore.esCompileCache[prettyPath] = obj;
+   }
+
+   storeSvgContent(relativePath, content) {
+      const prettyPath = helpers.unixifyPath(relativePath);
+      this.currentStore.svgCache[prettyPath] = content;
+   }
+
+   getCurrentSvgPackagesMeta() {
+      const { svgCache } = this.currentStore;
+      return getSvgCacheByStore(svgCache);
+   }
+
+   getLastSvgPackagesMeta() {
+      const { svgCache } = this.lastStore;
+      return getSvgCacheByStore(svgCache);
    }
 
    /**

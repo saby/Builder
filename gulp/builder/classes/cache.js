@@ -525,6 +525,9 @@ class Cache {
          if (lastModuleCache.esCompileCache.hasOwnProperty(prettyRelativePath)) {
             currentModuleCache.esCompileCache[prettyRelativePath] = lastModuleCache.esCompileCache[prettyRelativePath];
          }
+         if (lastModuleCache.svgCache.hasOwnProperty(prettyRelativePath)) {
+            currentModuleCache.svgCache[prettyRelativePath] = lastModuleCache.svgCache[prettyRelativePath];
+         }
          if (lastModuleCache.routesInfo.hasOwnProperty(prettyRelativePath)) {
             currentModuleCache.routesInfo[prettyRelativePath] = lastModuleCache.routesInfo[prettyRelativePath];
          }
