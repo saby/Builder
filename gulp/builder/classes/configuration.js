@@ -460,6 +460,9 @@ class BuildConfiguration {
                moduleInfo[currentFlag] = this[currentFlag];
             }
          });
+         if (moduleInfo.name.endsWith('-icons')) {
+            moduleInfo.icons = true;
+         }
          this.modules.push(moduleInfo);
       }
 
