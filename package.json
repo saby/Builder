@@ -1,6 +1,6 @@
 {
    "name": "sbis3-builder",
-   "version": "21.2000.0-BUILD",
+   "version": "21.2100.0-BUILD",
    "private": true,
    "description": "Gulp-based builder for SBIS3 web projects",
    "files": [
@@ -55,8 +55,8 @@
       "strip-bom": "3.0.0",
       "tensor-xmldom": "0.2.0-b9",
       "through2": "2.0.3",
-      "saby-typescript": "git+https://platform-git.sbis.ru/saby/TypeScript.git#rc-21.2000",
-      "saby-units": "git+https://platform-git.sbis.ru/saby/Units.git#rc-21.2000",
+      "saby-typescript": "git+https://platform-git.sbis.ru/saby/TypeScript.git#rc-21.2100",
+      "saby-units": "git+https://platform-git.sbis.ru/saby/Units.git#rc-21.2100",
       "uglify-js": "3.3.23",
       "vinyl": "2.2.0",
       "workerpool": "6.0.0",
@@ -76,16 +76,16 @@
       "eslint-plugin-promise": "3.8.0",
       "mocha": "^8.3.2",
       "nyc": "^15.1.0",
-      "sbis3-json-generator": "git+ssh://git@git.sbis.ru:root/sbis3-json-generator.git#rc-21.2000",
-      "rmi": "git+ssh://git@git.sbis.ru:sbis/rmi.git#rc-21.2000",
-      "sbis3-ws": "git+ssh://git@git.sbis.ru:sbis/ws.git#rc-21.2000",
-      "saby-i18n": "git+https://platform-git.sbis.ru/saby/i18n.git#rc-21.2000",
-      "Router": "git+https://platform-git.sbis.ru/saby/router.git#rc-21.2000",
-      "saby-types": "git+https://platform-git.sbis.ru/saby/Types.git#rc-21.2000",
-      "wasaby-app": "git+https://platform-git.sbis.ru/saby/wasaby-app.git#rc-21.2000",
-      "saby-ui": "git+https://platform-git.sbis.ru/saby/UI.git#rc-21.2000",
-      "saby-inferno": "git+https://platform-git.sbis.ru/saby/inferno.git#rc-21.2000",
-      "wasaby-requirejs-loader": "git+https://platform-git.sbis.ru/saby/wasaby-requirejs-loader.git#rc-21.2000"
+      "sbis3-json-generator": "git+ssh://git@git.sbis.ru:root/sbis3-json-generator.git#rc-21.2100",
+      "rmi": "git+ssh://git@git.sbis.ru:sbis/rmi.git#rc-21.2100",
+      "sbis3-ws": "git+ssh://git@git.sbis.ru:sbis/ws.git#rc-21.2100",
+      "saby-i18n": "git+https://platform-git.sbis.ru/saby/i18n.git#rc-21.2100",
+      "Router": "git+https://platform-git.sbis.ru/saby/router.git#rc-21.2100",
+      "saby-types": "git+https://platform-git.sbis.ru/saby/Types.git#rc-21.2100",
+      "wasaby-app": "git+https://platform-git.sbis.ru/saby/wasaby-app.git#rc-21.2100",
+      "saby-ui": "git+https://platform-git.sbis.ru/saby/UI.git#rc-21.2100",
+      "saby-inferno": "git+https://platform-git.sbis.ru/saby/inferno.git#rc-21.2100",
+      "wasaby-requirejs-loader": "git+https://platform-git.sbis.ru/saby/wasaby-requirejs-loader.git#rc-21.2100"
    },
    "engines": {
       "node": ">=10.14.2"
