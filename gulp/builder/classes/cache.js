@@ -139,7 +139,7 @@ function checkForFileInLastStore(currentStore, lastStore, relativePath) {
     * and ignore each other one.
     */
    FILE_CONTENTS_CACHE.some((currentCache) => {
-      if (lastStore[currentCache] && lastStore[currentCache].hasOwnProperty(relativePath)) {
+      if (lastStore[currentCache].hasOwnProperty(relativePath)) {
          currentStore[currentCache][relativePath] = lastStore[currentCache][relativePath];
          return true;
       }
@@ -151,7 +151,7 @@ function checkForFileInLastStore(currentStore, lastStore, relativePath) {
     * so we need too check for existence of current file in each of these cache properties
     */
    COMMON_CACHE_PROPERTIES.forEach((currentCache) => {
-      if (lastStore[currentCache] && lastStore[currentCache].hasOwnProperty(relativePath)) {
+      if (lastStore[currentCache].hasOwnProperty(relativePath)) {
          currentStore[currentCache][relativePath] = lastStore[currentCache][relativePath];
       }
    });
