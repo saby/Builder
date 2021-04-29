@@ -640,6 +640,7 @@ class Cache {
       // migrate the whole paths cache if there aren't any changes
       // in current interface module files
       const { paths } = this.lastStore.inputPaths[outputName];
+
       if (changedFiles.length === 0) {
          this.currentStore.inputPaths[outputName].paths = this.lastStore.inputPaths[outputName].paths;
          Object.keys(paths).forEach((currentPath) => {
@@ -650,15 +651,18 @@ class Cache {
          const normalizedChangedFiles = changedFiles.map(
             currentPath => helpers.unixifyPath(path.join(moduleInfo.name, currentPath))
          );
+
          Object.keys(paths).forEach((currentPath) => {
             if (!normalizedChangedFiles.includes(currentPath)) {
                this.currentStore.inputPaths[outputName].paths[currentPath] = paths[currentPath];
                moduleInfo.cache.migrateCurrentFileCache(currentPath);
+
                const dependencies = this.getAllDependencies(currentPath);
                dependencies.forEach((currentDependency) => {
                   const dependencyModuleName = transliterate(currentDependency.split('/').shift());
                   const lastStorePaths = this.lastStore.inputPaths[dependencyModuleName].paths;
                   const currentStorePaths = this.currentStore.inputPaths[dependencyModuleName].paths;
+
                   if (!currentStorePaths[currentDependency]) {
                      currentStorePaths[currentDependency] = lastStorePaths[currentDependency];
                      moduleInfo.cache.migrateCurrentFileCache(currentPath);
