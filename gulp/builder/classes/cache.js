@@ -66,7 +66,7 @@ const CACHE_INDEPENDENT_FLAGS = new Set([
 
 // non-important flags for builder cache. e.g. path can be changed
 // and if file hash by content was changed, it'll be rebuilt, then.
-const MODULE_CACHE_INDEPENDENT_FLAGS = new Set(['path', 'rebuild']);
+const MODULE_CACHE_INDEPENDENT_FLAGS = new Set(['path', 'rebuild', 'depends']);
 
 /**
  * Creates a hash by content for current file
