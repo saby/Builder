@@ -11,6 +11,7 @@ const path = require('path'),
    crypto = require('crypto');
 
 const helpers = require('../../../lib/helpers'),
+   { FILE_CONTENTS_CACHE, COMMON_CACHE_PROPERTIES } = require('../../../lib/builder-cache-constants'),
    transliterate = require('../../../lib/transliterate'),
    StoreInfo = require('./store-info'),
    logger = require('../../../lib/logger').logger();
@@ -65,7 +66,7 @@ const CACHE_INDEPENDENT_FLAGS = new Set([
 
 // non-important flags for builder cache. e.g. path can be changed
 // and if file hash by content was changed, it'll be rebuilt, then.
-const MODULE_CACHE_INDEPENDENT_FLAGS = new Set(['path', 'rebuild', 'changedFiles']);
+const MODULE_CACHE_INDEPENDENT_FLAGS = new Set(['path', 'rebuild', 'changedFiles', 'depends']);
 
 /**
  * Creates a hash by content for current file
@@ -129,6 +130,31 @@ function checkCommonFlags(lastRunningParameters, currentRunningParameters, finis
       return true;
    }
    return false;
+}
+
+function checkForFileInLastStore(currentStore, lastStore, relativePath) {
+   /**
+    * each of these cache types has its own files and don't intersect with each other,
+    * so we can surely migrate file for last store to current store only for first cache match
+    * and ignore each other one.
+    */
+   FILE_CONTENTS_CACHE.some((currentCache) => {
+      if (lastStore[currentCache].hasOwnProperty(relativePath)) {
+         currentStore[currentCache][relativePath] = lastStore[currentCache][relativePath];
+         return true;
+      }
+      return false;
+   });
+
+   /**
+    * for common cache properties there could be intersects for file in each of cache types,
+    * so we need too check for existence of current file in each of these cache properties
+    */
+   COMMON_CACHE_PROPERTIES.forEach((currentCache) => {
+      if (lastStore[currentCache].hasOwnProperty(relativePath)) {
+         currentStore[currentCache][relativePath] = lastStore[currentCache][relativePath];
+      }
+   });
 }
 
 /**
@@ -504,30 +530,8 @@ class Cache {
          // вытащим данные из старого кеша в новый кеш
          const lastModuleCache = moduleInfo.cache.lastStore;
          const currentModuleCache = moduleInfo.cache.currentStore;
-         if (lastModuleCache.componentsInfo.hasOwnProperty(prettyRelativePath)) {
-            currentModuleCache.componentsInfo[prettyRelativePath] = lastModuleCache.componentsInfo[prettyRelativePath];
-         }
-         if (lastModuleCache.markupCache.hasOwnProperty(prettyRelativePath)) {
-            currentModuleCache.markupCache[prettyRelativePath] = lastModuleCache.markupCache[prettyRelativePath];
-         }
-         if (lastModuleCache.esCompileCache.hasOwnProperty(prettyRelativePath)) {
-            currentModuleCache.esCompileCache[prettyRelativePath] = lastModuleCache.esCompileCache[prettyRelativePath];
-         }
-         if (lastModuleCache.svgCache.hasOwnProperty(prettyRelativePath)) {
-            currentModuleCache.svgCache[prettyRelativePath] = lastModuleCache.svgCache[prettyRelativePath];
-         }
-         if (lastModuleCache.routesInfo.hasOwnProperty(prettyRelativePath)) {
-            currentModuleCache.routesInfo[prettyRelativePath] = lastModuleCache.routesInfo[prettyRelativePath];
-         }
-         if (lastModuleCache.versionedModules.hasOwnProperty(prettyRelativePath)) {
-            currentModuleCache.versionedModules[
-               prettyRelativePath
-            ] = lastModuleCache.versionedModules[prettyRelativePath];
-         }
+         checkForFileInLastStore(currentModuleCache, lastModuleCache, prettyRelativePath);
 
-         if (lastModuleCache.cdnModules.hasOwnProperty(prettyRelativePath)) {
-            currentModuleCache.cdnModules[prettyRelativePath] = lastModuleCache.cdnModules[prettyRelativePath];
-         }
          if (this.lastStore.dependencies.hasOwnProperty(prettyRelativePath)) {
             this.currentStore.dependencies[prettyRelativePath] = this.lastStore.dependencies[prettyRelativePath];
          }

@@ -6,18 +6,26 @@
 'use strict';
 
 const helpers = require('../../../lib/helpers');
+const { FILE_CONTENTS_CACHE, COMMON_CACHE_PROPERTIES } = require('../../../lib/builder-cache-constants');
 const path = require('path');
 const fs = require('fs-extra');
 
-const CACHE_PROPERTIES = new Set([
-   'componentsInfo',
-   'routesInfo',
-   'markupCache',
-   'esCompileCache',
-   'versionedModules',
-   'cdnModules',
-   'svgCache'
-]);
+const CACHE_PROPERTIES = new Set([...FILE_CONTENTS_CACHE, ...COMMON_CACHE_PROPERTIES]);
+
+/**
+ * fills store with missing cache properties
+ * needed for compatibility with previous builds if
+ * there is new type of cache in new builder added.
+ */
+function fillRemainingProperties(store) {
+   if (store) {
+      CACHE_PROPERTIES.forEach((currentProperty) => {
+         if (!store.hasOwnProperty(currentProperty)) {
+            store[currentProperty] = {};
+         }
+      });
+   }
+}
 
 function setDefaultStore() {
    const result = {};
@@ -53,6 +61,8 @@ function getSvgCacheByStore(svgCache) {
 class ModuleCache {
    constructor(lastStore) {
       this.markupProperties = ['text', 'nodeName', 'dependencies', 'versioned', 'cdnLinked'];
+
+      fillRemainingProperties(lastStore);
       this.lastStore = lastStore || setDefaultStore();
       this.currentStore = setDefaultStore();
    }
