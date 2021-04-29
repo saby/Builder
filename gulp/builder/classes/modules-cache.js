@@ -9,16 +9,22 @@ const helpers = require('../../../lib/helpers');
 const path = require('path');
 const fs = require('fs-extra');
 
+const CACHE_PROPERTIES = new Set([
+   'componentsInfo',
+   'routesInfo',
+   'markupCache',
+   'esCompileCache',
+   'versionedModules',
+   'cdnModules',
+   'svgCache'
+]);
+
 function setDefaultStore() {
-   return {
-      componentsInfo: {},
-      routesInfo: {},
-      markupCache: {},
-      esCompileCache: {},
-      versionedModules: {},
-      cdnModules: {},
-      svgCache: {}
-   };
+   const result = {};
+   CACHE_PROPERTIES.forEach((currentProperty) => {
+      result[currentProperty] = {};
+   });
+   return result;
 }
 
 function getSvgCacheByStore(svgCache) {
@@ -151,6 +157,15 @@ class ModuleCache {
     */
    getVersionedModulesCache() {
       return this.currentStore.versionedModules;
+   }
+
+   migrateCurrentFileCache(currentPath) {
+      const prettyPath = helpers.unixifyPath(currentPath);
+      CACHE_PROPERTIES.forEach((currentProperty) => {
+         if (this.lastStore[currentProperty].hasOwnProperty(prettyPath)) {
+            this.currentStore[currentProperty][prettyPath] = this.lastStore[currentProperty][prettyPath];
+         }
+      });
    }
 
    /**
@@ -293,6 +308,9 @@ function generateDownloadModuleCache(taskParameters, moduleInfo, singleFileBuild
       if (patchBuild && lastCache && !moduleInfo.rebuild) {
          // in patch for modules without rebuild configuration store cache "as is"
          moduleInfo.cache.currentStore = moduleInfo.cache.lastStore;
+      }
+      if (moduleInfo.changedFiles) {
+         taskParameters.cache.migrateNotChangedFiles(moduleInfo);
       }
    };
 }

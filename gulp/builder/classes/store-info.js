@@ -227,19 +227,24 @@ class StoreInfo {
     */
    getOutputFilesSet(modulesForPatch) {
       const resultSet = new Set();
-      for (const filePath in this.inputPaths) {
-         if (!this.inputPaths.hasOwnProperty(filePath)) {
+      for (const module in this.inputPaths) {
+         if (!this.inputPaths.hasOwnProperty(module)) {
             continue;
          }
-         for (const relativeFilePath of this.inputPaths[filePath].output) {
-            // get only paths for patching modules in patch build
-            if (modulesForPatch && modulesForPatch.length > 0) {
-               const currentModuleName = relativeFilePath.split('/').shift();
-               if (modulesForPatch.includes(currentModuleName)) {
+         for (const filePath in this.inputPaths[module].paths) {
+            if (!this.inputPaths[module].paths.hasOwnProperty(filePath)) {
+               continue;
+            }
+            for (const relativeFilePath of this.inputPaths[module].paths[filePath].output) {
+               // get only paths for patching modules in patch build
+               if (modulesForPatch && modulesForPatch.length > 0) {
+                  const currentModuleName = relativeFilePath.split('/').shift();
+                  if (modulesForPatch.includes(currentModuleName)) {
+                     resultSet.add(relativeFilePath);
+                  }
+               } else {
                   resultSet.add(relativeFilePath);
                }
-            } else {
-               resultSet.add(relativeFilePath);
             }
          }
       }

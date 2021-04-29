@@ -2331,23 +2331,24 @@ describe('gulp/builder/generate-workflow.js', () => {
 
          await clearWorkspace();
       });
-      it('custom pack must have an ability to work with debug files', async() => {
+      it('custom flags for each module should work properly', async() => {
+         const intModule1Output = path.join(outputFolder, 'InterfaceModule1');
          const fixtureFolder = path.join(__dirname, 'fixture/custompack');
          await prepareTest(fixtureFolder);
          await linkPlatform(sourceFolder);
 
          const testResults = async() => {
             // there shouldn't be any artifacts of minimize
-            (await isRegularFile('InterfaceModule1', 'amdModule.min.css')).should.equal(false);
-            (await isRegularFile('InterfaceModule1', 'amdModule.min.js')).should.equal(false);
+            (await isRegularFile(intModule1Output, 'amdModule.min.css')).should.equal(false);
+            (await isRegularFile(intModule1Output, 'amdModule.min.js')).should.equal(false);
 
             // there shouldn't be any artifacts of typescript compile and libraries pack
-            (await isRegularFile('InterfaceModule1', 'library.js')).should.equal(false);
-            (await isRegularFile('InterfaceModule1', 'library.min.js')).should.equal(false);
-            (await isRegularFile('InterfaceModule1/private', 'module1.js')).should.equal(false);
-            (await isRegularFile('InterfaceModule1/private', 'module1.min.js')).should.equal(false);
-            (await isRegularFile('InterfaceModule1/private', 'module2.js')).should.equal(false);
-            (await isRegularFile('InterfaceModule1/private', 'module2.min.js')).should.equal(false);
+            (await isRegularFile(intModule1Output, 'library.js')).should.equal(false);
+            (await isRegularFile(intModule1Output, 'library.min.js')).should.equal(false);
+            (await isRegularFile(`${intModule1Output}/_private`, 'module1.js')).should.equal(false);
+            (await isRegularFile(`${intModule1Output}/_private`, 'module1.min.js')).should.equal(false);
+            (await isRegularFile(`${intModule1Output}/_private`, 'module2.js')).should.equal(false);
+            (await isRegularFile(`${intModule1Output}/_private`, 'module2.min.js')).should.equal(false);
 
             // there shouldn't be any artifacts of custom pack
             (await isRegularFile('InterfaceModule1/.builder', 'superbundle-for-builder-tests.package.js.package.json')).should.equal(false);
@@ -2398,6 +2399,113 @@ describe('gulp/builder/generate-workflow.js', () => {
 
          await clearWorkspace();
       });
+
+      it('builder must build only changed files', async() => {
+         const fixtureFolder = path.join(__dirname, 'fixture/custompack');
+         await prepareTest(fixtureFolder);
+         const onlyChangedOutput = `${outputFolder}-only-changed`;
+         const intModule1Output = path.join(onlyChangedOutput, 'InterfaceModule1');
+         await linkPlatform(sourceFolder);
+
+         const testResults = async(mustExist) => {
+            // there should be sources and compiled files in new output only for changed files
+            (await fs.pathExists(path.join(intModule1Output, 'library.ts'))).should.equal(mustExist);
+            (await fs.pathExists(path.join(intModule1Output, 'library.js'))).should.equal(mustExist);
+            (await fs.pathExists(path.join(intModule1Output, 'library.modulepack.js'))).should.equal(mustExist);
+            (await fs.pathExists(path.join(intModule1Output, 'library.min.js'))).should.equal(mustExist);
+            (await fs.pathExists(path.join(intModule1Output, 'amdModule.css'))).should.equal(mustExist);
+            (await fs.pathExists(path.join(intModule1Output, 'amdModule.min.css'))).should.equal(mustExist);
+            if (mustExist) {
+               const correctLibraryResult = await fs.readFile(path.join(outputFolder, 'InterfaceModule1', 'library.min.js'), 'utf8');
+               const currentLibraryResult = await fs.readFile(path.join(intModule1Output, 'library.min.js'), 'utf8');
+               currentLibraryResult.should.equal(correctLibraryResult);
+               const currentCssResult = await fs.readFile(path.join(intModule1Output, 'amdModule.min.css'), 'utf8');
+               currentCssResult.should.equal('.interfaceModule1_amdModule{background-image:url(images/logo-ru.svg)}');
+            }
+
+            // all other sources shouldn't be found in new output directory
+            (await fs.pathExists(path.join(intModule1Output, 'amdModule.js'))).should.equal(false);
+            (await fs.pathExists(path.join(intModule1Output, 'amdModule.min.js'))).should.equal(false);
+            (await fs.pathExists(path.join(intModule1Output, 'extend.package.json'))).should.equal(false);
+            (await fs.pathExists(path.join(`${intModule1Output}/packages`, 'extendable-bundle.package.json'))).should.equal(false);
+            (await fs.pathExists(path.join(`${intModule1Output}/_private`, 'module1.ts'))).should.equal(false);
+            (await fs.pathExists(path.join(`${intModule1Output}/_private`, 'module1.js'))).should.equal(false);
+            (await fs.pathExists(path.join(`${intModule1Output}/_private`, 'module1.min.js'))).should.equal(false);
+            (await fs.pathExists(path.join(`${intModule1Output}/_private`, 'module2.ts'))).should.equal(false);
+            (await fs.pathExists(path.join(`${intModule1Output}/_private`, 'module2.js'))).should.equal(false);
+            (await fs.pathExists(path.join(`${intModule1Output}/_private`, 'module2.min.js'))).should.equal(false);
+         };
+
+         const currentConfig = {
+            cache: cacheFolder,
+            output: outputFolder,
+            typescript: true,
+            less: true,
+            wml: true,
+            builderTests: true,
+            minimize: true,
+            dependenciesGraph: true,
+            distributive: false,
+            joinedMeta: true,
+            modules: [
+               {
+                  name: 'Модуль',
+                  path: path.join(sourceFolder, 'Модуль')
+               },
+               {
+                  name: 'ExternalInterfaceModule',
+                  path: path.join(sourceFolder, 'ExternalInterfaceModule')
+               },
+               {
+                  name: 'InterfaceModule1',
+                  path: path.join(sourceFolder, 'InterfaceModule1'),
+               }
+            ]
+         };
+         await fs.writeJSON(configPath, currentConfig);
+
+         await runWorkflowWithTimeout();
+         const currentCssContent = await fs.readFile(
+            path.join(sourceFolder, 'InterfaceModule1', 'amdModule.css'),
+            'utf8'
+         );
+         await fs.outputFile(
+            path.join(sourceFolder, 'InterfaceModule1', 'amdModule.css'),
+            currentCssContent.replace('logo-en', 'logo-ru')
+         );
+
+         const currentTsContent = await fs.readFile(
+            path.join(sourceFolder, 'InterfaceModule1', 'library.ts'),
+            'utf8'
+         );
+         await fs.outputFile(
+            path.join(sourceFolder, 'InterfaceModule1', 'library.ts'),
+            `/* some comment */ \n ${currentTsContent}`
+         );
+
+         // add list of changed files for module InterfaceModule1
+         currentConfig.modules[2].changedFiles = ['amdModule.css', 'library.ts'];
+
+         // we need to check that only selected files will be built, so we need
+         // change output directory and disable gulp_config check so cache
+         // won't be removed.
+         currentConfig.checkConfig = false;
+         currentConfig.output = onlyChangedOutput;
+         await fs.writeJSON(configPath, currentConfig);
+
+         await runWorkflowWithTimeout();
+         await testResults(true);
+
+         // remove output to rebuild it once again to make sure
+         // changed in config but not in sources files won't be rebuild
+         // once again
+         await fs.remove(onlyChangedOutput);
+         await runWorkflowWithTimeout();
+         await testResults(false);
+
+         await clearWorkspace();
+      });
+
       it('packed modules must be removed when "sources" flag has "false" value', async() => {
          const fixtureFolder = path.join(__dirname, 'fixture/custompack');
          await prepareTest(fixtureFolder);

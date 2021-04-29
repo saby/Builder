@@ -21,7 +21,8 @@ class ModuleInfo {
          responsible,
          required,
          rebuild,
-         depends
+         depends,
+         changedFiles
       } = baseModuleInfo;
       const modulePath = baseModuleInfo.path;
       this.name = name;
@@ -32,9 +33,15 @@ class ModuleInfo {
       this.depends = depends || [];
       this.cache = {};
       this.appRoot = path.dirname(modulePath).replace(/\\/g, '/');
-
-      // TODO learn jinnee to set SDK identity for modules in gulp_config
-      this.sdkElement = modulePath.includes('link_to_sdk');
+      if (changedFiles) {
+         this.changedFiles = [];
+         changedFiles.forEach((currentFile) => {
+            if (currentFile.endsWith('.ts')) {
+               this.typescriptChanged = true;
+            }
+            this.changedFiles.push(currentFile);
+         });
+      }
    }
 
    get nameWithResponsible() {

@@ -72,7 +72,7 @@ function getRelativePath(modulePath, filePath) {
  * Plugin declaration
  * @param {TaskParameters} taskParameters a whole parameters list for execution of build of current project
  * @param {ModuleInfo} moduleInfo all needed information about current interface module
- * @param {string[]} gulpModulesInfo paths to be used by less compiler for finding of imports.
+ * @param {Object} gulpModulesInfo paths to be used by less compiler for finding of imports.
  * Needed for proper work of trans-module imports
  * @returns {stream}
  */
@@ -217,7 +217,7 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
 
                // for less there is only a symlink needed to be created, so we can get a result faster
                // due to avoid read of compiled css file
-               if (taskParameters.cache.compareWithCompiled(relativeFilePath)) {
+               if (taskParameters.cache.compareWithCompiled(moduleInfo, relativeFilePath)) {
                   const newFile = file.clone();
                   const outputPath = getOutput(file, '.css');
                   newFile.path = outputPath;

@@ -263,7 +263,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             }
 
             const [cssFiles, jstplFiles] = getCssAndJstplFiles(
-               taskParameters.cache.getInputPathsByFolder(moduleInfo.name)
+               taskParameters.cache.getInputPathsByFolder(moduleInfo.outputName)
             );
             for (const relativePath of cssFiles) {
                const prettyRelativePath = modulePathToRequire.getPrettyPath(transliterate(relativePath));
@@ -279,7 +279,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             // Add missing module-dependencies meta for files when meta of those
             // can be received only if this file was compiled.
             if (taskParameters.config.compiled && taskParameters.cache.isFirstBuild()) {
-               const currentMDepsPath = path.join(taskParameters.config.compiled, path.basename(moduleInfo.output), 'module-dependencies.json');
+               const currentMDepsPath = path.join(taskParameters.config.compiled, moduleInfo.outputName, 'module-dependencies.json');
                if (await fs.pathExists(currentMDepsPath)) {
                   const compiledMDeps = await fs.readJson(currentMDepsPath);
                   Object.keys(compiledMDeps.links).forEach((currentNode) => {

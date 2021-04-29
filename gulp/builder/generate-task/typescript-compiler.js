@@ -39,7 +39,7 @@ function clearWorkspaceFromTsConfigTask(sourceDirectory) {
 }
 
 module.exports = function generateTaskForTypescriptCompile(taskParameters) {
-   if (!taskParameters.config.tsc) {
+   if (!taskParameters.config.tsc || !taskParameters.config.typescriptChanged) {
       return function skipRunTypescriptCompiler(done) {
          done();
       };
