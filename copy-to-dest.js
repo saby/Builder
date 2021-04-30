@@ -20,7 +20,14 @@ async function recursiveGetAllBuilderFiles(dir) {
  * code updates
  * @type {string[]}
  */
-const FILES_FOR_BUILDER_HASH = ['/less/', '/templates/', 'compile-less.js', 'build-tmpl.js', 'build-xhtml.js'];
+const FILES_FOR_BUILDER_HASH = [
+   '/less/',
+   '/templates/',
+   'builder/classes',
+   'compile-less.js',
+   'build-tmpl.js',
+   'build-xhtml.js'
+];
 
 async function getBuilderCodeHash(filesList) {
    const filesContent = await Promise.all(

@@ -342,11 +342,6 @@ class Cache {
          return true;
       }
 
-      if (!this.lastStore.versionedMetaRelativeForDesktop) {
-         logger.info(`Cache for versioned meta isn't relative. ${finishText}`);
-         return true;
-      }
-
       if (this.lastStore.runningParameters.criticalErrors) {
          logger.info(`Previous build was completed with critical errors. ${finishText}`);
          return true;
@@ -362,6 +357,10 @@ class Cache {
       if (isNewBuilder && !this.config.branchTests) {
          logger.info(`Hash of builder isn't corresponding to saved in cache. ${finishText}`);
          return true;
+      }
+
+      if (!this.lastStore.globalCacheChanges) {
+         logger.info(`There are global cache storage changes. ${finishText}`);
       }
 
       const lastRunningParameters = { ...this.lastStore.runningParameters };
@@ -564,6 +563,10 @@ class Cache {
          return true;
       }
 
+      if (!this.lastStore.inputPaths[moduleName].paths) {
+         this.lastStore.inputPaths[moduleName].paths = {};
+      }
+
       // новый файл
       if (!this.lastStore.inputPaths[moduleName].paths.hasOwnProperty(prettyRelativePath)) {
          return true;
@@ -640,6 +643,7 @@ class Cache {
       // migrate the whole paths cache if there aren't any changes
       // in current interface module files
       const { paths } = this.lastStore.inputPaths[outputName];
+
       if (changedFiles.length === 0) {
          this.currentStore.inputPaths[outputName].paths = this.lastStore.inputPaths[outputName].paths;
          Object.keys(paths).forEach((currentPath) => {
@@ -650,15 +654,18 @@ class Cache {
          const normalizedChangedFiles = changedFiles.map(
             currentPath => helpers.unixifyPath(path.join(moduleInfo.name, currentPath))
          );
+
          Object.keys(paths).forEach((currentPath) => {
             if (!normalizedChangedFiles.includes(currentPath)) {
                this.currentStore.inputPaths[outputName].paths[currentPath] = paths[currentPath];
                moduleInfo.cache.migrateCurrentFileCache(currentPath);
+
                const dependencies = this.getAllDependencies(currentPath);
                dependencies.forEach((currentDependency) => {
                   const dependencyModuleName = transliterate(currentDependency.split('/').shift());
                   const lastStorePaths = this.lastStore.inputPaths[dependencyModuleName].paths;
                   const currentStorePaths = this.currentStore.inputPaths[dependencyModuleName].paths;
+
                   if (!currentStorePaths[currentDependency]) {
                      currentStorePaths[currentDependency] = lastStorePaths[currentDependency];
                      moduleInfo.cache.migrateCurrentFileCache(currentPath);
@@ -901,7 +908,12 @@ class Cache {
          dependencies,
          async(currentRelativePath) => {
             const moduleName = transliterate(currentRelativePath.split('/').shift());
-            const lastStorePaths = this.lastStore.inputPaths[moduleName].paths;
+            let lastStorePaths;
+            if (this.lastStore.inputPaths[moduleName] && this.lastStore.inputPaths[moduleName].hasOwnProperty('paths')) {
+               lastStorePaths = this.lastStore.inputPaths[moduleName].paths;
+            } else {
+               lastStorePaths = {};
+            }
             if (this.cacheChanges.hasOwnProperty(currentRelativePath)) {
                return this.cacheChanges[currentRelativePath];
             }
@@ -915,10 +927,12 @@ class Cache {
             const currentPath = path.join(root, currentRelativePath);
             if (await fs.pathExists(currentPath)) {
                if (hashByContent) {
-                  const fileContents = await fs.readFile(currentPath);
+                  // gulp.src reader removes BOM from file contents, so we need to do
+                  // the same thing
+                  const fileContents = await fs.readFile(currentPath, 'utf8');
                   const hash = crypto
                      .createHash('sha1')
-                     .update(fileContents)
+                     .update(Buffer.from(fileContents.replace(/^\uFEFF/, '')))
                      .digest('base64');
                   isChanged = lastStorePaths[currentRelativePath].hash !== hash;
                } else {
