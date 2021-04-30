@@ -96,7 +96,7 @@ class StoreInfo {
             logger.debug(`"hashOfBuilder" in builder cache: ${this.hashOfBuilder}`);
             this.startBuildTime = builderInfo.startBuildTime;
             logger.debug(`"startBuildTime" in builder cache: ${this.startBuildTime}`);
-            this.versionedMetaRelativeForDesktop = builderInfo.versionedMetaRelativeForDesktop;
+            this.globalCacheChanges = builderInfo.globalCacheChanges;
          } catch (error) {
             logger.info({
                message: `Cache file "${path.join(cacheDirectory, 'builder-info.json')}" failed to be read`,
@@ -154,7 +154,7 @@ class StoreInfo {
          {
             hashOfBuilder: this.hashOfBuilder,
             startBuildTime: this.startBuildTime,
-            versionedMetaRelativeForDesktop: true
+            globalCacheChanges: true
          },
          {
             spaces: 1
@@ -227,19 +227,24 @@ class StoreInfo {
     */
    getOutputFilesSet(modulesForPatch) {
       const resultSet = new Set();
-      for (const filePath in this.inputPaths) {
-         if (!this.inputPaths.hasOwnProperty(filePath)) {
+      for (const module in this.inputPaths) {
+         if (!this.inputPaths.hasOwnProperty(module)) {
             continue;
          }
-         for (const relativeFilePath of this.inputPaths[filePath].output) {
-            // get only paths for patching modules in patch build
-            if (modulesForPatch && modulesForPatch.length > 0) {
-               const currentModuleName = relativeFilePath.split('/').shift();
-               if (modulesForPatch.includes(currentModuleName)) {
+         for (const filePath in this.inputPaths[module].paths) {
+            if (!this.inputPaths[module].paths.hasOwnProperty(filePath)) {
+               continue;
+            }
+            for (const relativeFilePath of this.inputPaths[module].paths[filePath].output) {
+               // get only paths for patching modules in patch build
+               if (modulesForPatch && modulesForPatch.length > 0) {
+                  const currentModuleName = relativeFilePath.split('/').shift();
+                  if (modulesForPatch.includes(currentModuleName)) {
+                     resultSet.add(relativeFilePath);
+                  }
+               } else {
                   resultSet.add(relativeFilePath);
                }
-            } else {
-               resultSet.add(relativeFilePath);
             }
          }
       }

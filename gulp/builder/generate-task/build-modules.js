@@ -89,8 +89,25 @@ function generateTaskForBuildModules(taskParameters) {
    );
 }
 
+function getModuleInput(taskParameters, moduleInfo, gulpSrcOptions) {
+   // get list of changed files if it was transmitted to builder config, otherwise
+   // set glob pattern to read all files from source directory recursively.
+   if (moduleInfo.changedFiles && !taskParameters.cache.isDropped()) {
+      if (moduleInfo.changedFiles.length === 0) {
+         // we need any pattern to pass through gulp.src function properly,
+         // so we add
+         moduleInfo.changedFiles.push('');
+      } else {
+         logger.debug(`Using only changed files list for module ${moduleInfo.name}`);
+      }
+      gulpSrcOptions.allowEmpty = true;
+      return moduleInfo.changedFiles.map(currentRelativePath => path.join(moduleInfo.path, currentRelativePath));
+   }
+
+   return path.join(moduleInfo.path, '/**/*.*');
+}
+
 function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap) {
-   const moduleInput = path.join(moduleInfo.path, '/**/*.*');
    const { config } = taskParameters;
    const hasLocalization = config.localizations.length > 0;
 
@@ -121,11 +138,12 @@ function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap
    };
 
    moduleInfo.cachePath = path.join(taskParameters.config.cachePath, 'modules-cache', `${moduleInfo.name}.json`);
+   const gulpSrcOptions = { dot: false, nodir: true };
 
    function buildModule() {
       return (
          gulp
-            .src(moduleInput, { dot: false, nodir: true })
+            .src(getModuleInput(taskParameters, moduleInfo, gulpSrcOptions), gulpSrcOptions)
             .pipe(
                plumber({
                   errorHandler(err) {

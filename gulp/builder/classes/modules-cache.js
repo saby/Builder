@@ -10,6 +10,8 @@ const { FILE_CONTENTS_CACHE, COMMON_CACHE_PROPERTIES } = require('../../../lib/b
 const path = require('path');
 const fs = require('fs-extra');
 
+const CACHE_PROPERTIES = new Set([...FILE_CONTENTS_CACHE, ...COMMON_CACHE_PROPERTIES]);
+
 /**
  * fills store with missing cache properties
  * needed for compatibility with previous builds if
@@ -17,7 +19,7 @@ const fs = require('fs-extra');
  */
 function fillRemainingProperties(store) {
    if (store) {
-      [...FILE_CONTENTS_CACHE, ...COMMON_CACHE_PROPERTIES].forEach((currentProperty) => {
+      CACHE_PROPERTIES.forEach((currentProperty) => {
          if (!store.hasOwnProperty(currentProperty)) {
             store[currentProperty] = {};
          }
@@ -27,7 +29,7 @@ function fillRemainingProperties(store) {
 
 function setDefaultStore() {
    const result = {};
-   [...FILE_CONTENTS_CACHE, ...COMMON_CACHE_PROPERTIES].forEach((currentProperty) => {
+   CACHE_PROPERTIES.forEach((currentProperty) => {
       result[currentProperty] = {};
    });
    return result;
@@ -165,6 +167,15 @@ class ModuleCache {
     */
    getVersionedModulesCache() {
       return this.currentStore.versionedModules;
+   }
+
+   migrateCurrentFileCache(currentPath) {
+      const prettyPath = helpers.unixifyPath(currentPath);
+      CACHE_PROPERTIES.forEach((currentProperty) => {
+         if (this.lastStore[currentProperty].hasOwnProperty(prettyPath)) {
+            this.currentStore[currentProperty][prettyPath] = this.lastStore[currentProperty][prettyPath];
+         }
+      });
    }
 
    /**
@@ -307,6 +318,9 @@ function generateDownloadModuleCache(taskParameters, moduleInfo, singleFileBuild
       if (patchBuild && lastCache && !moduleInfo.rebuild) {
          // in patch for modules without rebuild configuration store cache "as is"
          moduleInfo.cache.currentStore = moduleInfo.cache.lastStore;
+      }
+      if (moduleInfo.changedFiles) {
+         taskParameters.cache.migrateNotChangedFiles(moduleInfo);
       }
    };
 }

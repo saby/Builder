@@ -14,7 +14,8 @@ const transliterate = require('../../../lib/transliterate'),
 class ModuleInfo extends BaseModuleInfo {
    constructor(baseModuleInfo, commonOutputPath, staticServer) {
       super(baseModuleInfo);
-      this.output = path.join(commonOutputPath, transliterate(path.basename(baseModuleInfo.path)));
+      this.outputName = transliterate(path.basename(baseModuleInfo.path));
+      this.output = path.join(commonOutputPath, this.outputName);
       this.outputRoot = path.dirname(this.output).replace(/\\/g, '/');
 
       // объект для записи contents.json
