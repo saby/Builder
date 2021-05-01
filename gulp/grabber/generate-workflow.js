@@ -81,7 +81,12 @@ function generateTaskForLoadCache(taskParameters) {
 }
 
 function generateTaskForGrabSingleModule(taskParameters, moduleInfo) {
-   const moduleInput = path.join(moduleInfo.path, '/**/*.@(js|xhtml|tmpl|wml|ts)');
+   // disable wml/tmpl for a while due to false triggering of localization
+   // for every non-translatable text node in templates, e.g. "+".
+   // enable it after templates processor should be able to distinguish
+   // translatable words(marked with rk function or "{[…]}" directive) of any other text nodes
+   // https://online.sbis.ru/opendoc.html?guid=54653b6e-aef5-4ad7-a915-ae7c7a8029af
+   const moduleInput = path.join(moduleInfo.path, '/**/*.@(js|xhtml||ts)');
 
    return function grabModule() {
       return gulp
