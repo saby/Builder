@@ -286,7 +286,7 @@ describe('gulp/grabber/generate-workflow.js', () => {
       });
    });
 
-   describe('check localization words collector for tmpl code', () => {
+   describe.skip('check localization words collector for tmpl code', () => {
       it('rebuild without changes', async() => {
          const fixtureFolder = path.join(__dirname, 'fixture/grabber-generate-workflow/tmpl');
          await prepareTest(fixtureFolder);
@@ -368,7 +368,7 @@ describe('gulp/grabber/generate-workflow.js', () => {
       });
    });
 
-   describe('check localization words collector for wml code', () => {
+   describe.skip('check localization words collector for wml code', () => {
       it('rebuild without changes', async() => {
          const fixtureFolder = path.join(__dirname, 'fixture/grabber-generate-workflow/wml');
          await prepareTest(fixtureFolder);
