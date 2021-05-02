@@ -198,6 +198,17 @@ class Cache {
          output: [],
          paths: {}
       };
+
+      // create empty cache in last store to avoid errors when builder
+      // tries to get cache of some new module paths from cache where it's
+      // not existing yet
+      if (!this.lastStore.inputPaths.hasOwnProperty(moduleInfo.outputName)) {
+         this.lastStore.inputPaths[moduleInfo.outputName] = {
+            hash: '',
+            output: [],
+            paths: {}
+         };
+      }
    }
 
    // loads essential cache of compiled sources
@@ -563,10 +574,6 @@ class Cache {
          return true;
       }
 
-      if (!this.lastStore.inputPaths[moduleName].paths) {
-         this.lastStore.inputPaths[moduleName].paths = {};
-      }
-
       // новый файл
       if (!this.lastStore.inputPaths[moduleName].paths.hasOwnProperty(prettyRelativePath)) {
          return true;
@@ -908,12 +915,7 @@ class Cache {
          dependencies,
          async(currentRelativePath) => {
             const moduleName = transliterate(currentRelativePath.split('/').shift());
-            let lastStorePaths;
-            if (this.lastStore.inputPaths[moduleName] && this.lastStore.inputPaths[moduleName].hasOwnProperty('paths')) {
-               lastStorePaths = this.lastStore.inputPaths[moduleName].paths;
-            } else {
-               lastStorePaths = {};
-            }
+            const lastStorePaths = this.lastStore.inputPaths[moduleName].paths;
             if (this.cacheChanges.hasOwnProperty(currentRelativePath)) {
                return this.cacheChanges[currentRelativePath];
             }

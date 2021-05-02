@@ -131,7 +131,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                      taskParameters.cache.addDependencies(
                         moduleInfo.appRoot,
                         library.history[0],
-                        result.fileDependencies
+
+                        // file dependencies could be with a plugin, e.g. RichEditor/extended has
+                        // a dependency named "browser!RichEditor/_extended/Toolbar/Button/CodeSample/third-party/prism"
+                        result.fileDependencies.map(currentDependency => currentDependency.split(/!|\?/).pop())
                      );
                   }
                   if (result.warnings) {
