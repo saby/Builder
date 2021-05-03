@@ -915,6 +915,13 @@ class Cache {
          dependencies,
          async(currentRelativePath) => {
             const moduleName = transliterate(currentRelativePath.split('/').shift());
+            if (!this.lastStore.inputPaths[moduleName]) {
+               logger.info(`!!!!! ${moduleName}`);
+               logger.info('!!!!! currentStore');
+               logger.info(Object.keys(this.currentStore.inputPaths).toString());
+               logger.info('!!!!! lastStore');
+               logger.info(Object.keys(this.lastStore.inputPaths).toString());
+            }
             const lastStorePaths = this.lastStore.inputPaths[moduleName].paths;
             if (this.cacheChanges.hasOwnProperty(currentRelativePath)) {
                return this.cacheChanges[currentRelativePath];
