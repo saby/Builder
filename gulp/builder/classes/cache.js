@@ -370,7 +370,7 @@ class Cache {
          return true;
       }
 
-      if (!this.lastStore.globalCacheChanges) {
+      if (!this.lastStore.globalDependenciesCacheChanges) {
          logger.info(`There are global cache storage changes. ${finishText}`);
       }
 
