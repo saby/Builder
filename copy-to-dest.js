@@ -26,7 +26,9 @@ const FILES_FOR_BUILDER_HASH = [
    'builder/classes',
    'compile-less.js',
    'build-tmpl.js',
-   'build-xhtml.js'
+   'build-xhtml.js',
+   'modules-cache.js',
+   'cache.js'
 ];
 
 async function getBuilderCodeHash(filesList) {
