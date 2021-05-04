@@ -48,27 +48,6 @@ const {
    generateTaskForTerminatePool
 } = require('../common/helpers');
 
-function getFilesToBuild(prettyRoot, filePath, themesParts, dependencies) {
-   const filesToBuild = [filePath];
-   const prettyFilePath = helpers.unixifyPath(filePath);
-   const relativeFilePath = helpers.removeLeadingSlashes(
-      prettyFilePath.replace(prettyRoot, '')
-   );
-   Object.keys(dependencies).forEach((currentFile) => {
-      if (dependencies[currentFile].includes(relativeFilePath)) {
-         const fullPath = path.join(prettyRoot, currentFile);
-         filesToBuild.push(fullPath);
-         if (path.basename(fullPath) === 'theme.less') {
-            themesParts.push(currentFile);
-         }
-      }
-   });
-   if (path.basename(prettyFilePath) === 'theme.less' && !themesParts.includes(relativeFilePath)) {
-      themesParts.push(relativeFilePath);
-   }
-   return filesToBuild;
-}
-
 // watcher's mini task for generating of themes.
 function generateSaveThemesTask(taskParameters, themesParts) {
    return async function saveThemesMeta() {
@@ -207,11 +186,10 @@ function generateTaskForBuildFile(taskParameters, currentModuleInfo, gulpModules
       const prettyRoot = helpers.unixifyPath(
          path.dirname(currentModuleInfo.path)
       );
-      const filesToBuild = getFilesToBuild(
-         prettyRoot,
+      const filesToBuild = taskParameters.cache.getAllFilesToBuild(
          filePathInProject,
-         themesParts,
-         taskParameters.cache.getLastStoreDependencies()
+         prettyRoot,
+         themesParts
       );
       logger.info(`These are files to be rebuilt: ${JSON.stringify(filesToBuild, null, 3)}`);
       return gulp

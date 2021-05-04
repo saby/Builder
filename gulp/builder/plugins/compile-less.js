@@ -193,7 +193,7 @@ function compileLess(taskParameters, moduleInfo, gulpModulesInfo) {
                   }
                });
                const resultThemeName = `${moduleInfo.themeName}${modifier ? `__${modifier}` : ''}`;
-               taskParameters.cache.addThemePartIntoMeta(resultThemeName, relativeFilePath, !file.cached);
+               taskParameters.cache.addThemePartIntoMeta(resultThemeName, relativeFilePath);
                file.themeName = resultThemeName;
             }
 

@@ -35,6 +35,7 @@ class ModuleInfo {
       this.appRoot = path.dirname(modulePath).replace(/\\/g, '/');
       if (changedFiles) {
          this.changedFiles = [];
+         this.normalizedChangedFiles = [];
          changedFiles.forEach((currentFile) => {
             if (currentFile.endsWith('.ts')) {
                this.typescriptChanged = true;
