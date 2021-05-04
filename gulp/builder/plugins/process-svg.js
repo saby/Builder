@@ -142,7 +142,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                currentPackagesMeta[currentPackage].forEach((currentSvg) => {
                   currentPackageDependencies.push(currentSvg.path);
                   const optimizedSvg = optimize(currentSvg.content, getSvgoOptions(path.basename(currentSvg.path, '.svg')));
-                  currentResult.push(optimizedSvg.data);
+                  currentResult.push(`<svg>${optimizedSvg.data}</svg>`);
 
                   // add package artifact to output meta of current svg to remove it with a garbage
                   // collector if all of current package members are removed from sources
