@@ -225,7 +225,7 @@ describe('gulp/builder/generate-workflow.js', () => {
          // 4) write it inside common 'svg' tag of current svg package
          if (filteringPackageExists) {
             const filteringResult = await fs.readFile(path.join(iconsOutputFolder, 'filtering.svg'), 'utf8');
-            filteringResult.should.equal('<svg xmlns="http://www.w3.org/2000/svg"><symbol id="icon-Test1" x="0" y="0" viewBox="0 0 28 16"/></svg>');
+            filteringResult.should.equal('<svg xmlns="http://www.w3.org/2000/svg"><svg><symbol id="icon-Test1" x="0" y="0" viewBox="0 0 28 16"/></svg></svg>');
          }
       };
 
