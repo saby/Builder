@@ -701,8 +701,12 @@ class Cache {
          currentVariable => lastThemesMeta.fallbackList.variablesMap[currentVariable] === currentFallbackName
       );
       currentDefaultVariables.forEach((currentVariable) => {
-         currentThemesMeta.fallbackList.variablesMap[currentVariable] = lastThemesMeta.fallbackList.variablesMap[currentVariable];
-         currentThemesMeta.cssVariablesOptions.variables[currentVariable] = lastThemesMeta.cssVariablesOptions.variables[currentVariable];
+         currentThemesMeta.fallbackList.variablesMap[
+            currentVariable
+         ] = lastThemesMeta.fallbackList.variablesMap[currentVariable];
+         currentThemesMeta.cssVariablesOptions.variables[
+            currentVariable
+         ] = lastThemesMeta.cssVariablesOptions.variables[currentVariable];
       });
    }
 

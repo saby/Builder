@@ -101,7 +101,9 @@ function getModuleInput(taskParameters, moduleInfo, gulpSrcOptions) {
          logger.debug(`Using only changed files list for module ${moduleInfo.name}`);
       }
       gulpSrcOptions.allowEmpty = true;
-      const result = moduleInfo.normalizedChangedFiles.map(currentRelativePath => path.join(moduleInfo.appRoot, currentRelativePath));
+      const result = moduleInfo.normalizedChangedFiles.map(
+         currentRelativePath => path.join(moduleInfo.appRoot, currentRelativePath)
+      );
       return result;
    }
 
