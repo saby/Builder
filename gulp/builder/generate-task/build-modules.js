@@ -95,13 +95,14 @@ function getModuleInput(taskParameters, moduleInfo, gulpSrcOptions) {
    if (moduleInfo.changedFiles && !taskParameters.cache.isDropped()) {
       if (moduleInfo.changedFiles.length === 0) {
          // we need any pattern to pass through gulp.src function properly,
-         // so we add
-         moduleInfo.changedFiles.push('');
+         // so we add empty string to read from a whole module directory
+         moduleInfo.normalizedChangedFiles.push(moduleInfo.name);
       } else {
          logger.debug(`Using only changed files list for module ${moduleInfo.name}`);
       }
       gulpSrcOptions.allowEmpty = true;
-      return moduleInfo.changedFiles.map(currentRelativePath => path.join(moduleInfo.path, currentRelativePath));
+      const result = moduleInfo.normalizedChangedFiles.map(currentRelativePath => path.join(moduleInfo.appRoot, currentRelativePath));
+      return result;
    }
 
    return path.join(moduleInfo.path, '/**/*.*');

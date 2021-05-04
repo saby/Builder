@@ -644,6 +644,80 @@ class Cache {
       themesMap[prettyRelativePath] = resultThemeName;
    }
 
+   /**
+    *
+    * @param{String} filePath - path to current file
+    * @param{String} prettyRoot - current project root, needed if transmitted file path is absolute
+    * @param{Array} themesParts - list of "theme.less" files that are to be rebuilt
+    * @returns {*[]}
+    */
+   getAllFilesToBuild(filePath, prettyRoot, themesParts) {
+      const filesToBuild = [filePath];
+      const prettyFilePath = helpers.unixifyPath(filePath);
+      const relativeFilePath = helpers.removeLeadingSlashes(
+         prettyFilePath.replace(prettyRoot, '')
+      );
+      const { dependencies } = this.lastStore;
+      Object.keys(dependencies).forEach((currentFile) => {
+         if (dependencies[currentFile].includes(relativeFilePath)) {
+            if (prettyRoot) {
+               const fullPath = path.join(prettyRoot, currentFile);
+               filesToBuild.push(fullPath);
+               if (themesParts && path.basename(fullPath) === 'theme.less') {
+                  themesParts.push(currentFile);
+               }
+            } else {
+               filesToBuild.push(currentFile);
+            }
+         }
+      });
+      if (themesParts && path.basename(prettyFilePath) === 'theme.less' && !themesParts.includes(relativeFilePath)) {
+         themesParts.push(relativeFilePath);
+      }
+      return filesToBuild;
+   }
+
+   /**
+    * migrates theme meta from last store for current theme module
+    * @param{ModuleInfo} moduleInfo - info about current module
+    * @param{String} fullThemeName - full name of theme, e.g. Controls-default-theme/theme.less
+    */
+   migrateCurrentTheme(moduleInfo, fullThemeName) {
+      const currentThemesMeta = this.currentStore.themesMeta;
+      const lastThemesMeta = this.lastStore.themesMeta;
+      const themeName = lastThemesMeta.themesMap[fullThemeName];
+      const currentFallbackName = `${moduleInfo.name}/fallback.json`;
+      if (themeName) {
+         currentThemesMeta.themesMap[fullThemeName] = lastThemesMeta.themesMap[fullThemeName];
+         if (!currentThemesMeta.themes[themeName]) {
+            currentThemesMeta.themes[themeName] = [fullThemeName];
+         } else {
+            currentThemesMeta.themes[themeName].push(fullThemeName);
+         }
+      }
+      const currentDefaultVariables = Object.keys(
+         lastThemesMeta.fallbackList.variablesMap
+      ).filter(
+         currentVariable => lastThemesMeta.fallbackList.variablesMap[currentVariable] === currentFallbackName
+      );
+      currentDefaultVariables.forEach((currentVariable) => {
+         currentThemesMeta.fallbackList.variablesMap[currentVariable] = lastThemesMeta.fallbackList.variablesMap[currentVariable];
+         currentThemesMeta.cssVariablesOptions.variables[currentVariable] = lastThemesMeta.cssVariablesOptions.variables[currentVariable];
+      });
+   }
+
+   addCurrentModuleThemesMeta(moduleInfo, changedThemes) {
+      if (!changedThemes) {
+         const themesToMigrate = Object.keys(this.lastStore.themesMeta.themesMap)
+            .filter(currentThemeName => currentThemeName.startsWith(`${moduleInfo.name}/`));
+         themesToMigrate.forEach(currentTheme => this.migrateCurrentTheme(moduleInfo, currentTheme));
+      } else {
+         const themesToMigrate = Object.keys(this.lastStore.themesMeta.themesMap)
+            .filter(currentThemeName => currentThemeName.startsWith(`${moduleInfo.name}/`) && !changedThemes.includes(currentThemeName));
+         themesToMigrate.forEach(currentTheme => this.migrateCurrentTheme(moduleInfo, currentTheme));
+      }
+   }
+
    migrateNotChangedFiles(moduleInfo) {
       const { outputName, changedFiles } = moduleInfo;
 
@@ -657,10 +731,14 @@ class Cache {
             this.currentStore.dependencies[currentPath] = this.lastStore.dependencies[currentPath];
             moduleInfo.cache.migrateCurrentFileCache(currentPath);
          });
+         this.addCurrentModuleThemesMeta(moduleInfo);
       } else {
          const normalizedChangedFiles = changedFiles.map(
-            currentPath => helpers.unixifyPath(path.join(moduleInfo.name, currentPath))
-         );
+            currentPath => this.getAllFilesToBuild(
+               helpers.unixifyPath(path.join(moduleInfo.name, currentPath))
+            )
+         ).flat();
+         moduleInfo.normalizedChangedFiles = normalizedChangedFiles;
 
          Object.keys(paths).forEach((currentPath) => {
             if (!normalizedChangedFiles.includes(currentPath)) {
@@ -681,6 +759,7 @@ class Cache {
                this.currentStore.dependencies[currentPath] = this.lastStore.dependencies[currentPath];
             }
          });
+         this.addCurrentModuleThemesMeta(moduleInfo, normalizedChangedFiles);
       }
    }
 
@@ -895,10 +974,6 @@ class Cache {
          return true;
       }
       return false;
-   }
-
-   getLastStoreDependencies() {
-      return this.lastStore.dependencies;
    }
 
    /**
