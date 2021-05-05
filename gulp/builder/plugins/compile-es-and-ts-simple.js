@@ -76,8 +76,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   file.relative
                );
                const compiledPath = path.join(compiledSourcePath.replace('.ts', '.js'));
-               const compiledSourceHash = taskParameters.cache.getCompiledHash(relativeFilePath);
-               const currentHash = taskParameters.cache.getHash(relativeFilePath);
+               const compiledSourceHash = taskParameters.cache.getCompiledHash(moduleInfo, relativeFilePath);
+               const currentHash = taskParameters.cache.getHash(moduleInfo, relativeFilePath);
 
                if (compiledSourceHash === currentHash) {
                   file.useSymlink = true;

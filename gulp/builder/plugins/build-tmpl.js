@@ -110,8 +110,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                'readCompiledFile',
                [
                   compiledPath,
-                  taskParameters.cache.getCompiledHash(relativeFilePath),
-                  taskParameters.cache.getHash(relativeFilePath)
+                  taskParameters.cache.getCompiledHash(moduleInfo, relativeFilePath),
+                  taskParameters.cache.getHash(moduleInfo, relativeFilePath)
                ],
                file.history[0],
                moduleInfo
