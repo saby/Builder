@@ -68,6 +68,7 @@ function getPlatformModules() {
       new ModuleInfo(getModuleInfo('Env', 'rmi/src/client/Env')),
       new ModuleInfo(getModuleInfo('SbisEnv', 'rmi/src/client/SbisEnv')),
       new ModuleInfo(getModuleInfo('Browser', 'rmi/src/client/Browser')),
+      new ModuleInfo(getModuleInfo('TransportCore', 'rmi/src/client/TransportCore')),
       new ModuleInfo(getModuleInfo('UI', 'saby-ui/UI')),
       new ModuleInfo(getModuleInfo('Compiler', 'saby-ui/Compiler')),
       new ModuleInfo(getModuleInfo('UICore', 'saby-ui/UIInferno/UICore')),
