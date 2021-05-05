@@ -973,7 +973,7 @@ class Cache {
    }
 
    compareWithCompiled(moduleInfo, relativePath) {
-      const compiledHash = this.getCompiledHash(relativePath);
+      const compiledHash = this.getCompiledHash(moduleInfo, relativePath);
       if (compiledHash && this.getHash(moduleInfo, relativePath) === compiledHash) {
          return true;
       }
