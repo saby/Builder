@@ -182,6 +182,11 @@ describe('copy sources', () => {
                name: 'Browser',
                path: path.join(sourceFolder, 'Browser'),
                required: true
+            },
+            {
+               name: 'TransportCore',
+               path: path.join(sourceFolder, 'TransportCore'),
+               required: true
             }
          ]
       };
