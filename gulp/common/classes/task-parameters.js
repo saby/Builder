@@ -6,6 +6,7 @@
 
 const fs = require('fs-extra');
 const path = require('path');
+const { unixifyPath } = require('../../../lib/helpers');
 
 /**
  * Класс с базовой информацией для всех gulp задач.
@@ -107,10 +108,11 @@ class TaskParameters {
     * @param outputPath
     */
    addFileForRemoval(outputPath, isCompressed) {
-      this.filesToRemoveFromOutput.push(outputPath);
+      const prettyOutputPath = unixifyPath(outputPath);
+      this.filesToRemoveFromOutput.push(prettyOutputPath);
       if (this.config.compress && isCompressed) {
-         this.filesToRemoveFromOutput.push(`${outputPath}.br`);
-         this.filesToRemoveFromOutput.push(`${outputPath}.gz`);
+         this.filesToRemoveFromOutput.push(`${prettyOutputPath}.br`);
+         this.filesToRemoveFromOutput.push(`${prettyOutputPath}.gz`);
       }
    }
 
