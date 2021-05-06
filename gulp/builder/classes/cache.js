@@ -418,7 +418,7 @@ class Cache {
    /**
     * Чистит кеш, если инкрементальная сборка невозможна.
     */
-   async clearCacheIfNeeded() {
+   async clearCacheIfNeeded(modulesForPatch) {
       const removePromises = [];
       const cacheHasIncompatibleChanges = await this.cacheHasIncompatibleChanges();
       if (cacheHasIncompatibleChanges) {
@@ -447,8 +447,19 @@ class Cache {
           */
          const outputFilesListPath = path.join(this.config.cachePath, 'output-files-to-remove.json');
          if (await fs.pathExists(outputFilesListPath)) {
-            const filesListToRemove = await fs.readJson(outputFilesListPath);
             const prettyCurrentOutput = helpers.prettifyPath(this.config.rawConfig.output);
+            let filesListToRemove = await fs.readJson(outputFilesListPath);
+
+            // If it's a patch build, we need to remove only artifacts of custom packer for patch modules
+            if (modulesForPatch && modulesForPatch.length > 0) {
+               const patchModuleNames = modulesForPatch.map(moduleInfo => path.basename(moduleInfo.output));
+               filesListToRemove = filesListToRemove.filter((currentPath) => {
+                  const relativePath = path.relative(prettyCurrentOutput, currentPath);
+                  const moduleName = relativePath.split('/').shift();
+                  return patchModuleNames.includes(moduleName);
+               });
+            }
+
             filesListToRemove.forEach((filePath) => {
                // clearance of custompack artifacts is needed if builder results
                // will be written in the same folder as a previous build was.
