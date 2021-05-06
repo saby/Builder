@@ -180,7 +180,7 @@ function generateTaskForSaveTimeReport(taskParameters) {
 function generateTaskForClearCache(taskParameters) {
    return async function clearCache() {
       const startTime = Date.now();
-      await taskParameters.cache.clearCacheIfNeeded();
+      await taskParameters.cache.clearCacheIfNeeded(taskParameters.config.getModulesForPatch());
       taskParameters.storeTaskTime('clearCache', startTime);
    };
 }
