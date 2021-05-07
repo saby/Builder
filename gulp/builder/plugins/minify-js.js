@@ -147,7 +147,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
 
                // for js there is only a symlink needed to be created, so we can get a result faster
                // to avoid read of minified compiled js file
-               const hashesAreEqual = taskParameters.cache.compareWithCompiled(relativeFilePath);
+               const hashesAreEqual = taskParameters.cache.compareWithCompiled(moduleInfo, relativeFilePath);
                if (hashesAreEqual && await fs.pathExists(compiledPath)) {
                   file.useSymlink = true;
                   const newFile = file.clone();
