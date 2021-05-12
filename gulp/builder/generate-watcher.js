@@ -149,6 +149,9 @@ class ChildProcess {
             }
          }
 
+         // free up workflow for the next file in watcher build queue
+         watcherContext.currentlyBuilding = false;
+
          // remove built file from current building files list.
          delete watcherContext.filesToBuild.ready[filePath];
       });
@@ -222,6 +225,7 @@ class WatcherTask {
          ready: {},
          newChanged: false
       };
+      this.currentlyBuilding = 0;
       this.newChanged = false;
       this.commonBuildStarted = false;
    }
@@ -266,7 +270,6 @@ class WatcherTask {
                      buildExecutor.processCommonBuildResult(this);
                   } else {
                      changedFiles.forEach((filePath) => {
-                        logger.info(`watcher: start file ${filePath} build!`);
                         let fileContent;
 
                         /**
@@ -285,17 +288,25 @@ class WatcherTask {
                         }
                         const hash = fileContent ? crypto.createHash('sha1').update(fileContent).digest('base64') : '';
                         if (this.filesHash[filePath] !== hash) {
-                           // add current compiled file hash into current watcher hash list
-                           this.filesHash[filePath] = hash;
-                           const hotReloadFlag = processParameters.hotReloadPort ? `--hotReloadPort="${processParameters.hotReloadPort}"` : '';
-                           const currentExecutor = exec(
-                              `node "${gulpBinPath}" buildOnChange --config="${processParameters.config}" --nativeWatcher=true --filePath="${filePath}" ${hotReloadFlag}`,
-                              processOptions
-                           );
-                           const fileExecutor = new ChildProcess(currentExecutor);
-                           fileExecutor.processOutputEmit();
-                           fileExecutor.processErrorEmit();
-                           fileExecutor.processSingleFileResult(this, filePath, hash);
+                           // build only 1 file in a row to avoid CPU and memory overflow, also to avoid multiple
+                           // parallel attempts to save builder cache into json, so it wouldn't cause further errors
+                           // such as json parse errors
+                           if (!this.currentlyBuilding) {
+                              this.currentlyBuilding = true;
+                              logger.info(`watcher: start file ${filePath} build!`);
+
+                              // add current compiled file hash into current watcher hash list
+                              this.filesHash[filePath] = hash;
+                              const hotReloadFlag = processParameters.hotReloadPort ? `--hotReloadPort="${processParameters.hotReloadPort}"` : '';
+                              const currentExecutor = exec(
+                                 `node "${gulpBinPath}" buildOnChange --config="${processParameters.config}" --nativeWatcher=true --filePath="${filePath}" ${hotReloadFlag}`,
+                                 processOptions
+                              );
+                              const fileExecutor = new ChildProcess(currentExecutor);
+                              fileExecutor.processOutputEmit();
+                              fileExecutor.processErrorEmit();
+                              fileExecutor.processSingleFileResult(this, filePath, hash);
+                           }
                         } else {
                            logger.info(`File ${filePath} has already been built. False watcher trigger.`);
 
@@ -326,7 +337,7 @@ class WatcherTask {
             });
             process.exit(1);
          }
-      }, 1500);
+      }, 200);
    }
 
    // run single file gulp task for current file
