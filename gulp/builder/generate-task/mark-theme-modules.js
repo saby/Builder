@@ -168,7 +168,7 @@ function generateTaskForMarkThemeModules(taskParameters) {
    const collectStyleThemes = startTask('markThemeModules', taskParameters);
    return gulp.series(
       collectStyleThemes.start,
-      gulp.parallel(tasks),
+      gulp.series(tasks),
       collectStyleThemes.finish
    );
 }
