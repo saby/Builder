@@ -15,6 +15,10 @@ const through = require('through2'),
 
 const { stylesToExcludeFromMinify } = require('../../../lib/builder-constants');
 const thirdPartyModule = /.*[/\\]third-party[/\\].*/;
+const deepOptimizeModules = new Set([
+   'Controls',
+   'Controls-default-theme'
+]);
 
 /**
  * Объявление плагина
@@ -126,7 +130,11 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             // если файл не возможно минифицировать, то запишем оригинал
             let newText = file.contents.toString();
 
-            const [error, minified] = await execInPool(taskParameters.pool, 'minifyCss', [newText]);
+            const [error, minified] = await execInPool(
+               taskParameters.pool,
+               'minifyCss',
+               [newText, deepOptimizeModules.has(moduleInfo.name)]
+            );
             taskParameters.storePluginTime('minify css', minified.passedTime, true);
             newText = minified.styles;
             if (minified.errors.length > 0) {
