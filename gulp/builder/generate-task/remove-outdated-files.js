@@ -102,10 +102,14 @@ function generateTaskForRemoveFiles(taskParameters) {
                })()
             )
          );
+         await Promise.all(removePromises);
+
+         // meta should be updated only after removal of needless files.
          await metaToUpdate.updateFiles(normalizedCacheDirectory);
+      } else {
+         await Promise.all(removePromises);
       }
 
-      await Promise.all(removePromises);
       taskParameters.storeTaskTime('remove outdated files from output', startTime);
    };
 }
