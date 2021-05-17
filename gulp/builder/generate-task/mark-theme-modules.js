@@ -220,11 +220,13 @@ function generateTaskForAddMissingThemes(taskParameters, defaultThemesContent) {
             missingThemes.forEach((missingTheme) => {
                if (isThemeLess) {
                   const missingThemePath = path.join(sourcePath, missingTheme, 'theme.less');
+                  const fullThemeName = `${themeName}__${missingTheme}`;
                   modifiers.push(missingTheme);
+                  taskParameters.cache.setBaseThemeInfo(fullThemeName);
                   promises.push(
                      fs.outputFile(
                         missingThemePath,
-                        `@import "../theme.less";\n@themeName: ${themeName}__${missingTheme};`
+                        `@import "../theme.less";\n@themeName: ${fullThemeName};`
                      )
                   );
 
