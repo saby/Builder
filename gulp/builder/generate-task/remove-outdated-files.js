@@ -72,32 +72,40 @@ function generateTaskForRemoveFiles(taskParameters) {
          normalizedOutputDirectory,
          taskParameters.config.modulesForPatch
       );
-      if (filesForRemove.length === 0) {
-         return;
-      }
-      const metaToUpdate = new MetaClass();
+
       const removePromises = [];
-      filesForRemove.forEach(
-         filePath => removePromises.push(
-            (async() => {
-               await fs.remove(filePath);
-               const relativePath = path.relative(
-                  taskParameters.config.outputPath,
-                  filePath
-               ).replace(/\\/g, '/');
-               const moduleName = relativePath.split('/')[0];
-               if (relativePath.endsWith('.ts')) {
-                  metaToUpdate.add(
-                     'libraries.json',
-                     moduleName,
-                     relativePath.replace(/\.ts$/, '')
-                  );
-               }
-            })()
-         )
-      );
+
+      // remove missing themes from source code, they might be added manually
+      // by developers
+      taskParameters.cache.getMissingThemes().forEach((currentTheme) => {
+         removePromises.push(fs.remove(currentTheme));
+      });
+
+      if (filesForRemove.length > 0) {
+         const metaToUpdate = new MetaClass();
+         filesForRemove.forEach(
+            filePath => removePromises.push(
+               (async() => {
+                  await fs.remove(filePath);
+                  const relativePath = path.relative(
+                     taskParameters.config.outputPath,
+                     filePath
+                  ).replace(/\\/g, '/');
+                  const moduleName = relativePath.split('/')[0];
+                  if (relativePath.endsWith('.ts')) {
+                     metaToUpdate.add(
+                        'libraries.json',
+                        moduleName,
+                        relativePath.replace(/\.ts$/, '')
+                     );
+                  }
+               })()
+            )
+         );
+         await metaToUpdate.updateFiles(normalizedCacheDirectory);
+      }
+
       await Promise.all(removePromises);
-      await metaToUpdate.updateFiles(normalizedCacheDirectory);
       taskParameters.storeTaskTime('remove outdated files from output', startTime);
    };
 }
