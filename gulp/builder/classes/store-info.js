@@ -69,7 +69,12 @@ class StoreInfo {
          fallbackList: {
             variablesMap: {},
             hashes: {}
-         }
+         },
+
+         // list of missing themes paths. Needed to remove all these files
+         // after compilation to avoid merge conflicts, when developers make their
+         // own theme on this path
+         missingThemes: []
       };
    }
 

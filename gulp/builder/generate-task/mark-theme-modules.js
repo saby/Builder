@@ -13,6 +13,7 @@ const mapStream = require('map-stream');
 const logger = require('../../../lib/logger').logger();
 const startTask = require('../../common/start-task-with-timer');
 const approvedThemes = require('../../../resources/approved-themes');
+const fs = require('fs-extra');
 const unapprovedThemes = new Set();
 
 /**
@@ -66,6 +67,8 @@ function generateTaskForMarkThemeModules(taskParameters) {
    // analyse only interface modules supposed to have themes
    const modulesWithThemes = [];
    const buildModulesNames = new Set();
+   const defaultThemesContent = {};
+
    taskParameters.config.modules.forEach((currentModule) => {
       if (currentModule.name.endsWith('-theme')) {
          modulesWithThemes.push(currentModule);
@@ -98,6 +101,16 @@ function generateTaskForMarkThemeModules(taskParameters) {
        * Other Interface modules will be ignored from new theme's processing
        */
       const { themeName, originModule } = parseThemeName(buildModulesNames, currentModuleNameParts);
+      defaultThemesContent[moduleInfo.name] = {
+
+         // there will be listed all themes but default for current
+         // themed interface module
+         themes: [],
+         themeName,
+         sourcePath: moduleInfo.path,
+         modifiers: moduleInfo.modifiers
+      };
+
       return function markThemeModules() {
          return gulp
             .src(input, { dot: false, nodir: true, allowEmpty: true })
@@ -140,6 +153,15 @@ function generateTaskForMarkThemeModules(taskParameters) {
                      )) {
                         const relativeThemeParts = file.relative.split(path.sep);
                         const currentModifier = relativeThemeParts.length > 1 ? relativeThemeParts[0] : '';
+
+                        if (fileName === 'theme.less') {
+                           if (currentModifier) {
+                              defaultThemesContent[moduleInfo.name].themes.push(currentModifier);
+                           } else {
+                              defaultThemesContent[moduleInfo.name].isThemeLess = true;
+                           }
+                        }
+
                         moduleInfo.modifiers.push(currentModifier);
                         taskParameters.cache.setBaseThemeInfo(`${themeName}${currentModifier ? `__${currentModifier}` : ''}`);
                         moduleInfo.newThemesModule = true;
@@ -169,8 +191,53 @@ function generateTaskForMarkThemeModules(taskParameters) {
    return gulp.series(
       collectStyleThemes.start,
       gulp.series(tasks),
+      generateTaskForAddMissingThemes(taskParameters, defaultThemesContent),
       collectStyleThemes.finish
    );
+}
+
+function generateTaskForAddMissingThemes(taskParameters, defaultThemesContent) {
+   return async function addMissingThemes() {
+      const essentialThemeContent = defaultThemesContent['Controls-default-theme'];
+
+      // essential list of themes, for now it's a list of themes in Controls-default-theme module.
+      const essentialThemes = essentialThemeContent ? essentialThemeContent.themes : [];
+      const promises = [];
+      Object.keys(defaultThemesContent)
+         .filter(currentKey => currentKey !== 'Controls-default-theme')
+         .forEach((currentThemeModule) => {
+            const {
+               themes,
+               themeName,
+               sourcePath,
+               modifiers,
+               isThemeLess
+            } = defaultThemesContent[currentThemeModule];
+            const missingThemes = essentialThemes.filter(
+               theme => !themes.includes(theme)
+            );
+
+            missingThemes.forEach((missingTheme) => {
+               if (isThemeLess) {
+                  const missingThemePath = path.join(sourcePath, missingTheme, 'theme.less');
+                  const fullThemeName = `${themeName}__${missingTheme}`;
+                  modifiers.push(missingTheme);
+                  taskParameters.cache.setBaseThemeInfo(fullThemeName);
+                  promises.push(
+                     fs.outputFile(
+                        missingThemePath,
+                        `@import "../theme.less";\n@themeName: ${fullThemeName};`
+                     )
+                  );
+
+                  // add missing theme folder into cache for further removal from sources
+                  taskParameters.cache.addMissingTheme(path.dirname(missingThemePath));
+               }
+            });
+         });
+
+      await Promise.all(promises);
+   };
 }
 
 module.exports = generateTaskForMarkThemeModules;
