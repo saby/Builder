@@ -73,8 +73,9 @@ function needSymlink(config, moduleInfo, isFirstBuild) {
          }
       }
 
-      // don't use symlinks if it's release mode or symlinks is disabled manually
-      if ((config.isReleaseMode && !config.localStand) || !config.symlinks) {
+      // don't use symlinks if it's release mode or symlinks is disabled manually or symlinks disabled
+      // for certain files
+      if ((config.isReleaseMode && !config.localStand) || !config.symlinks || file.strictCopy) {
          return false;
       }
 
