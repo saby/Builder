@@ -284,11 +284,7 @@ class Cache {
    }
 
    save() {
-      return this.currentStore.save(
-         this.config.cachePath,
-         this.config.logFolder,
-         this.config.modulesForPatch.length > 0
-      );
+      return this.currentStore.save(this.config.cachePath, this.config.logFolder);
    }
 
    /**
