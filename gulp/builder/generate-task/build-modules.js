@@ -18,6 +18,7 @@ const gulpBuildHtmlTmpl = require('../plugins/build-html-tmpl'),
    packLibrary = require('../plugins/pack-library'),
    compileJsonToJs = require('../plugins/compile-json-js'),
    compileLess = require('../plugins/compile-less'),
+   addMissingThemes = require('../../common/plugins/add-missing-themes'),
    changedInPlace = require('../../common/plugins/changed-in-place'),
    addComponentInfo = require('../plugins/add-component-info'),
    buildStaticHtml = require('../plugins/build-static-html'),
@@ -138,6 +139,7 @@ function generateTaskForBuildSingleModule(taskParameters, moduleInfo, modulesMap
                   }
                })
             )
+            .pipe(addMissingThemes(taskParameters, moduleInfo))
             .pipe(changedInPlace(taskParameters, moduleInfo))
             .pipe(gulpIf(!!moduleInfo.typescript, compileEsAndTs(taskParameters, moduleInfo)))
             .pipe(addComponentInfo(taskParameters, moduleInfo))

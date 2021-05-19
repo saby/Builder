@@ -40,7 +40,7 @@ class MetaClass {
                      /**
                       * some meta files can be created only in case of custom pack enabled.
                       * Therefore there is no need of updating of the meta.
-                       */
+                      */
                      if (await fs.pathExists(metaPath)) {
                         const currentMeta = await fs.readJson(metaPath);
                         const newMeta = currentMeta.filter(

@@ -627,6 +627,14 @@ class Cache {
       return false;
    }
 
+   addMissingTheme(theme, themeContent) {
+      this.currentStore.themesMeta.missingThemes[theme] = themeContent;
+   }
+
+   getMissingThemes() {
+      return this.currentStore.themesMeta.missingThemes;
+   }
+
    setBaseThemeInfo(resultThemeName) {
       const { themes } = this.currentStore.themesMeta;
       if (!themes.hasOwnProperty(resultThemeName)) {
