@@ -632,8 +632,8 @@ class Cache {
       return false;
    }
 
-   addMissingTheme(theme) {
-      this.currentStore.themesMeta.missingThemes.push(theme);
+   addMissingTheme(theme, themeContent) {
+      this.currentStore.themesMeta.missingThemes[theme] = themeContent;
    }
 
    getMissingThemes() {

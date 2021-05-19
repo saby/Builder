@@ -13,7 +13,6 @@ const mapStream = require('map-stream');
 const logger = require('../../../lib/logger').logger();
 const startTask = require('../../common/start-task-with-timer');
 const approvedThemes = require('../../../resources/approved-themes');
-const fs = require('fs-extra');
 const unapprovedThemes = new Set();
 
 /**
@@ -223,15 +222,12 @@ function generateTaskForAddMissingThemes(taskParameters, defaultThemesContent) {
                   const fullThemeName = `${themeName}__${missingTheme}`;
                   modifiers.push(missingTheme);
                   taskParameters.cache.setBaseThemeInfo(fullThemeName);
-                  promises.push(
-                     fs.outputFile(
-                        missingThemePath,
-                        `@import "../theme.less";\n@themeName: ${fullThemeName};`
-                     )
-                  );
 
                   // add missing theme folder into cache for further removal from sources
-                  taskParameters.cache.addMissingTheme(path.dirname(missingThemePath));
+                  taskParameters.cache.addMissingTheme(
+                     path.dirname(missingThemePath),
+                     `@import "../theme.less";\n@themeName: ${fullThemeName};`
+                  );
                }
             });
          });
