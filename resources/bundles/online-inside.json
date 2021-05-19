@@ -468,7 +468,7 @@
   "resources/ParametersWebAPI/config-scope.package.min",
   "resources/Person/MiniCard/MiniCard.package.min",
   "resources/PersonDeprecated/collage.package.min",
-  "resources/PersonDeprecated/PersonInfo.package.min",
+  "resources/PersonDeprecated/Info/PersonInfo.package.min",
   "resources/PersonCard/packages/personBaseCard.package.min",
   "resources/PersonCore/EventRibbon/EventRibbonPackage.min",
   "resources/PersonCore/Utils/ExtUtils.package.min",
