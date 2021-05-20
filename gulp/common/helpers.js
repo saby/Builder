@@ -47,7 +47,7 @@ function checkSourceNecessityByConfig(config, extension) {
 function needSymlink(config, moduleInfo, isFirstBuild) {
    const hasLocalization = config.localizations.length > 0;
    const checkForSymlink = (file) => {
-      if (file.useSymlink) {
+      if (file.useSymlink && !file.strictCopy) {
          // if it's a file from compiled sources to be symlink to, rebase it to
          // compiled sources directory, otherwise symlink it "as is"
          if (file.origin) {
