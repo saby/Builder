@@ -364,12 +364,6 @@ class Cache {
       // check whether or not tsc cache should be removed
       this.checkModulesLists(lastRunningParameters, currentRunningParameters);
 
-      // check is there difference between common builder flags that have their influence on a whole project build.
-      const isCommonFlagsChanged = checkCommonFlags(lastRunningParameters, currentRunningParameters, finishText);
-      if (isCommonFlagsChanged) {
-         return true;
-      }
-
       const lastModulesIndexes = {};
       const lastModulesList = new Set(lastRunningParameters.modules.map((currentModule, index) => {
          lastModulesIndexes[currentModule.name] = index;
@@ -387,6 +381,12 @@ class Cache {
       const skipDeepConfigCheck = this.config.modulesForPatch.length > 0;
       if (skipDeepConfigCheck) {
          return false;
+      }
+
+      // check is there difference between common builder flags that have their influence on a whole project build.
+      const isCommonFlagsChanged = checkCommonFlags(lastRunningParameters, currentRunningParameters, finishText);
+      if (isCommonFlagsChanged) {
+         return true;
       }
 
       // checks each interface module between 2 builds to have equal common flags
