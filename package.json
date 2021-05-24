@@ -34,7 +34,7 @@
    "dependencies": {
       "async": "2.6.1",
       "autoprefixer": "9.5.0",
-      "clean-css": "4.1.11",
+      "clean-css": "5.1.2",
       "escodegen": "1.11.0",
       "esprima": "4.0.1",
       "estraverse": "4.2.0",
