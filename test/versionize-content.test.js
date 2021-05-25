@@ -475,8 +475,8 @@ describe('versionize-content', () => {
       const styleSourceNotChanged = styleSourceContent.includes("url('cbuc-icons/cbuc-icons.eot#iefix')") &&
          styleSourceContent.includes("url('cbuc-icons/cbuc-icons.woff2')");
       styleSourceNotChanged.should.equal(true);
-      const styleCompiledChanged = styleCompiledContent.includes('url(cbuc-icons/cbuc-icons.eot?x_module=%{MODULE_VERSION_STUB=Modul}#iefix)') &&
-         styleCompiledContent.includes('url(cbuc-icons/cbuc-icons.woff2?x_module=%{MODULE_VERSION_STUB=Modul})');
+      const styleCompiledChanged = styleCompiledContent.includes("url('cbuc-icons/cbuc-icons.eot?x_module=%{MODULE_VERSION_STUB=Modul}#iefix')") &&
+         styleCompiledContent.includes("url('cbuc-icons/cbuc-icons.woff2?x_module=%{MODULE_VERSION_STUB=Modul}')");
       styleCompiledChanged.should.equal(true);
       await clearWorkspace();
    });
