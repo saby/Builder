@@ -1010,7 +1010,9 @@ class Cache {
          async(currentRelativePath) => {
             const moduleName = transliterate(currentRelativePath.split('/').shift());
             if (!this.lastStore.inputPaths[moduleName]) {
-               logger.info(`!!!!! ${moduleName}`);
+               logger.info(`!!!!! missing module name ${moduleName}`);
+               logger.info(`!!!!! full dependency name ${currentRelativePath}`);
+               logger.info(`!!!!! origin: ${relativePath}`);
                logger.info('!!!!! currentStore');
                logger.info(Object.keys(this.currentStore.inputPaths).toString());
                logger.info('!!!!! lastStore');
