@@ -78,13 +78,6 @@ describe('build less', () => {
          '  box-shadow: 0 4px 24px #d2e2f3e0;\n' +
          '}\n');
    });
-   it('less with defau`lt theme', async() => {
-      const filePath = path.join(workspaceFolder, 'AnyModule/bla/bla/long/path/test.less');
-      const text = '.test-selector {\ntest-mixin: @test-mixin;test-var: @test-var;}';
-      const result = await processLessFile(text, filePath, defaultModuleThemeObject, gulpModulesInfo);
-      result.imports.length.should.equal(2);
-      result.text.should.equal(".test-selector {\n  test-mixin: 'mixin there';\n  test-var: 'it is online';\n}\n");
-   });
    it('less with grids: correctly added prefixes', async() => {
       const filePath = path.join(workspaceFolder, 'AnyModule/bla/bla/long/path/test.less');
       const text = '.test-prefixes {\n' +
@@ -128,53 +121,6 @@ describe('build less', () => {
          '}\n'
       );
    });
-   it('less from retail', async() => {
-      const retailModulePath = helpers.prettifyPath(path.join(workspaceFolder, 'Retail'));
-      const filePath = helpers.prettifyPath(path.join(retailModulePath, 'bla/bla/long/path/test.less'));
-      const text = '.test-selector {\ntest-mixin: @test-mixin;test-var: @test-var;}';
-      const themeName = resolveThemeName(filePath, retailModulePath);
-      const result = await processLessFile(text, filePath, {
-         newThemesModule: false,
-         theme: {
-            name: themeName,
-            path: themes[themeName].path,
-            moduleName: themes[themeName].moduleName
-         }
-      }, gulpModulesInfo);
-      result.imports.length.should.equal(2);
-      result.text.should.equal(".test-selector {\n  test-mixin: 'mixin there';\n  test-var: 'it is carry';\n}\n");
-   });
-   it('less from retail with presto theme', async() => {
-      const retailModulePath = helpers.prettifyPath(path.join(workspaceFolder, 'Retail'));
-      const filePath = helpers.prettifyPath(path.join(retailModulePath, 'themes/presto/test.less'));
-      const text = '.test-selector {\ntest-mixin: @test-mixin;test-var: @test-var;}';
-      const themeName = resolveThemeName(filePath, retailModulePath);
-      const result = await processLessFile(text, filePath, {
-         newThemesModule: false,
-         theme: {
-            name: themeName,
-            path: themes[themeName].path,
-            moduleName: themes[themeName].moduleName
-         }
-      }, gulpModulesInfo);
-      result.imports.length.should.equal(2);
-      result.text.should.equal(".test-selector {\n  test-mixin: 'mixin there';\n  test-var: 'it is presto';\n}\n");
-   });
-   it('Button less from SBIS3.CONTROLS', async() => {
-      const filePath = helpers.prettifyPath(path.join(workspaceFolder, 'SBIS3.CONTROLS/Button/Button.less'));
-      const text = '.test-selector {\ntest-mixin: @test-mixin;test-var: @test-var;}';
-      const themeName = resolveThemeName(filePath, filePath);
-      const result = await processLessFile(text, filePath, {
-         newThemesModule: false,
-         theme: {
-            name: themeName,
-            path: themes[themeName].path,
-            moduleName: themes[themeName].moduleName
-         }
-      }, gulpModulesInfo);
-      result.imports.length.should.equal(2);
-      result.text.should.equal(".test-selector {\n  test-mixin: 'mixin there';\n  test-var: 'it is online';\n}\n");
-   });
 
    // важно отобразить корректно строку в которой ошибка
    it('less with import error', async() => {
@@ -193,24 +139,6 @@ describe('build less', () => {
       return lib
          .trimLessError(errorMessage)
          .should.equal(" in line 1: 'notExist' wasn't found.");
-   });
-
-   it('less from WS.Deprecated', async() => {
-      const filePath = path.join(workspaceFolder, 'WS.Deprecated/Controls/TabControl/TabControl.less');
-      const text = '.test-selector {\ntest-mixin: @test-mixin;test-var: @test-var;}';
-      const themeName = resolveThemeName(filePath, filePath);
-      const result = await processLessFile(text, filePath, {
-         newThemesModule: false,
-         theme: {
-            name: themeName,
-            path: themes[themeName].path,
-            moduleName: themes[themeName].moduleName
-         }
-      }, gulpModulesInfo);
-      result.imports.length.should.equal(2);
-      result.text.should.equal(
-         ".test-selector {\n  test-mixin: 'mixin there';\n  test-var: 'it is online';\n}\n"
-      );
    });
 
    it('less from CloudControls', async() => {
