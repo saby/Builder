@@ -54,7 +54,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                   {
                      multiService: taskParameters.config.multiService,
                      servicesPath: `${taskParameters.config.urlDefaultServicePath}service/`,
-                     application: taskParameters.config.applicationForLayout
+                     application: taskParameters.config.applicationForLayout,
+                     resourcesUrl: taskParameters.config.resourcesUrl ? 'resources/' : ''
                   },
                   relativeTmplPathWithModuleName,
                   componentsPropertiesFilePath
