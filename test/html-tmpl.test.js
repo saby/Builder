@@ -43,47 +43,105 @@ describe('convert html.tmpl', () => {
          templatesConfig.pageName.should.equal('');
          templatesConfig.servicesPath.should.equal('/service/');
       };
-      it('multiService without application', () => {
-         const templatesConfig = new TemplatesBuilder();
-         templatesConfig.setCommonRootInfo({
-            servicesPath,
-            application: '/',
-            multiService: true
+      describe('multiService', () => {
+         describe('without application', () => {
+            it('with resourcesUrl', () => {
+               const templatesConfig = new TemplatesBuilder();
+               templatesConfig.setCommonRootInfo({
+                  servicesPath,
+                  application: '/',
+                  resourcesUrl: 'resources/',
+                  multiService: true
+               });
+               testMultiServiceResults(templatesConfig);
+            });
+            it('without resourcesUrl', () => {
+               const templatesConfig = new TemplatesBuilder();
+               templatesConfig.setCommonRootInfo({
+                  servicesPath,
+                  application: '/',
+                  multiService: true
+               });
+               testMultiServiceResults(templatesConfig);
+            });
          });
-         testMultiServiceResults(templatesConfig);
+         describe('with application', () => {
+            it('with resourcesUrl', () => {
+               const templatesConfig = new TemplatesBuilder();
+               templatesConfig.setCommonRootInfo({
+                  servicesPath,
+                  application: '/someRoot/',
+                  resourcesUrl: 'resources/',
+                  multiService: true
+               });
+               testMultiServiceResults(templatesConfig);
+            });
+            it('without resourcesUrl', () => {
+               const templatesConfig = new TemplatesBuilder();
+               templatesConfig.setCommonRootInfo({
+                  servicesPath,
+                  application: '/someRoot/',
+                  multiService: true
+               });
+               testMultiServiceResults(templatesConfig);
+            });
+         });
       });
-      it('multiService with application', () => {
-         const templatesConfig = new TemplatesBuilder();
-         templatesConfig.setCommonRootInfo({
-            servicesPath,
-            application: '/someRoot/',
-            multiService: true
+      describe('single service', () => {
+         describe('without application', () => {
+            it('with resourcesUrl', () => {
+               const templatesConfig = new TemplatesBuilder();
+               templatesConfig.setCommonRootInfo({
+                  servicesPath,
+                  application: '/',
+                  resourcesUrl: 'resources/',
+                  multiService: false
+               });
+               testSingleServiceResults(templatesConfig);
+               templatesConfig.appRoot.should.equal('/');
+               templatesConfig.wsRoot.should.equal('/resources/WS.Core/');
+               templatesConfig.resourceRoot.should.equal('/resources/');
+            });
+            it('without resourcesUrl', () => {
+               const templatesConfig = new TemplatesBuilder();
+               templatesConfig.setCommonRootInfo({
+                  servicesPath,
+                  application: '/',
+                  multiService: false
+               });
+               testSingleServiceResults(templatesConfig);
+               templatesConfig.appRoot.should.equal('/');
+               templatesConfig.wsRoot.should.equal('/WS.Core/');
+               templatesConfig.resourceRoot.should.equal('/');
+            });
          });
-         testMultiServiceResults(templatesConfig);
-      });
-      it('single service without application', () => {
-         const templatesConfig = new TemplatesBuilder();
-         templatesConfig.setCommonRootInfo({
-            servicesPath,
-            application: '/',
-            multiService: false
+         describe('with application', () => {
+            it('with resourcesUrl', () => {
+               const templatesConfig = new TemplatesBuilder();
+               templatesConfig.setCommonRootInfo({
+                  servicesPath,
+                  application: '/someRoot/',
+                  resourcesUrl: 'resources/',
+                  multiService: false
+               });
+               testSingleServiceResults(templatesConfig);
+               templatesConfig.appRoot.should.equal('/someRoot/');
+               templatesConfig.wsRoot.should.equal('/someRoot/resources/WS.Core/');
+               templatesConfig.resourceRoot.should.equal('/someRoot/resources/');
+            });
+            it('without resourcesUrl', () => {
+               const templatesConfig = new TemplatesBuilder();
+               templatesConfig.setCommonRootInfo({
+                  servicesPath,
+                  application: '/someRoot/',
+                  multiService: false
+               });
+               testSingleServiceResults(templatesConfig);
+               templatesConfig.appRoot.should.equal('/someRoot/');
+               templatesConfig.wsRoot.should.equal('/someRoot/WS.Core/');
+               templatesConfig.resourceRoot.should.equal('/someRoot/');
+            });
          });
-         testSingleServiceResults(templatesConfig);
-         templatesConfig.appRoot.should.equal('/');
-         templatesConfig.wsRoot.should.equal('/resources/WS.Core/');
-         templatesConfig.resourceRoot.should.equal('/resources/');
-      });
-      it('single service with application', () => {
-         const templatesConfig = new TemplatesBuilder();
-         templatesConfig.setCommonRootInfo({
-            servicesPath,
-            application: '/someRoot/',
-            multiService: false
-         });
-         testSingleServiceResults(templatesConfig);
-         templatesConfig.appRoot.should.equal('/someRoot/');
-         templatesConfig.wsRoot.should.equal('/someRoot/resources/WS.Core/');
-         templatesConfig.resourceRoot.should.equal('/someRoot/resources/');
       });
    });
 });
