@@ -159,7 +159,7 @@ describe('gulp/builder/generate-workflow.js', () => {
       lessDependenciesForTest['TestModule/stable'].should.have.members([
          'css!Controls-default-theme/_old-mixins',
          'css!SBIS3.CONTROLS/themes/_mixins',
-         'css!SBIS3.CONTROLS/themes/online/_variables',
+         'css!Controls-default-theme/_theme',
          'css!TestModule/Stable-for-import',
          'css!TestModule/Stable-for-theme-import',
          'css!TestModule/Stable-with-import',
@@ -176,7 +176,7 @@ describe('gulp/builder/generate-workflow.js', () => {
       lessDependenciesForTest['TestModule/stable'].should.have.members([
          'css!Controls-default-theme/_old-mixins',
          'css!SBIS3.CONTROLS/themes/_mixins',
-         'css!SBIS3.CONTROLS/themes/online/_variables',
+         'css!Controls-default-theme/_theme',
          'css!TestModule/Stable-for-import',
          'css!TestModule/Stable-for-theme-import',
          'css!TestModule/Stable-with-import',
