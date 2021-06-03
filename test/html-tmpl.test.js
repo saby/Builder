@@ -24,14 +24,8 @@ describe('convert html.tmpl', () => {
          'UI Module'
       );
 
-      // check if there is a correct base div and base html tags
-      result.includes('<div id="wasaby-content"').should.equal(true);
-      result.includes('<!DOCTYPE html>').should.equal(true);
-      result.includes('<html').should.equal(true);
-      result.includes('<head').should.equal(true);
-      result.includes('<body').should.equal(true);
-      result.includes('</body>').should.equal(true);
-      result.includes('</html>').should.equal(true);
+      // check if there is a correct base component for current html page
+      result.includes('application="UI/_base/HTML"').should.equal(true);
    });
 
    describe('templates config - check wsconfig setup', () => {
