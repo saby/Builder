@@ -51,6 +51,7 @@
   "resources/Capital/CapitalContent.package.min",
   "resources/CAInside/Inory/RegInory.package.min",
   "resources/CAInside/packages/COC_list.package.min",
+  "resources/CAInside/packages/ca_registry.package.min",
   "resources/CAPublic/packages/OutsideAgent.package.min",
   "resources/CAManager/Packages/CheckValidCertificate.package.min",
   "resources/CAManager/Packages/StatisticPage.package.min",
