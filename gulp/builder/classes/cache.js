@@ -981,7 +981,13 @@ class Cache {
 
    getCompiledHash(moduleInfo, relativePath) {
       const prettyRelativePath = helpers.unixifyPath(relativePath);
-      if (this.compiledStore.inputPaths[moduleInfo.outputName].paths[prettyRelativePath]) {
+
+      // get compiled hash only for interface module that exists in compiled
+      // cache, otherwise build source file as usual
+      if (
+         this.compiledStore.inputPaths.hasOwnProperty(moduleInfo.outputName) &&
+         this.compiledStore.inputPaths[moduleInfo.outputName].paths[prettyRelativePath]
+      ) {
          return this.compiledStore.inputPaths[moduleInfo.outputName].paths[prettyRelativePath].hash;
       }
       return '';
