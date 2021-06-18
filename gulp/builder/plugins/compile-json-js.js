@@ -41,7 +41,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
              * dont build AMD-formatted json files for *.package.json and *.config.json. It's common
              * builder config files, participating only in project's build.
              */
-            if (!file.basename.includes('.json') || file.basename.includes('package.json') || file.basename.endsWith('.config.json')) {
+            if (!file.basename.endsWith('.json') || file.basename.includes('package.json') || file.basename.endsWith('.config.json')) {
                callback(null, file);
                taskParameters.storePluginTime('jsonJs', startTime);
                return;
@@ -52,8 +52,8 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
              * exists. It will be compiled into AMD-formatted json file.
              * Needed to avoid double symlink issue in debug build(double symlinks
              * throws fatal error).
-             * P.S. can't be catched by tests, file order in gulp stream can be different between 2 builds.
-             * It can throw an error in first build, and build successfully in another
+             * P.S. can't be caught by tests, in each build gulp's stream could have different order for files in it.
+             * It cloud throw an error in one build, and build successfully in another
              */
             if (file.basename.endsWith('.json.js')) {
                const jsonInSource = await fs.pathExists(file.path.replace(jsonExt, '.json'));

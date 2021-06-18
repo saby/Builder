@@ -29,6 +29,12 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             return;
          }
 
+         // minified versions of xhtml should be ignored, they will be compiled from sources further
+         if (file.basename.endsWith('.min.xhtml')) {
+            callback(null);
+            return;
+         }
+
          if (!taskParameters.config.templateBuilder) {
             logger.warning({
                message: '"View" or "UI" interface module doesn\'t exists in current project. "*.xhtml" templates will be ignored',
