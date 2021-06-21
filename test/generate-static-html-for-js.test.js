@@ -17,7 +17,8 @@ const config = {
    globalParams: false,
    urlServicePath: '/',
    urlDefaultServicePath: '/',
-   wsPath: 'resources/WS.Core/'
+   wsPath: 'resources/WS.Core/',
+   resourcesUrl: true
 };
 
 const modules = new Map([
