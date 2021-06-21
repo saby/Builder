@@ -44,12 +44,7 @@ const excludeRegexes = [
    /.*[/\\]ServerEvent[/\\]worker[/\\].*/,
 
    // https://online.sbis.ru/opendoc.html?guid=761eb095-c7be-437d-ab0c-c5058de852a4
-   /.*[/\\]EDO2[/\\]Route[/\\].*/,
-
-   // WS.Core/ext/requirejs/r.js используется только для юнит тестов и, возможно, в препроцессоре.
-   // не нужно его минимизировать.
-   // https://online.sbis.ru/opendoc.html?guid=02ee2490-afc0-4841-a084-b14aaca64e9c
-   /.*[/\\]WS\.Core[/\\]ext[/\\]requirejs[/\\]r\.js/
+   /.*[/\\]EDO2[/\\]Route[/\\].*/
 ];
 
 const thirdPartyModule = /.*[/\\]third-party[/\\].*/;
