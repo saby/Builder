@@ -60,6 +60,12 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             callback(null, file);
             return;
          }
+
+         // minified versions of files should be ignored, they will be compiled from sources
+         if (file.basename.endsWith(`.min${file.extname}`)) {
+            callback(null);
+            return;
+         }
          if (!taskParameters.config.templateBuilder) {
             logger.warning({
                message: '"View" or "UI" interface module doesn\'t exists in current project. "*.tmpl/*.wml" templates will be ignored',
