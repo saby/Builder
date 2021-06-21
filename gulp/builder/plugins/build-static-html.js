@@ -32,9 +32,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo, modulesMap) 
          const startTime = Date.now();
          try {
             const configForReplaceInHTML = {
-               urlServicePath: taskParameters.config.urlServicePath,
-               urlDefaultServicePath: taskParameters.config.urlDefaultServicePath,
-               wsPath: taskParameters.config.resourcesUrl ? 'resources/WS.Core/' : 'WS.Core'
+               urlServicePath: taskParameters.config.urlServicePath || '/',
+               urlDefaultServicePath: taskParameters.config.urlDefaultServicePath || '/',
+               wsPath: taskParameters.config.resourcesUrl ? 'resources/WS.Core/' : 'WS.Core/',
+               resourcesUrl: taskParameters.config.resourcesUrl
             };
             const needReplacePath = !taskParameters.config.multiService;
             const componentsInfo = moduleInfo.cache.getComponentsInfo();
