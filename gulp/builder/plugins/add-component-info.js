@@ -37,7 +37,7 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             'parseJsComponent',
             [
                file.contents.toString(),
-               taskParameters.config.builderTests
+               taskParameters.config.lessCoverage || taskParameters.config.builderTests
             ],
             file.history[0],
             moduleInfo
