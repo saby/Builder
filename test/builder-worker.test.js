@@ -115,7 +115,7 @@ describe('gulp/common/worker.js', () => {
          resultsBuildLess.compiled.hasOwnProperty('text').should.equal(true);
          resultsBuildLess.compiled.imports.length.should.equal(4);
          resultsBuildLess.compiled.text.should.equal(
-            ".test-selector {\n  test-mixin: 'mixin there';\n  test-var: 'it is online';\n}\n"
+            '.test-selector {\n  test-mixin: var(--test-mixin);\n  test-var: var(--test-var);\n}\n'
          );
       } finally {
          await clearWorkspace();
