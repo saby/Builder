@@ -159,7 +159,8 @@ describe('gulp/builder/generate-workflow.js', () => {
       lessDependenciesForTest['TestModule/stable'].should.have.members([
          'css!Controls-default-theme/_old-mixins',
          'css!SBIS3.CONTROLS/themes/_mixins',
-         'css!Controls-default-theme/_theme',
+         'css!Controls-default-theme/_mixins',
+         'css!Controls-default-theme/_new-mixins',
          'css!TestModule/Stable-for-import',
          'css!TestModule/Stable-for-theme-import',
          'css!TestModule/Stable-with-import',
@@ -176,7 +177,8 @@ describe('gulp/builder/generate-workflow.js', () => {
       lessDependenciesForTest['TestModule/stable'].should.have.members([
          'css!Controls-default-theme/_old-mixins',
          'css!SBIS3.CONTROLS/themes/_mixins',
-         'css!Controls-default-theme/_theme',
+         'css!Controls-default-theme/_mixins',
+         'css!Controls-default-theme/_new-mixins',
          'css!TestModule/Stable-for-import',
          'css!TestModule/Stable-for-theme-import',
          'css!TestModule/Stable-with-import',
@@ -438,8 +440,10 @@ describe('gulp/builder/generate-workflow.js', () => {
 
       // autoprefixer enabled by default, so css result must have all needed prefixes
       stableCss.replace(/\n$/, '').should.equal('.test-selector {\n' +
-         '  test-mixin: \'mixin there\';\n' +
-         '  test-var: \'it is online\';\n' +
+         '  test-mixin: undefined;\n' +
+         '  test-mixin: var(--test-mixin);\n' +
+         '  test-var: undefined;\n' +
+         '  test-var: var(--test-var);\n' +
          '  display: -ms-grid;\n' +
          '  display: grid;\n' +
          '  -ms-grid-columns: 1fr 1fr;\n' +
@@ -2606,8 +2610,8 @@ describe('gulp/builder/generate-workflow.js', () => {
          const packedHtml = await fs.readFile(path.join(outputFolder, 'TestModule/testPage.html'), 'utf8');
          const correctHtmlResult = await fs.readFile(path.join(fixtureFolder, 'correctSingleHtmlResult.html'), 'utf8');
          packedHtml.should.equal(correctHtmlResult);
-         const staticCssPackage = await fs.readFile(path.join(outputFolder, 'TestModule/static_packages/7d6fb458c2376d100c20793aecae03f5.min.css'), 'utf8');
-         staticCssPackage.should.equal('.test-selector{test-var:1px;background:url(../Test/image/test.png)}');
+         const staticCssPackage = await fs.readFile(path.join(outputFolder, 'TestModule/static_packages/640357cdcd290233e6f57f9cbc903632.min.css'), 'utf8');
+         staticCssPackage.should.equal('.test-selector{test-var:undefined;test-var:var(--test-var);background:url(../Test/image/test.png)}');
 
          // in single service there should be static url for cdn
          packedHtml.includes('href="/cdn/EmojiFont/1.0.1/TFEmojiFont.woff2"').should.equal(true);
@@ -2620,8 +2624,8 @@ describe('gulp/builder/generate-workflow.js', () => {
          const packedHtml = await fs.readFile(path.join(outputFolder, 'TestModule/testPage.html'), 'utf8');
          const correctHtmlResult = await fs.readFile(path.join(fixtureFolder, 'correctMultiHtmlResult.html'), 'utf8');
          packedHtml.should.equal(correctHtmlResult);
-         const staticCssPackage = await fs.readFile(path.join(outputFolder, 'TestModule/static_packages/55ae7a3b8992d8a501a63806cb1e28a8.min.css'), 'utf8');
-         staticCssPackage.should.equal('.test-selector{test-var:1px;background:url(../Test/image/test.png?x_module=%{MODULE_VERSION_STUB=TestModule})}');
+         const staticCssPackage = await fs.readFile(path.join(outputFolder, 'TestModule/static_packages/d408360c83221ea67a00d8b16bd8cd4d.min.css'), 'utf8');
+         staticCssPackage.should.equal('.test-selector{test-var:undefined;test-var:var(--test-var);background:url(../Test/image/test.png?x_module=%{MODULE_VERSION_STUB=TestModule})}');
 
          // in multi service there should be placeholder for cdn in url
          packedHtml.includes('href="%{CDN_ROOT}EmojiFont/1.0.1/TFEmojiFont.woff2"').should.equal(true);
