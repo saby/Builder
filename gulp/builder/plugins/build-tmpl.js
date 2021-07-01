@@ -159,7 +159,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                newText,
                relativeFilePath,
                componentsPropertiesFilePath,
-               taskParameters.config.localizations.length > 0
+               {
+                  generateCodeForTranslations: taskParameters.config.localizations.length > 0,
+                  useReact: !!taskParameters.config.useReact
+               }
             ],
             relativeFilePath,
             moduleInfo

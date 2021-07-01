@@ -42,6 +42,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                moduleInfo.contents.buildnumber = `%{MODULE_VERSION_STUB=${moduleName}}`;
             }
 
+            if (taskParameters.config.useReact) {
+               moduleInfo.contents.useReact = true;
+            }
+
             // save modular contents.js into joined if needed.
             if (taskParameters.config.joinedMeta) {
                helpers.joinContents(taskParameters.config.commonContents, moduleInfo.contents);
