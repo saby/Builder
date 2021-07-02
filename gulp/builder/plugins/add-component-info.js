@@ -20,6 +20,7 @@ const through = require('through2'),
  * @returns {stream}
  */
 module.exports = function declarePlugin(taskParameters, moduleInfo) {
+   const { interfaces } = taskParameters.config;
    return through.obj(
       async function onTransform(file, encoding, callback) {
          if (file.cached) {
@@ -51,6 +52,10 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
                moduleInfo
             });
          }
+
+         if (interfaces.providedOrder.includes(componentInfo.componentName)) {
+            componentInfo.provided = true;
+         }
          if (componentInfo.patchedText) {
             file.contents = Buffer.from(componentInfo.patchedText);
          }
@@ -70,6 +75,16 @@ module.exports = function declarePlugin(taskParameters, moduleInfo) {
             const componentsInfo = moduleInfo.cache.getComponentsInfo();
             Object.keys(componentsInfo).forEach((filePath) => {
                const info = componentsInfo[filePath];
+               if (info.provided) {
+                  info.componentDep.forEach((currentDep) => {
+                     if (
+                        interfaces.required.includes(currentDep) &&
+                        !interfaces.provided[info.componentName]
+                     ) {
+                        interfaces.provided[info.componentName] = currentDep;
+                     }
+                  });
+               }
                if (info.hasOwnProperty('isNavigation') && info.isNavigation) {
                   moduleInfo.navigationModules.push(info.componentName);
                }
