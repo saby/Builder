@@ -32,11 +32,6 @@ class BuildConfiguration {
       // objects list of full information about every single interface module of the building project
       this.modules = [];
 
-      // reversed map of modules, needed to get current input path by output result path. The deal
-      // is that output interface name could differ from s3mod name, e.g. MyModule.s3mod could have
-      // SomeAnotherName as a directory and we need to have that information for builder cache usage purposes.
-      this.reversedModulesMap = {};
-
       // modules for patch - when we need to rebuild part of project modules instead of full rebuild.
       this.modulesForPatch = [];
 
@@ -409,6 +404,11 @@ class BuildConfiguration {
 
       // list of required interface modules for templates build
       const templateModules = ['View', 'UICore', 'UI', 'Compiler', 'UICommon'];
+      this.interfaces = {
+         providedOrder: [],
+         provided: {},
+         required: []
+      };
       for (const module of this.rawConfig.modules) {
          const moduleInfo = new ModuleInfo(module, this.outputPath, this.staticServer);
 
@@ -462,6 +462,17 @@ class BuildConfiguration {
             this.typescriptChanged = true;
          }
          this.modules.push(moduleInfo);
+         if (moduleInfo.featuresRequired.length > 0) {
+            moduleInfo.featuresRequired.forEach(
+               requiredFeature => this.interfaces.required.push(`${moduleInfo.outputName}/${requiredFeature}`)
+            );
+         }
+         if (moduleInfo.featuresProvided.length > 0) {
+            moduleInfo.featuresProvided.forEach((providedFeature) => {
+               this.interfaces.provided[`${moduleInfo.outputName}/${providedFeature}`] = null;
+               this.interfaces.providedOrder.push(`${moduleInfo.outputName}/${providedFeature}`);
+            });
+         }
       }
 
       // templates can be built only if there is a whole pack of required interface modules

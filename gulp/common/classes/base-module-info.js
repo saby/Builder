@@ -22,7 +22,9 @@ class ModuleInfo {
          required,
          rebuild,
          depends,
-         changedFiles
+         changedFiles,
+         featuresRequired,
+         featuresProvided
       } = baseModuleInfo;
       const modulePath = baseModuleInfo.path;
       this.name = name;
@@ -32,6 +34,8 @@ class ModuleInfo {
       this.rebuild = rebuild;
       this.depends = depends || [];
       this.cache = {};
+      this.featuresRequired = featuresRequired || [];
+      this.featuresProvided = featuresProvided || [];
       this.appRoot = path.dirname(modulePath).replace(/\\/g, '/');
       if (changedFiles) {
          this.changedFiles = [];
