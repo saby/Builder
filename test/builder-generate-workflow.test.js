@@ -1847,7 +1847,11 @@ describe('gulp/builder/generate-workflow.js', () => {
             'lazy-private.package.min.css.gz',
             'lazy-private.package.min.js',
             'lazy-private.package.min.js.br',
-            'lazy-private.package.min.js.gz'
+            'lazy-private.package.min.js.gz',
+            'packageMap.json.js',
+            'packageMap.json.min.js',
+            'packageMap.json.min.js.br',
+            'packageMap.json.min.js.gz'
          ];
 
          // output directory must have brotli(except windows os) and gzip files, only for minified files and packages.
