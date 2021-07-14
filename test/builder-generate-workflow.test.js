@@ -1818,7 +1818,6 @@ describe('gulp/builder/generate-workflow.js', () => {
             'Stable.min.css.gz',
             'Stable.min.css.br',
             'cbuc-icons.eot',
-            'bundles.json',
             'bundlesRoute.json',
             'module-dependencies.json',
             'pack.package.json',
@@ -1986,8 +1985,7 @@ describe('gulp/builder/generate-workflow.js', () => {
                'test-brotli.package.min.css',
                'test-brotli.package.min.js.br',
                'test-brotli.package.min.js.gz',
-               'bundlesRoute.json',
-               'bundles.json'
+               'bundlesRoute.json'
             ],
             moduleOutputFolder
          );
@@ -2275,7 +2273,7 @@ describe('gulp/builder/generate-workflow.js', () => {
           * Only bundles.json meta from packer meta results uses in all desktop applications.
           */
          (await isRegularFile(moduleOutputFolder, 'bundlesRoute.json')).should.equal(false);
-         (await isRegularFile(moduleOutputFolder, 'bundles.json')).should.equal(true);
+         (await isRegularFile(moduleOutputFolder, 'bundles.json')).should.equal(false);
          await runWorkflowWithTimeout();
 
          /**
@@ -2283,7 +2281,7 @@ describe('gulp/builder/generate-workflow.js', () => {
           * Only bundles.json meta from packer meta results uses in all desktop applications.
           */
          (await isRegularFile(moduleOutputFolder, 'bundlesRoute.json')).should.equal(false);
-         (await isRegularFile(moduleOutputFolder, 'bundles.json')).should.equal(true);
+         (await isRegularFile(moduleOutputFolder, 'bundles.json')).should.equal(false);
          await clearWorkspace();
       });
       it('custom pack must have an ability to work with debug files', async() => {
